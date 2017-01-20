@@ -5,7 +5,11 @@
   "scripts": {
     "lint": "eslint .",
     "start": "node .",
-    "posttest": "npm run lint && nsp check"
+    "posttest": "npm run lint && nsp check",
+    "build:sdk": "./node_modules/.bin/lb-sdk server/server ./client/sdk -d ng4web -i enabled",
+    "server:status": "slc ctl --control http://192.168.0.100 status",
+    "server:build": "slc build --npm",
+    "server:deploy": "slc deploy --service PMJakarta http://192.168.0.100"
   },
   "dependencies": {
     "compression": "^1.0.3",

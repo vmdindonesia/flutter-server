@@ -2,5 +2,15 @@
   "db": {
     "name": "db",
     "connector": "memory"
+  },
+  "pmjakarta": {
+    "host": "192.168.0.41",
+    "port": 3306,
+    "url": "",
+    "database": "pmjakarta",
+    "password": "PmJ4k4rt4!",
+    "name": "pmjakarta",
+    "user": "pmjakarta",
+    "connector": "mysql"
   }
 }
