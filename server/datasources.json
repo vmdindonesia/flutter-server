@@ -12,5 +12,13 @@
     "name": "pmjakarta",
     "user": "pmjakarta",
     "connector": "mysql"
+  },
+  "pmjakarta-local": {
+    "name": "pmjakarta-local",
+    "connector": "mysql",
+    "host": "localhost",
+    "user": "root",
+    "password": "password",
+    "database": "pmjakarta"
   }
 }
