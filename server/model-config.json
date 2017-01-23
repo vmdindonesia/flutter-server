@@ -14,22 +14,28 @@
     ]
   },
   "User": {
-    "dataSource": "db"
+    "dataSource": "pmjakarta"
   },
   "AccessToken": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
   },
   "ACL": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
   },
   "Role": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
+  },
+  "Members": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
