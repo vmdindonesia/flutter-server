@@ -1,13 +1,13 @@
 {
   "name": "Members",
-  "base": "User",
+  "base": "PersistedModel",
   "idInjection": false,
   "options": {
     "validateUpsert": true
   },
   "mysql": {
-    "schema": "pm-jakarta",
-    "table": "members"
+    "schema": "pmjakarta",
+    "table": "Members"
   },
   "properties": {
     "realm": {
@@ -170,6 +170,22 @@
       },
       "_selectable": true
     },
+    "gender": {
+      "type": "String",
+      "required": false,
+      "length": 50,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "gender",
+        "dataType": "varchar",
+        "dataLength": 50,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
     "photo": {
       "type": "String",
       "required": false,
@@ -214,22 +230,6 @@
         "dataLength": null,
         "dataPrecision": 3,
         "dataScale": 0,
-        "nullable": "Y"
-      },
-      "_selectable": true
-    },
-    "gender": {
-      "type": "String",
-      "required": true,
-      "length": 50,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "gender",
-        "dataType": "varchar",
-        "dataLength": 50,
-        "dataPrecision": null,
-        "dataScale": null,
         "nullable": "Y"
       },
       "_selectable": true
