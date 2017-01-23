@@ -12,5 +12,15 @@
     "name": "pmjakarta",
     "user": "pmjakarta",
     "connector": "mysql"
+  },
+  "pmjakartalocal": {
+    "host": "127.0.0.1",
+    "port": 3306,
+    "url": "",
+    "database": "pm-jakarta",
+    "password": "password",
+    "name": "pmjakartalocal",
+    "user": "root",
+    "connector": "mysql"
   }
 }
