@@ -26,7 +26,7 @@ module.exports = function(Members) {
         // modelmembers.find(
             
         // )
-        console.log(params);
+        console.log(params,"remote methed members");
     }
 
 };
