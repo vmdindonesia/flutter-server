@@ -58,6 +58,38 @@
       },
       "_selectable": false
     },
+    "hobby": {
+      "type": "String",
+      "required": true,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "hobby",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+     "about": {
+      "type": "String",
+      "required": true,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "about",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
     "email": {
       "type": "String",
       "required": true,
@@ -221,13 +253,13 @@
     "profession": {
       "type": "Number",
       "required": false,
-      "length": null,
+      "length": 255,
       "precision": 3,
       "scale": 0,
       "mysql": {
         "columnName": "profession",
-        "dataType": "tinyint",
-        "dataLength": null,
+        "dataType": "varchar",
+        "dataLength": 255,
         "dataPrecision": 3,
         "dataScale": 0,
         "nullable": "Y"
