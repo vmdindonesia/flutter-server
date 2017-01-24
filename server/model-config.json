@@ -36,5 +36,11 @@
   "Members": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "ViewMember": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
