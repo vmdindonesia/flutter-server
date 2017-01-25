@@ -362,14 +362,14 @@
       },
       "_selectable": true
     },
-    "registred": {
+    "registered": {
       "type": "Number",
       "required": false,
       "length": null,
       "precision": 3,
       "scale": 0,
       "mysql": {
-        "columnName": "registred",
+        "columnName": "registered",
         "dataType": "tinyint",
         "dataLength": null,
         "dataPrecision": 3,
@@ -439,22 +439,6 @@
         "dataLength": null,
         "dataPrecision": 10,
         "dataScale": 0,
-        "nullable": "N"
-      },
-      "_selectable": false
-    },
-    "password": {
-      "type": "String",
-      "required": false,
-      "length": 255,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "password",
-        "dataType": "varchar",
-        "dataLength": 255,
-        "dataPrecision": null,
-        "dataScale": null,
         "nullable": "N"
       },
       "_selectable": false

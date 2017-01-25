@@ -39,8 +39,18 @@
   },
   "ViewMember": {
     "dataSource": "pmjakarta",
-    "public": true,
-    "$promise": {},
-    "$resolved": true
+    "public": true
+  },
+  "DislikeList": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "LikeList": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "MatchMamber": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
