@@ -1,32 +1,23 @@
 'use strict';
 
 module.exports = function(Members) {
+    Members.remoteMethod('updateById', {
+        http: { path: '/:id/updateById', verb: 'post' },
+        accepts: [
+            { arg: 'id', type: 'number' },
+            { arg: 'param', type: 'object' }
+        ],
+        returns: { arg: 'respon', type: 'object',  root: true }
+    });
 
-
-     Members.remoteMethod(
-        'getRandomMembers', {
-            accepts: [{
-                arg: 'params',
-                type: 'Object',
-                required: true,
-                http: { source: 'body' }
-            }],
-            returns: {
-                arg: 'accessToken', type: 'object', root: true,
-            },
-            http: {
-                path: '/getRandomMembers',
-                verb: 'post'
+    Members.updateById = function(id, param, cb) {
+        Members.upsertWithWhere({ id: id }, param, function (err, result) {
+            if (err) {
+                cb(null, err);
+                return;
             }
+
+            cb(null, result);
         });
-
-    Members.getRandomMembers = function (params, cb) {
-        // let modelmembers = app.models.Members;
-        // let ds=Members.data
-        // modelmembers.find(
-            
-        // )
-        console.log(params,"remote methed members");
     }
-
 };
