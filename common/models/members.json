@@ -481,6 +481,13 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "updateById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "newLogin"
     }
   ],
   "methods": {}
