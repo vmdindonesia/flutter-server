@@ -56,5 +56,9 @@
   "container": {
     "dataSource": "storage",
     "public": true
+  },
+  "MemberImage": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
