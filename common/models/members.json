@@ -461,7 +461,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "memberImage": {
+      "type": "hasMany",
+      "model": "MemberImage",
+      "foreignKey": "membersId"
+    }
+  },
   "acls": [
     {
       "accessType": "READ",
