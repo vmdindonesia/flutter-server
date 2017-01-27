@@ -466,6 +466,12 @@
       "type": "hasMany",
       "model": "MemberImage",
       "foreignKey": "membersId"
+    },
+    "memberSetting": {
+      "type": "hasOne",
+      "model": "MemberSetting",
+      "foreignKey": "membersId",
+      "primaryKey": "id"
     }
   },
   "acls": [

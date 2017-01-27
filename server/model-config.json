@@ -60,5 +60,9 @@
   "MemberImage": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "MemberSetting": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
