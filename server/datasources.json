@@ -12,5 +12,11 @@
     "name": "pmjakarta",
     "user": "pmjakarta",
     "connector": "mysql"
+  },
+  "storage": {
+    "name": "storage",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./server/storage"
   }
 }
