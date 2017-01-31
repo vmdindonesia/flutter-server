@@ -1,0 +1,27 @@
+{
+  "name": "FireLoopRef",
+  "plural": "FireLoopRef",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "text": {
+      "type": "string",
+      "default": ".common/models/FireLoopRef.ts"
+    },
+    "FireLoopRef": {
+      "type": "string",
+      "default": ".common/models/FireLoopRef.ts"
+    },
+    "FireLooRefs": {
+      "type": "string",
+      "default": ".common/models/FireLoopRefs.ts"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
