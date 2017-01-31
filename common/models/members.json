@@ -9,6 +9,11 @@
     "schema": "pmjakarta",
     "table": "Members"
   },
+  "scope": {
+    "where": {
+      "deletedAt": null
+    }
+  },
   "properties": {
     "realm": {
       "type": "String",
@@ -458,6 +463,22 @@
         "nullable": "N"
       },
       "_selectable": false
+    },
+    "deletedAt": {
+      "type": "Date",
+      "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "deleted_at",
+        "dataType": "date",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": false
     }
   },
   "validations": [],
@@ -470,6 +491,12 @@
     "memberSetting": {
       "type": "hasOne",
       "model": "MemberSetting",
+      "foreignKey": "membersId",
+      "primaryKey": "id"
+    },
+    "nearbies": {
+      "type": "hasOne",
+      "model": "Nearby",
       "foreignKey": "membersId",
       "primaryKey": "id"
     }
