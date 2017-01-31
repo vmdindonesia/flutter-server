@@ -17,6 +17,6 @@
     "name": "storage",
     "connector": "loopback-component-storage",
     "provider": "filesystem",
-    "root": "/var/www/storage"
+    "root": "/var/loopback/storage/pmjakarta"
   }
 }
