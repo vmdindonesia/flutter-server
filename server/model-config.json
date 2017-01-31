@@ -68,6 +68,17 @@
     "public": true
   },
   "Nearby": {
+  "FireLoopRef": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Chat": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "Chatdetail": {
     "dataSource": "pmjakarta",
     "public": true
   }
