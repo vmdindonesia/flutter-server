@@ -7,7 +7,7 @@
   },
   "mysql": {
     "schema": "pmjakarta",
-    "table": "nearby"
+    "table": "Nearby"
   },
   "properties": {
     "geolocation": {
@@ -61,7 +61,7 @@
     }
   },
   "validations": [],
-   "relations": {
+  "relations": {
     "members": {
       "type": "belongsTo",
       "model": "Members",

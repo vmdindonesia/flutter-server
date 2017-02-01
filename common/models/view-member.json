@@ -9,11 +9,6 @@
     "schema": "pmjakarta",
     "table": "view_member"
   },
-  "scope": {
-    "where": {
-      "deletedAt": null
-    }
-  },
   "properties": {
     "realm": {
       "type": "String",
@@ -47,6 +42,38 @@
       },
       "_selectable": true
     },
+    "fullName": {
+      "type": "String",
+      "required": true,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "full_name",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "email": {
+      "type": "String",
+      "required": true,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "email",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
     "emailVerified": {
       "type": "Number",
       "required": false,
@@ -62,6 +89,22 @@
         "nullable": "Y"
       },
       "_selectable": true
+    },
+    "password": {
+      "type": "String",
+      "required": true,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "password",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
     },
     "verificationToken": {
       "type": "String",
@@ -89,22 +132,6 @@
         "columnName": "phone",
         "dataType": "varchar",
         "dataLength": 13,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "Y"
-      },
-      "_selectable": true
-    },
-    "address": {
-      "type": "String",
-      "required": false,
-      "length": 65535,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "address",
-        "dataType": "text",
-        "dataLength": 65535,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
@@ -183,22 +210,6 @@
       "scale": null,
       "mysql": {
         "columnName": "hobby",
-        "dataType": "varchar",
-        "dataLength": 255,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "Y"
-      },
-      "_selectable": true
-    },
-    "about": {
-      "type": "String",
-      "required": false,
-      "length": 255,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "about",
         "dataType": "varchar",
         "dataLength": 255,
         "dataPrecision": null,
@@ -319,22 +330,6 @@
       },
       "_selectable": true
     },
-    "degree": {
-      "type": "String",
-      "required": false,
-      "length": 255,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "degree",
-        "dataType": "varchar",
-        "dataLength": 255,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "Y"
-      },
-      "_selectable": true
-    },
     "nameCard": {
       "type": "String",
       "required": false,
@@ -383,9 +378,57 @@
       },
       "_selectable": true
     },
-    "bday": {
+    "deletedAt": {
       "type": "Date",
       "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "deleted_at",
+        "dataType": "datetime",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
+    "about": {
+      "type": "string",
+      "required": false,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "about",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
+    "address": {
+      "type": "string",
+      "required": false,
+      "length": 65535,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "address",
+        "dataType": "text",
+        "dataLength": 65535,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
+    "bday": {
+      "type": "date",
+      "required": true,
       "length": null,
       "precision": null,
       "scale": null,
@@ -399,41 +442,24 @@
       },
       "_selectable": false
     },
-    "email": {
+    "degree": {
       "type": "String",
       "required": false,
       "length": 255,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "email",
+        "columnName": "degree",
         "dataType": "varchar",
         "dataLength": 255,
         "dataPrecision": null,
         "dataScale": null,
-        "nullable": "N"
+        "nullable": "Y"
       },
-      "_selectable": false
-    },
-    "fullName": {
-      "type": "String",
-      "required": false,
-      "length": 255,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "full_name",
-        "dataType": "varchar",
-        "dataLength": 255,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "N"
-      },
-      "_selectable": false
+      "_selectable": true
     },
     "id": {
       "type": "Number",
-      "id": true,
       "required": false,
       "length": null,
       "precision": 10,
@@ -445,22 +471,6 @@
         "dataPrecision": 10,
         "dataScale": 0,
         "nullable": "N"
-      },
-      "_selectable": false
-    },
-    "deletedAt": {
-      "type": "Date",
-      "required": false,
-      "length": null,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "deleted_at",
-        "dataType": "date",
-        "dataLength": null,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "Y"
       },
       "_selectable": false
     }
