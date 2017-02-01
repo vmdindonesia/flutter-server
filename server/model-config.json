@@ -65,10 +65,6 @@
     "dataSource": "pmjakarta",
     "public": true
   },
-  "FireLoopRef": {
-    "dataSource": "db",
-    "public": true
-  },
   "Chat": {
     "dataSource": "pmjakarta",
     "public": true
