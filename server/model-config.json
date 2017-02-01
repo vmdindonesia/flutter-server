@@ -35,9 +35,7 @@
   },
   "Members": {
     "dataSource": "pmjakarta",
-    "public": true,
-    "$promise": {},
-    "$resolved": true
+    "public": true
   },
   "DislikeList": {
     "dataSource": "pmjakarta",
@@ -64,15 +62,16 @@
     "public": true
   },
   "Nearby": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
   "FireLoopRef": {
     "dataSource": "db",
     "public": true
   },
   "Chat": {
     "dataSource": "pmjakarta",
-    "public": true,
-    "$promise": {},
-    "$resolved": true
+    "public": true
   },
   "Chatdetail": {
     "dataSource": "pmjakarta",
@@ -84,8 +83,10 @@
   },
   "ViewMember": {
     "dataSource": "pmjakarta",
-    "public": true,
-    "$promise": {},
-    "$resolved": true
+    "public": true
+  },
+  "ViewChat": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
