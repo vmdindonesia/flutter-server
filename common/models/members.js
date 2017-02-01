@@ -33,9 +33,10 @@ module.exports = function(Members) {
         var accessToken = app.models.AccessToken;
         
         // Check user already registered or not
+        console.log(param);
         accessToken.destroyAll(
-            { id: { neq: param.id } },
-            { userId: param.userId }
+            { userId: param.userId },
+            { id: { neq: param.id } }
         , function(err, result) {
             if (err) {
                 cb(err);
