@@ -24,26 +24,35 @@ module.exports = function(Members) {
 
     Members.remoteMethod('newLogin', {
         http: { path: '/newLogin', verb: 'post' },
-        accepts: { arg: 'param', type: 'object', required: true },
+        accepts: { arg: 'email', type: 'string', required: true },
         returns: { arg: 'respon', type: 'object',  root: true }
     });
 
-    Members.newLogin = function(param, cb) {
+    Members.newLogin = function(email, cb) {
         var app = require('../../server/server');
         var accessToken = app.models.AccessToken;
         
         // Check user already registered or not
-        console.log(param);
-        accessToken.destroyAll(
-            { userId: param.userId },
-            { id: { neq: param.id } }
-        , function(err, result) {
+        Members.findOne({
+            where: { email: email },
+            fields: { id: true }
+        }, function(err, member) {
             if (err) {
                 cb(err);
                 return;
             }
 
-            cb(null, result);
+            accessToken.destroyAll({
+                userId: member.id 
+            }, function(err, result) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+
+                cb(null, result);
+            });
         });
+
     }
 };

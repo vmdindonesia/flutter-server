@@ -191,6 +191,22 @@
       },
       "_selectable": true
     },
+    "religion": {
+      "type": "String",
+      "required": false,
+      "length": 20,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "religion",
+        "dataType": "varchar",
+        "dataLength": 20,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
     "photo": {
       "type": "String",
       "required": false,
@@ -272,17 +288,17 @@
       "_selectable": true
     },
     "income": {
-      "type": "Number",
+      "type": "String",
       "required": false,
-      "length": null,
-      "precision": 10,
-      "scale": 0,
+      "length": 20,
+      "precision": null,
+      "scale": null,
       "mysql": {
         "columnName": "income",
-        "dataType": "int",
-        "dataLength": null,
-        "dataPrecision": 10,
-        "dataScale": 0,
+        "dataType": "varchar",
+        "dataLength": 20,
+        "dataPrecision": null,
+        "dataScale": null,
         "nullable": "Y"
       },
       "_selectable": true
@@ -540,7 +556,7 @@
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$unauthenticated",
       "permission": "ALLOW",
       "property": "newLogin"
     }
