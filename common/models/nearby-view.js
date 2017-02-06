@@ -42,8 +42,6 @@ module.exports = function(Nearbyview) {
     }
 
     function getMember(id, myLocation, setting, cb) {
-        // console.log(myLocation);
-
         // Default filter
         var filter = {
             where: {
@@ -52,7 +50,10 @@ module.exports = function(Nearbyview) {
                     near: myLocation,
                     maxDistance: setting.distance,
                     unit: 'kilometers'
-                }, 
+                },
+                age: {
+                    between: [setting.ageLower, setting.ageUpper]
+                }
             }
         }
 
