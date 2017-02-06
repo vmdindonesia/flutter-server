@@ -520,17 +520,16 @@
       "model": "MemberImage",
       "foreignKey": "membersId"
     },
-    "memberSetting": {
-      "type": "hasOne",
-      "model": "MemberSetting",
-      "foreignKey": "membersId",
-      "primaryKey": "id"
-    },
     "nearbies": {
       "type": "hasOne",
       "model": "Nearby",
       "foreignKey": "membersId",
       "primaryKey": "id"
+    },
+    "memberSetting": {
+      "type": "hasOne",
+      "model": "MemberSetting",
+      "foreignKey": "membersId"
     }
   },
   "acls": [
