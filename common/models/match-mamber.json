@@ -27,21 +27,21 @@
       },
       "_selectable": false
     },
-    "mamberId": {
-      "type": "String",
-      "required": false,
-      "length": 45,
-      "precision": null,
-      "scale": null,
+    "membersId": {
+      "type": "Number",
+      "required": true,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
       "mysql": {
-        "columnName": "mamber_id",
-        "dataType": "varchar",
-        "dataLength": 45,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "Y"
+        "columnName": "members_id",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "N"
       },
-      "_selectable": true
+      "_selectable": false
     },
     "mamberMatchId": {
       "type": "String",
@@ -61,7 +61,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "members": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "mamberMatchId"
+    }
+  },
   "acls": [],
   "methods": {}
 }
