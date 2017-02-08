@@ -530,6 +530,12 @@
       "type": "hasOne",
       "model": "MemberSetting",
       "foreignKey": "membersId"
+    },
+    "matchMambers": {
+      "type": "hasMany",
+      "model": "MatchMamber",
+      "foreignKey": "mamberMatchId",
+      "primaryKey": "id"
     }
   },
   "acls": [
