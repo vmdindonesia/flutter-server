@@ -536,6 +536,11 @@
       "model": "MatchMamber",
       "foreignKey": "mamberMatchId",
       "primaryKey": "id"
+    },
+    "memberPhotos": {
+      "type": "hasOne",
+      "model": "MemberPhoto",
+      "foreignKey": "membersId"
     }
   },
   "acls": [

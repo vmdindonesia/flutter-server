@@ -84,5 +84,11 @@
   "ViewChat": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "MemberPhoto": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
