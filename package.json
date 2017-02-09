@@ -29,6 +29,7 @@
     "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.8.3",
     "eslint": "^3.15.0",
     "eslint-config-loopback": "^8.0.0",
+    "jshint": "^2.9.4",
     "nsp": "^2.1.0"
   },
   "repository": {
