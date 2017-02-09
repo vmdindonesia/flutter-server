@@ -1,5 +1,5 @@
 {
-  "name": "MatchMamber",
+  "name": "ChatDetail",
   "base": "PersistedModel",
   "idInjection": false,
   "options": {
@@ -7,18 +7,17 @@
   },
   "mysql": {
     "schema": "pmjakarta",
-    "table": "Match_mamber"
+    "table": "Chat_detail"
   },
   "properties": {
-    "id": {
+    "matchId": {
       "type": "Number",
-      "id": true,
       "required": true,
       "length": null,
       "precision": 10,
       "scale": 0,
       "mysql": {
-        "columnName": "id",
+        "columnName": "match_id",
         "dataType": "int",
         "dataLength": null,
         "dataPrecision": 10,
@@ -43,31 +42,58 @@
       },
       "_selectable": false
     },
-    "mamberMatchId": {
+    "text": {
       "type": "String",
-      "required": false,
-      "length": 45,
+      "required": true,
+      "length": 65535,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "mamber_match_id",
-        "dataType": "varchar",
-        "dataLength": 45,
+        "columnName": "text",
+        "dataType": "text",
+        "dataLength": 65535,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "createdDate": {
+      "type": "Date",
+      "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "created_date",
+        "dataType": "datetime",
+        "dataLength": null,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
       },
-      "_selectable": true
+      "_selectable": false
+    },
+    "id": {
+      "type": "Number",
+      "id": true,
+      "required": false,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "id",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "N"
+      },
+      "_selectable": false
     }
   },
   "validations": [],
-  "relations": {
-    "members": {
-      "type": "belongsTo",
-      "model": "Members",
-      "foreignKey": "mamberMatchId"
-    }
-  },
+  "relations": {},
   "acls": [],
   "methods": {}
 }
