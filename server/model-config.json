@@ -45,10 +45,6 @@
     "dataSource": "pmjakarta",
     "public": true
   },
-  "MatchMamber": {
-    "dataSource": "pmjakarta",
-    "public": true
-  },
   "container": {
     "dataSource": "storage",
     "public": true
@@ -69,10 +65,6 @@
     "dataSource": "pmjakarta",
     "public": true
   },
-  "Chatdetail": {
-    "dataSource": "pmjakarta",
-    "public": true
-  },
   "NearbyView": {
     "dataSource": "pmjakarta",
     "public": true
@@ -90,5 +82,17 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "Match": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "MatchMember": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ChatDetail": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
