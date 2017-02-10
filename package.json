@@ -6,13 +6,15 @@
     "lint": "eslint .",
     "start": "node .",
     "posttest": "npm run lint && nsp check",
-    "build:sdk": "./node_modules/.bin/lb-sdk server/server.js ./client/sdk -l angular2 -d ng2web -i disabled",
+    "build:sdk": "./node_modules/.bin/lb-sdk server/server.js ./client/sdk -l angular2 -d ng2web -i enabled",
     "server:deploy": "slc deploy --service pmjakarta http://192.168.0.100",
     "server:build": "slc build --npm",
     "server:status": "slc ctl --control http://192.168.0.100 status"
   },
   "dependencies": {
     "@mean-expert/fireloop": "^1.0.0-beta.1.3",
+    "@mean-expert/loopback-component-realtime": "^1.0.0-rc.4",
+    "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.8.3",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "helmet": "^3.4.0",
@@ -22,11 +24,9 @@
     "loopback-component-storage": "^3.0.0",
     "loopback-connector-mysql": "^3.0.0",
     "serve-favicon": "^2.0.1",
-    "socket.io": "^1.7.2",
     "strong-error-handler": "^1.0.1"
   },
   "devDependencies": {
-    "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.8.3",
     "eslint": "^3.15.0",
     "eslint-config-loopback": "^8.0.0",
     "jshint": "^2.9.4",
