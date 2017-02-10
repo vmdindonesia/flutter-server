@@ -10,7 +10,8 @@
       "loopback/common/mixins",
       "loopback/server/mixins",
       "../common/mixins",
-      "./mixins"
+      "./mixins",
+      "../node_modules/loopback-component-realtime/dist/mixins"
     ]
   },
   "User": {
@@ -93,6 +94,10 @@
   },
   "ChatDetail": {
     "dataSource": "pmjakarta",
+    "public": true
+  },
+  "Todo": {
+    "dataSource": "db",
     "public": true
   }
 }

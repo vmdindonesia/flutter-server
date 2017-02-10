@@ -8,16 +8,19 @@ module.exports = function(Chatdetail) {
     });
 
     Chatdetail.createChat = function(data, cb) {
-    	var socket = Chatdetail.app.io;
-
         Chatdetail.create(data, function (err, result) {
         	if (err) {
         		cb(err);
         		return;
         	}
 
-            socket.emit('chating', result);
         	cb(null, result);
         });
     };
+
+    Chatdetail.observe('after save', (ctx, next) => {
+        console.log(123);
+        Chatdetail.app.mx.IO.emit('chating', ctx.instance);
+        next();
+    });
 };
