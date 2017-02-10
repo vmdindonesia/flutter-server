@@ -6,8 +6,8 @@ var app = module.exports = loopback();
 
 app.start = function() {
   // start the web server
-  return app.listen(function() {
-    app.emit('started');
+  var server = app.listen(function() {
+    app.emit('started', server);
     var baseUrl = app.get('url').replace(/\/$/, '');
     console.log('Web server listening at: %s', baseUrl);
     if (app.get('loopback-component-explorer')) {
@@ -15,6 +15,7 @@ app.start = function() {
       console.log('Browse your REST API at %s%s', baseUrl, explorerPath);
     }
   });
+  return server;
 };
 
 // Bootstrap the application, configure models, datasources and middleware.
@@ -23,16 +24,17 @@ boot(app, __dirname);
 
 // start the server if `$ node server.js`
 if (require.main === module) {
-  //app.start();
-  app.io = require('socket.io')(app.start());
-  app.io.on('connection', function(socket){
-  	console.log('a user connected');
-    // socket.on('chat message', function(msg){
-    //   console.log('message: ' + msg);
-    //   app.io.emit('chat message', msg);
-    // });
-  	socket.on('disconnect', function(){
-  		console.log('user disconnected');
-  	});
-  });
+  app.start();
+  // app.io = require('socket.io')(app.start());
+  // app.io.origins('*:*');
+  // app.io.on('connection', function(socket){
+  // 	console.log('a user connected');
+  //   // socket.on('chat message', function(msg){
+  //   //   console.log('message: ' + msg);
+  //   //   app.io.emit('chat message', msg);
+  //   // });
+  // 	socket.on('disconnect', function(){
+  // 		console.log('user disconnected');
+  // 	});
+  // });
 }
