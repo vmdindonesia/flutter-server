@@ -93,7 +93,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "members": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "membersId"
+    }
+  },
   "acls": [],
   "methods": {}
 }
