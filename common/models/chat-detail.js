@@ -8,19 +8,32 @@ module.exports = function(Chatdetail) {
     });
 
     Chatdetail.createChat = function(data, cb) {
+        var app = require('../../server/server');
+        var memberPhoto = app.models.MemberPhoto;
+        var _ = require('lodash');
+
         Chatdetail.create(data, function (err, result) {
         	if (err) {
         		cb(err);
         		return;
         	}
 
-        	cb(null, result);
+            memberPhoto.findOne({
+                where: { membersId: result.membersId }
+            }, function (err, photo) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+
+                result['src'] = _.isNull(photo) ? null : photo.src;
+
+                // Send with socket
+                Chatdetail.app.mx.IO.emit('chating', result);
+
+                // Result object
+                cb(null, result);
+            });
         });
     };
-
-    Chatdetail.observe('after save', (ctx, next) => {
-        console.log(123);
-        Chatdetail.app.mx.IO.emit('chating', ctx.instance);
-        next();
-    });
 };
