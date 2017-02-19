@@ -8,9 +8,9 @@
     "port": 3306,
     "url": "",
     "database": "pmjakarta",
-    "password": "0tTSDG(X",
+    "password": "pmj4k4rt@",
     "name": "pmjakarta",
-    "user": "root",
+    "user": "flutterasia",
     "connector": "mysql"
   },
   "storage": {
