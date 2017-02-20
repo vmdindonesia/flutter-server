@@ -11,7 +11,9 @@
       "loopback/server/mixins",
       "../common/mixins",
       "./mixins",
-      "../node_modules/loopback-component-realtime/dist/mixins"
+      "../node_modules/@mean-expert/loopback-stats-mixin/dist",
+      "../node_modules/loopback-component-realtime/dist/mixins",
+      "../node_modules/loopback-ds-timestamp-mixin"
     ]
   },
   "User": {
@@ -84,10 +86,6 @@
     "$promise": {},
     "$resolved": true
   },
-  "Match": {
-    "dataSource": "pmjakarta",
-    "public": true
-  },
   "MatchMember": {
     "dataSource": "pmjakarta",
     "public": true
@@ -99,5 +97,11 @@
   "Todo": {
     "dataSource": "db",
     "public": true
+  },
+  "Matches": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
