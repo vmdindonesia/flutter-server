@@ -94,10 +94,6 @@
     "dataSource": "pmjakarta",
     "public": true
   },
-  "Todo": {
-    "dataSource": "db",
-    "public": true
-  },
   "Matches": {
     "dataSource": "pmjakarta",
     "public": true,
