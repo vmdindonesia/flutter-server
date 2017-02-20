@@ -29,7 +29,7 @@ module.exports = function(Chatdetail) {
                 result['src'] = _.isNull(photo) ? null : photo.src;
 
                 // Send with socket
-                Chatdetail.app.mx.IO.emit('chating', result);
+                // Chatdetail.app.mx.IO.emit('chating', result);
 
                 // Result object
                 cb(null, result);
