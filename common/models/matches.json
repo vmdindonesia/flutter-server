@@ -7,7 +7,7 @@
   },
   "mysql": {
     "schema": "pmjakarta",
-    "table": "matches"
+    "table": "Matches"
   },
   "properties": {
     "createdAt": {
