@@ -496,6 +496,22 @@
       },
       "_selectable": false
     },
+    "flagMember": {
+      "type": "String",
+      "required": false,
+      "length": 2,
+      "precision": null,
+      "scale": 0,
+      "mysql": {
+        "columnName": "flag_member",
+        "dataType": "varchar",
+        "dataLength": 2,
+        "dataPrecision": null,
+        "dataScale": 0,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
     "documentPicture": {
       "type": "String",
       "required": false,
