@@ -55,4 +55,25 @@ module.exports = function(Members) {
         });
 
     }
+    
+    Members.remoteMethod('onlineOffline', {
+        http: { path: '/:id/onlineOffline', verb: 'post' },
+        accepts: [
+            { arg: 'id', type: 'number' },
+            { arg: 'param', type: 'object' }
+        ],
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
+    Members.onlineOffline = function (id, online, cb) {
+        Members.upsertWithWhere({ id: id }, online, function (err, result) {
+            if (err) {
+                cb(err);
+                return;
+            }
+
+            Members.app.mx.IO.emit('online-'+id, result);
+            cb(null, result);
+        });
+    }
 };
