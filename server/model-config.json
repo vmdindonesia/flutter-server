@@ -105,5 +105,9 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "ReportMembers": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
