@@ -10,26 +10,114 @@
       "loopback/common/mixins",
       "loopback/server/mixins",
       "../common/mixins",
-      "./mixins"
+      "./mixins",
+      "../node_modules/@mean-expert/loopback-stats-mixin/dist",
+      "../node_modules/loopback-component-realtime/dist/mixins",
+      "../node_modules/loopback-ds-timestamp-mixin"
     ]
   },
   "User": {
-    "dataSource": "db"
+    "dataSource": "pmjakarta",
+    "public": false
   },
   "AccessToken": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
   },
   "ACL": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
   },
   "Role": {
-    "dataSource": "db",
+    "dataSource": "pmjakarta",
     "public": false
+  },
+  "Members": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "DislikeList": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "LikeList": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "container": {
+    "dataSource": "storage",
+    "public": true
+  },
+  "MemberImage": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "MemberSetting": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "Nearby": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "Chat": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "NearbyView": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ViewMember": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ViewChat": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "MemberPhoto": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "MatchMember": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ChatDetail": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "Matches": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "ViewMatch": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "ReportMembers": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ApprovalView": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "MappingMobileCode": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
