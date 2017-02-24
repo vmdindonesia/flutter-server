@@ -109,5 +109,9 @@
   "ReportMembers": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "ApprovalView": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
