@@ -4,6 +4,10 @@ var loopback = require('loopback');
 var boot = require('loopback-boot');
 var app = module.exports = loopback();
 
+// Bootstrap the application, configure models, datasources and middleware.
+// Sub-apps like REST API are mounted via boot scripts.
+boot(app, __dirname);
+
 app.start = function() {
   // start the web server
   var server = app.listen(function() {
@@ -17,10 +21,6 @@ app.start = function() {
   });
   return server;
 };
-
-// Bootstrap the application, configure models, datasources and middleware.
-// Sub-apps like REST API are mounted via boot scripts.
-boot(app, __dirname);
 
 // start the server if `$ node server.js`
 if (require.main === module) {
