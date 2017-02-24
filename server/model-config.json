@@ -113,5 +113,11 @@
   "ApprovalView": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "MappingMobileCode": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
