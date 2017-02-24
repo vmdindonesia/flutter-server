@@ -527,6 +527,38 @@
         "nullable": "Y"
       },
       "_selectable": true
+    },
+    "status": {
+      "type": "Number",
+      "required": false,
+      "length": 1,
+      "precision": 2,
+      "scale": 0,
+      "mysql": {
+        "columnName": "status",
+        "dataType": "tinyint",
+        "dataLength": 1,
+        "dataPrecision": 2,
+        "dataScale": 0,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
+    "online": {
+      "type": "Number",
+      "required": false,
+      "length": 1,
+      "precision": 2,
+      "scale": 0,
+      "mysql": {
+        "columnName": "online",
+        "dataType": "tinyint",
+        "dataLength": 1,
+        "dataPrecision": 2,
+        "dataScale": 0,
+        "nullable": "Y"
+      },
+      "_selectable": true
     }
   },
   "validations": [],
@@ -576,6 +608,13 @@
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "onlineOffline"
     },
     {
       "accessType": "*",

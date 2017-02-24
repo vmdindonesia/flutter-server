@@ -55,7 +55,7 @@ module.exports = function(Members) {
         });
 
     }
-    
+
     Members.remoteMethod('onlineOffline', {
         http: { path: '/:id/onlineOffline', verb: 'post' },
         accepts: [
@@ -73,6 +73,31 @@ module.exports = function(Members) {
             }
 
             Members.app.mx.IO.emit('online-'+id, result);
+            cb(null, result);
+        });
+    }
+
+    Members.remoteMethod('statistic', {
+        http: { path: '/statistic', verb: 'get' },
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
+    Members.statistic = function (cb) {
+        var ds = Members.dataSource;
+        var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive " +
+                   "FROM" +
+                   "(SELECT COUNT(id) AS registered FROM pmjakarta.Members) AS a, " +
+                   "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
+                   "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
+                   "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
+                   "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e";
+
+        ds.connector.execute(sql, function(err, result) {
+            if (err) {
+                cb(err);
+                return;
+            }
+
             cb(null, result);
         });
     }
