@@ -9,7 +9,10 @@
   },
   "files": {
     "loopback#static": {
-      "params": "$!../client" 
+      "paths": [
+        "/app"
+      ],
+      "params": "$!../client/www"
     }
   }
 }
