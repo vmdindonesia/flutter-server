@@ -145,7 +145,7 @@
     },
     "bday": {
       "type": "Date",
-      "required": true,
+      "required": false,
       "length": null,
       "precision": null,
       "scale": null,
@@ -629,6 +629,27 @@
       "principalId": "$unauthenticated",
       "permission": "ALLOW",
       "property": "newLogin"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW",
+      "property": "deleteById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY",
+      "property": "deleteById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "register"
     }
   ],
   "methods": {}
