@@ -1,6 +1,5 @@
 'use strict';
 
-
 module.exports = function(Members) {
     Members.remoteMethod('updateById', {
         http: { path: '/:id/updateById', verb: 'post' },
@@ -101,4 +100,45 @@ module.exports = function(Members) {
             cb(null, result);
         });
     }
+
+    Members.remoteMethod('register', {
+        http: { path: '/register', verb: 'post' },
+        accepts: { arg: 'param', type: 'object' },
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
+    Members.register = function (param, cb) {
+        Members.create(param, function (err, member) {
+            if (err) {
+                cb(err);
+                return;
+            }
+
+            cb(null, member);
+        });
+    }
+
+    Members.afterRemote('register', function(context, remoteMethodOutput, next) {
+        var Role = Members.app.models.Role;
+        var RoleMapping = Members.app.models.RoleMapping;
+
+        Role.findOne({
+            where: { name: 'admin' }
+        }, function (err, role) {
+            if (err) {
+                cb(err);
+                return;
+            }
+
+            RoleMapping.create({
+                principalType: RoleMapping.USER,
+                principalId: remoteMethodOutput.id,
+                roleId: role.id
+            }, function (err, roleMapping) {
+                if (err) next(err);
+
+                next();
+            });
+        });
+    });
 };
