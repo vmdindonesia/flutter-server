@@ -119,5 +119,17 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "StatusVerifyRate": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "StatusVerifyUser": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
