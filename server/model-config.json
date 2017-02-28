@@ -131,5 +131,9 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "PhotoKtp": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
