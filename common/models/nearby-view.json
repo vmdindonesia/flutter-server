@@ -249,6 +249,22 @@
         "nullable": "N"
       },
       "_selectable": false
+    },
+    "online": {
+      "type": "Number",
+      "required": false,
+      "length": 1,
+      "precision": 2,
+      "scale": 0,
+      "mysql": {
+        "columnName": "online",
+        "dataType": "tinyint",
+        "dataLength": 1,
+        "dataPrecision": 2,
+        "dataScale": 0,
+        "nullable": "Y"
+      },
+      "_selectable": true
     }
   },
   "validations": [],
