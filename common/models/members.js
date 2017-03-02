@@ -83,13 +83,14 @@ module.exports = function(Members) {
 
     Members.statistic = function (cb) {
         var ds = Members.dataSource;
-        var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive " +
+        var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive f.matches " +
                    "FROM" +
                    "(SELECT COUNT(id) AS registered FROM pmjakarta.Members) AS a, " +
                    "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
                    "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
                    "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
-                   "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e";
+                   "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e, " +
+                   "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member) AS f";
 
         ds.connector.execute(sql, function(err, result) {
             if (err) {
