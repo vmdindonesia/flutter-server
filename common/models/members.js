@@ -141,4 +141,32 @@ module.exports = function(Members) {
             });
         });
     });
+
+    Members.isSocialRegistered = function (socialId, loginWith, cb) {
+        Members.find({
+            where: {
+                and: [
+                    { socialId: socialId },
+                    { loginWith: loginWith }
+                ]
+            }
+        }, function (error, members) {
+            console.log('ERROR MEMBERS : ' + JSON.stringify(error, null, 2));
+            console.log('MEMBERS RES : ' + JSON.stringify(members, null, 2));
+            var result = false;
+            if(members.length > 0){ //sudah diregister
+                result = true;
+            }
+            cb(null, result);
+        })
+    }
+
+    Members.remoteMethod('isSocialRegistered', {
+        accepts: [
+            { arg: 'socialId', type: 'string', required: true },
+            { arg: 'loginWith', type: 'string', required: true }
+        ],
+        returns: { arg: 'result', type: 'boolean' }
+    })
+
 };
