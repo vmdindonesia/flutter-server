@@ -11,6 +11,7 @@ module.exports = function(Chatdetail) {
         var app = require('../../server/server');
         var memberPhoto = app.models.MemberPhoto;
         var _ = require('lodash');
+        var socket = Chatdetail.app.io;
 
         Chatdetail.create(data, function (err, result) {
         	if (err) {
@@ -29,7 +30,7 @@ module.exports = function(Chatdetail) {
                 result['src'] = _.isNull(photo) ? null : photo.src;
 
                 // Send with socket
-                Chatdetail.app.mx.IO.emit('chating', result);
+                socket.in(data.matchId).emit('chating', result);
 
                 // Result object
                 cb(null, result);
