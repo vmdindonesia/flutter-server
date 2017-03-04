@@ -26,6 +26,7 @@
     "loopback-connector-mysql": "^3.0.0",
     "loopback-ds-timestamp-mixin": "^3.4.0",
     "serve-favicon": "^2.0.1",
+    "socket.io": "^1.7.3",
     "strong-error-handler": "^1.0.1",
     "xmlhttprequest": "^1.8.0"
   },
