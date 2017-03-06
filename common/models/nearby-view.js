@@ -42,6 +42,7 @@ module.exports = function(Nearbyview) {
     }
 
     function getMember(id, myLocation, setting, cb) {
+        console.log(setting);
         // Default filter
         var filter = {
             where: {
@@ -53,7 +54,8 @@ module.exports = function(Nearbyview) {
                 },
                 age: {
                     between: [setting.ageLower, setting.ageUpper]
-                }
+                },
+                visibility: true
             }
         }
 
