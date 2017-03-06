@@ -135,5 +135,9 @@
   "PhotoKtp": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "MemberVerifyStatus": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
