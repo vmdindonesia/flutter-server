@@ -2,11 +2,10 @@
 
 module.exports = function (Mappingmobilecode) {
   Mappingmobilecode.beforeRemote('create', function (context, user, next) {
-    console.log('AAAAA');
     var randomNum = Math.random();
     var expectedNum = Math.floor(randomNum * 10000);
     var stringNum = ('000' + expectedNum).slice(-4);
-    console.log(stringNum);
+    console.log('GENERATED CODE : ' + stringNum);
     context.args.data.generatedCode = stringNum;
 
     next();
@@ -14,7 +13,6 @@ module.exports = function (Mappingmobilecode) {
   });
 
   Mappingmobilecode.afterRemote('create', function (context, user, next) {
-    console.log(context.args.data);
     function httpGetAsync(theUrl, callback) {
       var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
       var xmlHttp = new XMLHttpRequest();
@@ -27,10 +25,10 @@ module.exports = function (Mappingmobilecode) {
     }
     console.log('AFTER REMOTE');
 
-    var smsGatewayUrl = 'http://secure.gosmsgateway.com:8080/masking/api/send.php?username=flutter&mobile=' + context.args.data.mobileNumber + '&message=Harap+masukkan+' + context.args.data.generatedCode + '+di+Aplikasi+Flutterasia+dalam+30+menit.&password=gosms38246';
+    var smsGatewayUrl = 'https://secure.gosmsgateway.com/masking/api/send.php?username=flutter&mobile=' + context.args.data.mobileNumber + '&message=Harap+masukkan+' + context.args.data.generatedCode + '+di+Aplikasi+Flutterasia+dalam+30+menit.&password=gosms38246';
     httpGetAsync(smsGatewayUrl, function () {
       console.log('HTTP DONE');
-      console.log(smsGatewayUrl);
+      // console.log(smsGatewayUrl);
       next();
     })
 
