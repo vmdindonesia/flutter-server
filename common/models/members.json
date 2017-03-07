@@ -239,14 +239,14 @@
       },
       "_selectable": true
     },
-    "photo": {
+    "photoKtp": {
       "type": "String",
       "required": false,
       "length": 255,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "photo",
+        "columnName": "photo_ktp",
         "dataType": "varchar",
         "dataLength": 255,
         "dataPrecision": null,
