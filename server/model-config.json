@@ -139,5 +139,13 @@
   "MemberVerifyStatus": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "VerificationView": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ApprovalContentView": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
