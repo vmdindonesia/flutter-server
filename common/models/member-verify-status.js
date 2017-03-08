@@ -2,6 +2,24 @@
 
 module.exports = function (Memberverifystatus) {
 
+    Memberverifystatus.beforeRemote('create', function (context, user, next) {
+        var dateNow = new Date();
+        context.args.data.createAt = dateNow;
+        context.args.data.updateAt = dateNow;
+
+        next();
+    })
+
+    Memberverifystatus.observe('before save', function (ctx, next) {
+        var dateNow = new Date();
+        if (ctx.instance) {
+            ctx.instance.updateAt = dateNow;
+        } else {
+            ctx.data.updateAt = dateNow;
+        }
+        next();
+    })
+
     Memberverifystatus.remoteMethod('getVerifyStatusByUserId', {
         accepts: { arg: 'userId', type: 'string', required: true },
         returns: [
@@ -18,6 +36,22 @@ module.exports = function (Memberverifystatus) {
             { arg: 'result', type: 'object' },
             { arg: 'error', type: 'object' }
         ]
+    });
+
+    Memberverifystatus.remoteMethod('changeVerifyStatus', {
+        description: 'Changing MemberVerifyStatus value by User Id',
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'userId', type: 'number', required: true },
+            { arg: 'key', type: 'string', required: true },
+            { arg: 'value', type: 'number', required: true }
+        ],
+        returns: [
+            { arg: 'status', type: 'string' },
+            { arg: 'result', type: 'object' },
+            { arg: 'error', type: 'object' }
+        ]
+
     });
 
     Memberverifystatus.getVerifyStatusByUserId = function (userId, cb) {
@@ -96,6 +130,22 @@ module.exports = function (Memberverifystatus) {
 
         });
 
+
+    }
+
+    Memberverifystatus.changeVerifyStatus = function (userId, key, value, cb) {
+        var filter = {
+            where: {
+                userId: userId
+            }
+        }
+        Memberverifystatus.find(filter, function (error, result) {
+            var someData = result[0];
+            someData[key] = value;
+            Memberverifystatus.upsert(someData, function (error, result) {
+                cb(null, 'OK', result);
+            });
+        });
 
     }
 
