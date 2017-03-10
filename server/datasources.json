@@ -7,16 +7,16 @@
     "host": "192.168.0.100",
     "port": 3306,
     "url": "",
-    "database": "pmjakarta",
-    "password": "pmj4k4rt@",
+    "database": "pmjtesting",
+    "password": "0tTSDG(X",
     "name": "pmjakarta",
-    "user": "flutterasia",
+    "user": "root",
     "connector": "mysql"
   },
   "storage": {
     "name": "storage",
     "connector": "loopback-component-storage",
     "provider": "filesystem",
-    "root": "/var/loopback/storage/pmjakarta"
+    "root": "./server/storage"
   }
 }
