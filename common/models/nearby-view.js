@@ -42,6 +42,8 @@ module.exports = function(Nearbyview) {
     }
 
     function getMember(id, myLocation, setting, cb) {
+        var _ = require('lodash');
+
         console.log(setting);
         // Default filter
         var filter = {
@@ -64,6 +66,17 @@ module.exports = function(Nearbyview) {
             filter.where['gender'] = 0;
         } else if (setting.women && !setting.men) {
             filter.where['gender'] = 1;
+        }
+
+        // Config filter religion
+        console.log(setting.religion);
+        if (! _.isNull(setting.religion)) {
+            filter.where['religion'] = { inq: JSON.parse(setting.religion) }
+        }
+
+        // Config filter zodiak
+        if (!_.isNull(setting.zodiac)) {
+            filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) }
         }
 
         // Getting data from db

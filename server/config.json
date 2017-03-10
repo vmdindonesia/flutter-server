@@ -17,6 +17,7 @@
       "limit": "100kb"
     },
     "cors": false,
-    "handleErrors": false
+    "handleErrors": false,
+    "logoutSessionsOnSensitiveChanges": true
   }
 }
