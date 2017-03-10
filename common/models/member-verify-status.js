@@ -10,15 +10,15 @@ module.exports = function (Memberverifystatus) {
         next();
     })
 
-    Memberverifystatus.observe('before save', function (ctx, next) {
-        var dateNow = new Date();
-        if (ctx.instance) {
-            ctx.instance.updateAt = dateNow;
-        } else {
-            ctx.data.updateAt = dateNow;
-        }
-        next();
-    })
+    // Memberverifystatus.observe('before save', function (ctx, next) {
+    //     var dateNow = new Date();
+    //     if (ctx.instance) {
+    //         ctx.instance.updateAt = dateNow;
+    //     } else {
+    //         ctx.data.updateAt = dateNow;
+    //     }
+    //     next();
+    // })
 
     Memberverifystatus.remoteMethod('getVerifyStatusByUserId', {
         accepts: { arg: 'userId', type: 'string', required: true },
@@ -140,13 +140,21 @@ module.exports = function (Memberverifystatus) {
             }
         }
         Memberverifystatus.find(filter, function (error, result) {
-            var someData = result[0];
-            someData[key] = value;
-            Memberverifystatus.upsert(someData, function (error, result) {
-                cb(null, 'OK', result);
-            });
+            if (error) {
+                cb(null, 'FAIL', undefined, error);
+            } else {
+                var someData = result[0];
+                someData[key] = value;
+                someData['updateAt'] = new Date();
+                Memberverifystatus.upsert(someData, function (error, result) {
+                    if (error) {
+                        cb(null, 'FAIL', undefined, error);
+                    } else {
+                        cb(null, 'OK', result);
+                    }
+                });
+            }
         });
-
     }
 
 
