@@ -18889,7 +18889,7 @@ ion-split-pane {
 
 .tabs-ios .tab-button {
   padding: 0 2px;
-  max-width: 110px;
+  max-width: 240px;
   min-height: 49px;
   font-size: 10px;
   color: #8c8c8c;
