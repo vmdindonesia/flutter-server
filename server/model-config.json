@@ -147,5 +147,9 @@
   "ApprovalContentView": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "ApprovalMessage": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
