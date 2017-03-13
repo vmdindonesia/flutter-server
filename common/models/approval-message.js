@@ -1,10 +1,6 @@
 'use strict';
 
 module.exports = function (Approvalmessage) {
-    var tag = {
-        reject: 'REJECT'
-    }
-
 
     Approvalmessage.beforeRemote('create', function (context, user, next) {
         var dateNow = new Date();
@@ -14,11 +10,12 @@ module.exports = function (Approvalmessage) {
     });
 
     Approvalmessage.remoteMethod('sendRejectMessage', {
-        description: 'Send Approval Message to User',
+        description: 'Send Rejected Approval Message to User',
         http: { verb: 'post' },
         accepts: [
             { arg: 'fromId', type: 'number', required: true },
             { arg: 'toId', type: 'number', required: true },
+            { arg: 'tag', type: 'string', required: true },
             { arg: 'message', type: 'string', required: true }
         ],
         returns: [
@@ -28,14 +25,14 @@ module.exports = function (Approvalmessage) {
         ]
     });
 
-    Approvalmessage.sendRejectMessage = function (fromId, toId, message, cb) {
+    Approvalmessage.sendRejectMessage = function (fromId, toId, tag, message, cb) {
 
         var dateNow = new Date();
 
         Approvalmessage.create({
             fromId: fromId,
             toId: toId,
-            tag: tag.reject,
+            tag: tag,
             message: message,
             createAt: dateNow,
             updateAt: dateNow
