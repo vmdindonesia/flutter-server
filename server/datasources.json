@@ -18,5 +18,14 @@
     "connector": "loopback-component-storage",
     "provider": "filesystem",
     "root": "/var/loopback/storage/pmjakarta"
+  },
+  "pmjtesting": {
+    "host": "192.168.0.100",
+    "port": 3306,
+    "database": "pmjtesting",
+    "password": "0tTSDG(X",
+    "name": "pmjtesting",
+    "user": "root",
+    "connector": "mysql"
   }
 }
