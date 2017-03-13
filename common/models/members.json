@@ -290,13 +290,13 @@
     "hobby": {
       "type": "String",
       "required": false,
-      "length": 255,
+      "length": 65535,
       "precision": null,
       "scale": null,
       "mysql": {
         "columnName": "hobby",
-        "dataType": "varchar",
-        "dataLength": 255,
+        "dataType": "text",
+        "dataLength": 65535,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"

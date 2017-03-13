@@ -151,5 +151,9 @@
   "ApprovalMessage": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "Hobby": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
