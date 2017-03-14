@@ -152,15 +152,21 @@
     "dataSource": "pmjakarta",
     "public": true
   },
+  "Email": {
+    "dataSource": "pmjemail"
+  },
   "Hobby": {
     "dataSource": "pmjakarta",
     "public": true
   },
-  "Email": {
-    "dataSource": "pmjemail"
-  },
   "MappingMemberToken": {
     "dataSource": "pmjtesting",
     "public": true
+  },
+  "LikeView": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
