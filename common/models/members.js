@@ -199,4 +199,34 @@ module.exports = function(Members) {
             next();
         });
     });
+
+    Members.on('resetPasswordRequest', function (info) {
+        console.log(info.email); // the email of the requested user
+        console.log(info.accessToken.id); // the temp access token to allow password reset
+
+        // requires AccessToken.belongsTo(User)
+        info.accessToken.user(function (err, user) {
+            console.log(user); // the actual user
+        });
+    });
+
+    // Members.remoteMethod('resetPassword', {
+    //     http: { path: '/reset', verb: 'get' },
+    //     returns: { arg: 'respon', type: 'object', root: true }
+    // });
+
+    // Members.resetPassword = function (cb) {
+    //     User.on('resetPasswordRequest', function (info) {
+    //         console.log(info.email); // the email of the requested user
+    //         console.log(info.accessToken.id); // the temp access token to allow password reset
+
+    //         // requires AccessToken.belongsTo(User)
+    //         info.accessToken.user(function (err, user) {
+    //             if (err) return cb(err);
+
+    //             console.log(user); // the actual user
+    //             cb(user);
+    //         });
+    //     });
+    // }
 };
