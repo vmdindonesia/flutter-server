@@ -158,5 +158,9 @@
   },
   "Email": {
     "dataSource": "pmjemail"
+  },
+  "MappingMemberToken": {
+    "dataSource": "pmjtesting",
+    "public": true
   }
 }
