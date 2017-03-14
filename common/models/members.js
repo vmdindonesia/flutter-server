@@ -4,17 +4,17 @@ var loopback = require("loopback");
 var path = require('path');
 var moment = require('moment');
 
-module.exports = function(Members) {
+module.exports = function (Members) {
     Members.remoteMethod('updateById', {
         http: { path: '/:id/updateById', verb: 'post' },
         accepts: [
             { arg: 'id', type: 'number' },
             { arg: 'param', type: 'object' }
         ],
-        returns: { arg: 'respon', type: 'object',  root: true }
+        returns: { arg: 'respon', type: 'object', root: true }
     });
 
-    Members.updateById = function(id, param, cb) {
+    Members.updateById = function (id, param, cb) {
         Members.upsertWithWhere({ id: id }, param, function (err, result) {
             if (err) {
                 cb(null, err);
@@ -28,26 +28,26 @@ module.exports = function(Members) {
     Members.remoteMethod('newLogin', {
         http: { path: '/newLogin', verb: 'post' },
         accepts: { arg: 'email', type: 'string', required: true },
-        returns: { arg: 'respon', type: 'object',  root: true }
+        returns: { arg: 'respon', type: 'object', root: true }
     });
 
-    Members.newLogin = function(email, cb) {
+    Members.newLogin = function (email, cb) {
         var app = require('../../server/server');
         var accessToken = app.models.AccessToken;
-        
+
         // Check user already registered or not
         Members.findOne({
             where: { email: email },
             fields: { id: true }
-        }, function(err, member) {
+        }, function (err, member) {
             if (err) {
                 cb(err);
                 return;
             }
 
             accessToken.destroyAll({
-                userId: member.id 
-            }, function(err, result) {
+                userId: member.id
+            }, function (err, result) {
                 if (err) {
                     cb(err);
                     return;
@@ -77,7 +77,7 @@ module.exports = function(Members) {
                 return;
             }
 
-            socket.emit('online-'+id, result);
+            socket.emit('online-' + id, result);
             cb(null, result);
         });
     }
@@ -90,15 +90,15 @@ module.exports = function(Members) {
     Members.statistic = function (cb) {
         var ds = Members.dataSource;
         var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive, f.matches " +
-                   "FROM" +
-                   "(SELECT COUNT(id) AS registered FROM pmjakarta.Members) AS a, " +
-                   "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
-                   "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
-                   "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
-                   "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e, " +
-                   "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member) AS f";
+            "FROM" +
+            "(SELECT COUNT(id) AS registered FROM pmjakarta.Members) AS a, " +
+            "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
+            "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
+            "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
+            "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e, " +
+            "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member) AS f";
 
-        ds.connector.execute(sql, function(err, result) {
+        ds.connector.execute(sql, function (err, result) {
             if (err) {
                 cb(err);
                 return;
@@ -125,7 +125,7 @@ module.exports = function(Members) {
         });
     }
 
-    Members.afterRemote('register', function(context, remoteMethodOutput, next) {
+    Members.afterRemote('register', function (context, remoteMethodOutput, next) {
         var Role = Members.app.models.Role;
         var RoleMapping = Members.app.models.RoleMapping;
 
@@ -161,7 +161,7 @@ module.exports = function(Members) {
             console.log('ERROR MEMBERS : ' + JSON.stringify(error, null, 2));
             console.log('MEMBERS RES : ' + JSON.stringify(members, null, 2));
             var result = false;
-            if(members.length > 0){ //sudah diregister
+            if (members.length > 0) { //sudah diregister
                 result = true;
             }
             cb(null, result);
@@ -177,6 +177,15 @@ module.exports = function(Members) {
     });
 
     Members.afterRemote('create', function (context, userInstance, next) {
+
+        //Send Notif
+        var message = {
+            app_id: '8267bba1-3ac6-421a-93fb-19e06ff97c79',
+            contents: { en: userInstance.fullName + ' just join as new Member' },
+            included_segments: ["All"]
+        };
+        sendNotification(message);
+
         // Send mail
         var myMessage = {
             dateNow: moment().format('DD/MM/YYYY'),
@@ -198,5 +207,39 @@ module.exports = function(Members) {
             console.log('email sent!');
             next();
         });
+
+
+
     });
+
+    var sendNotification = function (data) {
+        var headers = {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": "Basic MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy"
+        };
+
+        var options = {
+            host: "onesignal.com",
+            port: 443,
+            path: "/api/v1/notifications",
+            method: "POST",
+            headers: headers
+        };
+
+        var https = require('https');
+        var req = https.request(options, function (res) {
+            res.on('data', function (data) {
+                console.log("Response:");
+                console.log(JSON.parse(data));
+            });
+        });
+
+        req.on('error', function (e) {
+            console.log("ERROR:");
+            console.log(e);
+        });
+
+        req.write(JSON.stringify(data));
+        req.end();
+    };
 };
