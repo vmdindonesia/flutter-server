@@ -158,5 +158,11 @@
   },
   "Email": {
     "dataSource": "pmjemail"
+  },
+  "LikeView": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
