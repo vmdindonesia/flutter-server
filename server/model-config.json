@@ -155,5 +155,8 @@
   "Hobby": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "Email": {
+    "dataSource": "pmjemail"
   }
 }
