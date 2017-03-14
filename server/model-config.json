@@ -152,12 +152,12 @@
     "dataSource": "pmjakarta",
     "public": true
   },
+  "Email": {
+    "dataSource": "pmjemail"
+  },
   "Hobby": {
     "dataSource": "pmjakarta",
     "public": true
-  },
-  "Email": {
-    "dataSource": "pmjemail"
   },
   "LikeView": {
     "dataSource": "pmjakarta",
