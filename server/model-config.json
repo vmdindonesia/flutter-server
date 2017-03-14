@@ -159,6 +159,10 @@
     "dataSource": "pmjakarta",
     "public": true
   },
+  "MappingMemberToken": {
+    "dataSource": "pmjtesting",
+    "public": true
+  },
   "LikeView": {
     "dataSource": "pmjakarta",
     "public": true,

@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = function (Memberverifystatus) {
+    var app = require('../../server/server');
 
     Memberverifystatus.beforeRemote('create', function (context, user, next) {
         var dateNow = new Date();
@@ -8,6 +9,25 @@ module.exports = function (Memberverifystatus) {
         context.args.data.updateAt = dateNow;
 
         next();
+    })
+
+    Memberverifystatus.afterRemote('changeVerifyStatus', function (context, user, next) {
+        var Members = app.models.Members;
+        Members.findById(user.result.userId, function (error, result) {
+            if (error) {
+                console.log('ERROR : ' + error);
+                next();
+            } else {
+                console.log('MEMBERS : ' + JSON.stringify(result));
+                var message = {
+                    app_id: '8267bba1-3ac6-421a-93fb-19e06ff97c79',
+                    contents: { en: result.fullName + ' verify status changed' },
+                    included_segments: ["All"]
+                };
+                sendNotification(message);
+                next();
+            }
+        })
     })
 
     // Memberverifystatus.observe('before save', function (ctx, next) {
@@ -156,6 +176,37 @@ module.exports = function (Memberverifystatus) {
             }
         });
     }
+
+    var sendNotification = function (data) {
+        var headers = {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": "Basic MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy"
+        };
+
+        var options = {
+            host: "onesignal.com",
+            port: 443,
+            path: "/api/v1/notifications",
+            method: "POST",
+            headers: headers
+        };
+
+        var https = require('https');
+        var req = https.request(options, function (res) {
+            res.on('data', function (data) {
+                console.log("Response:");
+                console.log(JSON.parse(data));
+            });
+        });
+
+        req.on('error', function (e) {
+            console.log("ERROR:");
+            console.log(e);
+        });
+
+        req.write(JSON.stringify(data));
+        req.end();
+    };
 
 
 
