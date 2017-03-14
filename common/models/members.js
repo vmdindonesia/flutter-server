@@ -1,5 +1,9 @@
 'use strict';
 
+var loopback = require("loopback");
+var path = require('path');
+var moment = require('moment');
+
 module.exports = function(Members) {
     Members.remoteMethod('updateById', {
         http: { path: '/:id/updateById', verb: 'post' },
@@ -170,6 +174,29 @@ module.exports = function(Members) {
             { arg: 'loginWith', type: 'string', required: true }
         ],
         returns: { arg: 'result', type: 'boolean' }
-    })
+    });
 
+    Members.afterRemote('create', function (context, userInstance, next) {
+        // Send mail
+        var myMessage = {
+            dateNow: moment().format('DD/MM/YYYY'),
+            fullName: userInstance.fullName
+        };
+
+        var renderer = loopback.template(path.resolve(__dirname, '../views/email-template-registration.ejs'));
+        var html_body = renderer(myMessage);
+        var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
+
+        Members.app.models.Email.send({
+            to: userInstance.email,
+            from: 'smdev77@gmail.com',
+            subject: 'Test email from loopback',
+            html: html_body
+        }, function (err, mail) {
+            if (err) return next(err);
+
+            console.log('email sent!');
+            next();
+        });
+    });
 };
