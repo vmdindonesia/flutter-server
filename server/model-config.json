@@ -168,5 +168,11 @@
   "ViewMember": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "ViewLikeMe": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
