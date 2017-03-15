@@ -721,6 +721,13 @@
       "principalId": "$unauthenticated",
       "permission": "ALLOW",
       "property": "isSocialRegistered"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$unauthenticated",
+      "permission": "ALLOW",
+      "property": "passwordReset"
     }
   ],
   "methods": {}

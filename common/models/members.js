@@ -3,6 +3,7 @@
 var loopback = require("loopback");
 var path = require('path');
 var moment = require('moment');
+var config = require('../../server/config.json');
 
 module.exports = function (Members) {
     Members.remoteMethod('updateById', {
@@ -199,7 +200,7 @@ module.exports = function (Members) {
         Members.app.models.Email.send({
             to: userInstance.email,
             from: 'smdev77@gmail.com',
-            subject: 'Test email from loopback',
+            subject: 'Thanks for registering',
             html: html_body
         }, function (err, mail) {
             if (err) return next(err);
@@ -207,9 +208,6 @@ module.exports = function (Members) {
             console.log('email sent!');
             next();
         });
-
-
-
     });
 
     var sendNotification = function (data) {
@@ -242,4 +240,45 @@ module.exports = function (Members) {
         req.write(JSON.stringify(data));
         req.end();
     };
+
+    Members.remoteMethod('passwordReset', {
+        http: { path: '/passwordReset', verb: 'post' },
+        accepts: { arg: 'param', type: 'Object', required: true },
+        returns: { arg: 'respon', type: 'Object', root: true }
+    });
+
+    Members.passwordReset = function (param, cb) {
+        Members.resetPassword(param, function (err, result) {
+            if (err) return cb(err)
+
+            cb(null, {
+                success: "success"
+            });
+        });
+    }
+
+    Members.on('resetPasswordRequest', function (info) {
+        var url = config.remoteHost + '/reset-password?access_token=' + info.accessToken.id;
+
+        // Send mail
+        var data = {
+            dateNow: moment().format('DD/MM/YYYY'),
+            resetEmail: url
+        };
+
+        var renderer = loopback.template(path.resolve(__dirname, '../views/email-template-password.ejs'));
+        var html_body = renderer(data);
+        // var mailFrom = Members.app.dataSources.pmjakarta.settings.transports[0].auth.user;
+
+        Members.app.models.Email.send({
+            to: info.email,
+            from: 'smdev77@gmail.com',
+            subject: 'Reset password request',
+            html: html_body
+        }, function (err, mail) {
+            if (err) return next(err);
+
+            console.log('email sent!');
+        });
+    });
 };
