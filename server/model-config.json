@@ -72,10 +72,6 @@
     "dataSource": "pmjakarta",
     "public": true
   },
-  "ViewMember": {
-    "dataSource": "pmjakarta",
-    "public": true
-  },
   "ViewChat": {
     "dataSource": "pmjakarta",
     "public": true
@@ -168,5 +164,9 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "ViewMember": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
