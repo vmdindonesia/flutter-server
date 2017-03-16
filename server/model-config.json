@@ -156,7 +156,7 @@
     "public": true
   },
   "MappingMemberToken": {
-    "dataSource": "pmjtesting",
+    "dataSource": "pmjakarta",
     "public": true
   },
   "LikeView": {
@@ -176,7 +176,7 @@
     "$resolved": true
   },
   "Feedback": {
-    "dataSource": "pmjtesting",
+    "dataSource": "pmjakarta",
     "public": true,
     "$promise": {},
     "$resolved": true
