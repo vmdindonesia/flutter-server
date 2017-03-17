@@ -40,6 +40,17 @@ module.exports = function (Memberverifystatus) {
     //     next();
     // })
 
+    Memberverifystatus.remoteMethod('isUserNeedVerify', {
+        description: 'Check User need verify or not.',
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'userId', type: 'number', required: true }
+        ],
+        returns: [
+            { arg: 'result', type: 'boolean', description: 'result is true or false' }
+        ]
+    });
+
     Memberverifystatus.remoteMethod('getVerifyStatusByUserId', {
         accepts: { arg: 'userId', type: 'string', required: true },
         returns: [
@@ -207,6 +218,44 @@ module.exports = function (Memberverifystatus) {
         req.write(JSON.stringify(data));
         req.end();
     };
+
+    Memberverifystatus.isUserNeedVerify = function (userId, cb) {
+        
+        var query = 'SELECT * FROM ( ' +
+            ' SELECT A.user_id, \'phone\' AS \'verify_key\', A.phone AS \'verify_value\' ' +
+            ' FROM member_verify_status A UNION ' +
+            ' SELECT A.user_id, \'ktp\' AS \'verify_key\', A.ktp AS \'verify_value\' ' +
+            ' FROM member_verify_status A UNION ' +
+            ' SELECT A.user_id, \'sim\' AS \'verify_key\', A.sim AS \'verify_value\' ' +
+            ' FROM member_verify_status A UNION ' +
+            ' SELECT A.user_id, \'school_certificate\' AS \'verify_key\', A.school_certificate AS \'verify_value\' ' +
+            ' FROM member_verify_status A UNION ' +
+            ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
+            ' FROM member_verify_status A UNION ' +
+            ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
+            ' FROM member_verify_status A ' +
+            ' ) B WHERE user_id = ? ';
+        var params = [userId];
+
+        Memberverifystatus.dataSource.connector.execute(query, params, function (error, result) {
+            if (error) {
+                cb(error);
+            } else {
+                if (result.length <= 0) {
+                    cb(null, true);
+
+                } else {
+                    var flag = true;
+                    result.forEach(function (item) {
+                        if (item.verify_value > 0) {
+                            flag = false;
+                        }
+                    }, this);
+                    cb(null, flag);
+                }
+            }
+        });
+    }
 
 
 
