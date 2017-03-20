@@ -281,4 +281,77 @@ module.exports = function (Members) {
             console.log('email sent!');
         });
     });
+
+    Members.remoteMethod('isUserNeedProfile', {
+        description: 'Check User need fill profile or not.',
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'userId', type: 'number', required: true }
+        ],
+        returns: [
+            { arg: 'result', type: 'boolean', description: 'result is true or false' }
+        ]
+    });
+
+    Members.isUserNeedProfile = function (userId, cb) {
+
+        //MAV VALUE IS 9. IF USER < 9 then return TRUE
+        var query = '';
+        query = query.concat(' SELECT B.id, SUM(value) AS \'value\' FROM ( ')
+            .concat(' SELECT A.id, \'phone\' AS \'key\', ')
+            .concat(' IF(A.phone IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'religion\' AS \'key\', ')
+            .concat(' IF(A.religion IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'profession\' AS \'key\', ')
+            .concat(' IF(A.profession IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'income\' AS \'key\', ')
+            .concat(' IF(A.income IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'living\' AS \'key\', ')
+            .concat(' IF(A.living IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'smoke\' AS \'key\', ')
+            .concat(' IF(A.smoke IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'race\' AS \'key\', ')
+            .concat(' IF(A.race IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'marital_status\' AS \'key\', ')
+            .concat(' IF(A.marital_status IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'hobby\' AS \'key\', ')
+            .concat(' IF(A.hobby IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' ) B WHERE B.id = ? ')
+            .concat(' GROUP BY B.id ');
+
+
+        var params = [userId];
+
+        Members.dataSource.connector.execute(query, params, function (error, result) {
+            if (error) {
+                cb(error);
+            } else {
+                var count = result[0].value;
+                if (count < 9) {
+                    cb(null, true);
+                } else {
+                    cb(null, false);
+                }
+            }
+        });
+    }
+
+
 };
