@@ -85,6 +85,25 @@ module.exports = function (Memberverifystatus) {
 
     });
 
+    Memberverifystatus.afterRemote('getVerifyStatusByUserId', function (context, user, next) {
+        var Memberphoto = app.models.MemberPhoto;
+        Memberphoto.findOne({
+            where: {
+                membersId: user.result.userId
+            }
+        }, function (error, result) {
+            if (result) {
+                next();
+            } else {
+                Memberphoto.create({
+                    membersId: user.result.userId,
+                    src: 'init_first'
+                });
+                next();
+            }
+        })
+    })
+
     Memberverifystatus.getVerifyStatusByUserId = function (userId, cb) {
         var filterMemberVerifyStatus = {
             where: {
@@ -220,7 +239,7 @@ module.exports = function (Memberverifystatus) {
     };
 
     Memberverifystatus.isUserNeedVerify = function (userId, cb) {
-        
+
         var query = 'SELECT * FROM ( ' +
             ' SELECT A.user_id, \'phone\' AS \'verify_key\', A.phone AS \'verify_value\' ' +
             ' FROM member_verify_status A UNION ' +
