@@ -178,6 +178,23 @@ module.exports = function (Members) {
     });
 
     Members.afterRemote('create', function (context, userInstance, next) {
+        //init verify status
+        var app = require('../../server/server');
+        var Memberverifystatus = app.models.MemberVerifyStatus;
+        console.log('USER ID : ' + userInstance.id);
+        var dateNow = new Date();
+        Memberverifystatus.create({
+            userId: userInstance.id,
+            phone: 0,
+            ktp: 0,
+            sim: 0,
+            schoolCertificate: 0,
+            passport: 0,
+            businessCard: 0,
+            createAt: dateNow,
+            updateAt: dateNow
+        });
+
 
         //Send Notif
         var message = {
