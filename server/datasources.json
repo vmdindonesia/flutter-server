@@ -25,12 +25,12 @@
     "transports": [
       {
         "type": "smtp",
-        "host": "smtp.mailtrap.io",
-        "secure": false,
-        "port": 25,
+        "host": "smtp.gmail.com",
+        "secure": true,
+        "port": 465,
         "auth": {
-          "user": "e9fce363dbeb7f",
-          "pass": "ca39da0d5ded2b"
+          "user": "donotreplyflutterasia@gmail.com",
+          "pass": "dataon123!"
         }
       }
     ]
