@@ -216,7 +216,7 @@ module.exports = function (Members) {
 
         Members.app.models.Email.send({
             to: userInstance.email,
-            from: 'smdev77@gmail.com',
+            from: 'donotreplyflutterasia@gmail.com',
             subject: 'Thanks for registering',
             html: html_body
         }, function (err, mail) {
@@ -289,7 +289,7 @@ module.exports = function (Members) {
 
         Members.app.models.Email.send({
             to: info.email,
-            from: 'smdev77@gmail.com',
+            from: 'donotreplyflutterasia@gmail.com',
             subject: 'Reset password request',
             html: html_body
         }, function (err, mail) {
