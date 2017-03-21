@@ -44,7 +44,7 @@ module.exports = function(Nearbyview) {
     function getMember(id, myLocation, setting, cb) {
         var _ = require('lodash');
 
-        console.log(setting);
+        // console.log(setting);
         // Default filter
         var filter = {
             where: {
@@ -84,7 +84,7 @@ module.exports = function(Nearbyview) {
             if (err) {
                 cb(err)
             }
-
+            
             getDistance(myLocation, result, cb);
         });
     }
