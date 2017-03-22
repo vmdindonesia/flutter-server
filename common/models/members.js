@@ -231,24 +231,42 @@ module.exports = function (Members) {
         sendNotification(message, 'MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy');
 
         // Send mail
-        var myMessage = {
-            dateNow: moment().format('DD/MM/YYYY'),
-            fullName: userInstance.fullName
-        };
+        // var myMessage = {
+        //     dateNow: moment().format('DD/MM/YYYY'),
+        //     fullName: userInstance.fullName
+        // };
 
-        var renderer = loopback.template(path.resolve(__dirname, '../views/email-template-registration.ejs'));
-        var html_body = renderer(myMessage);
+        // var renderer = loopback.template(path.resolve(__dirname, '../views/email-template-registration.ejs'));
+        // var html_body = renderer(myMessage);
         var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
 
-        Members.app.models.Email.send({
+        // Members.app.models.Email.send({
+        //     to: userInstance.email,
+        //     from: mailFrom,
+        //     subject: 'Thanks for registering',
+        //     html: html_body
+        // }, function (err, mail) {
+        //     if (err) return next(err);
+
+        //     console.log('email sent!');
+        //     next();
+        // });
+
+        // Send verify email
+        var url = config.remoteHost + 'api/Members/confirm?uid=' + userInstance.id + '&redirect=/';
+        var options = {
+            type: 'email',
             to: userInstance.email,
             from: mailFrom,
-            subject: 'Thanks for registering',
-            html: html_body
-        }, function (err, mail) {
+            subject: 'Thanks for registering.',
+            template: path.resolve(__dirname, '../views/verify.ejs'),
+            user: Members,
+            verifyHref: url
+        };
+        userInstance.verify(options, function (err, response, nexts) {
             if (err) return next(err);
 
-            console.log('email sent!');
+            console.log('> verification email sent:', response);
             next();
         });
     });
