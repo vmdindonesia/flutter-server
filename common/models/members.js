@@ -216,7 +216,7 @@ module.exports = function (Members) {
 
         Members.app.models.Email.send({
             to: userInstance.email,
-            from: 'donotreplyflutterasia@gmail.com',
+            from: mailFrom,
             subject: 'Thanks for registering',
             html: html_body
         }, function (err, mail) {
@@ -285,11 +285,11 @@ module.exports = function (Members) {
 
         var renderer = loopback.template(path.resolve(__dirname, '../views/email-template-password.ejs'));
         var html_body = renderer(data);
-        // var mailFrom = Members.app.dataSources.pmjakarta.settings.transports[0].auth.user;
+        var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
 
         Members.app.models.Email.send({
             to: info.email,
-            from: 'donotreplyflutterasia@gmail.com',
+            from: mailFrom,
             subject: 'Reset password request',
             html: html_body
         }, function (err, mail) {
@@ -369,6 +369,4 @@ module.exports = function (Members) {
             }
         });
     }
-
-
 };
