@@ -180,5 +180,9 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "Devicetokenmapping": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
