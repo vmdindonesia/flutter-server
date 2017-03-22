@@ -21,7 +21,33 @@ module.exports = function (Members) {
                 cb(null, err);
                 return;
             }
+            if (param.status == 1) {
+                console.log('SEND NOTIF TO USER');
+                var app = require('../../server/server');
+                var Devicetokenmapping = app.models.Devicetokenmapping;
+                Members.findOne({
+                    where: {
+                        id: id
+                    }
+                }, function (error, result) {
+                    var fullName = '';
+                    if (result) {
+                        fullName = result.fullName;
+                    }
+                    Devicetokenmapping.getUserToken(id, function (error, result) {
+                        var tokens = [];
+                        tokens.push(result);
+                        var message = {
+                            app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+                            contents: { en: 'Hi ' + fullName + ', your account has been Activated' },
+                            include_player_ids: tokens
+                        };
+                        sendNotification(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
 
+                    })
+
+                })
+            }
             cb(null, result);
         });
     }
@@ -202,7 +228,7 @@ module.exports = function (Members) {
             contents: { en: userInstance.fullName + ' just join as new Member' },
             included_segments: ["All"]
         };
-        sendNotification(message);
+        sendNotification(message, 'MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy');
 
         // Send mail
         var myMessage = {
@@ -227,10 +253,15 @@ module.exports = function (Members) {
         });
     });
 
-    var sendNotification = function (data) {
+    var sendNotification = function (data, someAuth) {
+        // var someAuth = 'Basic MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy';
+        // if (flag == true) {
+        //     someAuth = 'Basic ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm';
+        // }
+
         var headers = {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": "Basic MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy"
+            "Authorization": "Basic " + someAuth
         };
 
         var options = {
