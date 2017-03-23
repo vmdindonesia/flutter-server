@@ -448,15 +448,15 @@
       "_selectable": true
     },
     "kids": {
-      "type": "Number",
+      "type": "String",
       "required": false,
-      "length": null,
+      "length": 11,
       "precision": 10,
       "scale": 0,
       "mysql": {
         "columnName": "kids",
         "dataType": "int",
-        "dataLength": null,
+        "dataLength": 11,
         "dataPrecision": 10,
         "dataScale": 0,
         "nullable": "Y"
