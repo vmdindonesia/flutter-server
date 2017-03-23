@@ -234,7 +234,7 @@ module.exports = function (Members) {
         var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
 
         // Send verify email
-        var url = config.remoteHost + 'api/Members/confirm?uid=' + userInstance.id + '&redirect=/';
+        var url = config.remoteHost + '/api/Members/confirm?uid=' + userInstance.id + '&redirect=/';
         var options = {
             type: 'email',
             to: userInstance.email,
