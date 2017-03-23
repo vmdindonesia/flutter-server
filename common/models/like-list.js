@@ -11,7 +11,7 @@ module.exports = function (Likelist) {
         var Members = app.models.Members;
         console.log('SEND NOTIF');
         //model instance isi {"id":404,"likeUser":"318767","likeMember":"183836"}
-        Members.findById(modelInstance.likeMember, function (error, result) {
+        Members.findById(modelInstance.likeUser, function (error, result) {
             if (result) {
                 var userData = result;
                 Devicetokenmapping.getUserToken(modelInstance.likeMember, function (error, result) {
