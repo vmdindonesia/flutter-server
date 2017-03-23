@@ -1,0 +1,38 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "pmjakarta": {
+    "host": "192.168.0.100",
+    "port": 3306,
+    "url": "",
+    "database": "pmjakarta",
+    "password": "0tTSDG(X",
+    "name": "pmjtesting",
+    "user": "root",
+    "connector": "mysql"
+  },
+  "storage": {
+    "name": "storage",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "/var/loopback/storage/pmjakarta"
+  },
+  "pmjemail": {
+    "name": "pmjemail",
+    "connector": "mail",
+    "transports": [
+      {
+        "type": "smtp",
+        "host": "smtp.gmail.com",
+        "secure": true,
+        "port": 465,
+        "auth": {
+          "user": "donotreplyflutterasia@gmail.com",
+          "pass": "dataon123!"
+        }
+      }
+    ]
+  }
+}
