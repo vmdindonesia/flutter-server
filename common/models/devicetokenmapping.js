@@ -34,17 +34,21 @@ module.exports = function (Devicetokenmapping) {
             } else {
                 var dateNow = new Date();
                 if (result) {
-                    Devicetokenmapping.update({
-                        id: userId,
-                        token: token,
-                        updateAt: dateNow
-                    }, function (error, result) {
-                        if (error) {
-                            cb(error);
-                        } else {
-                            cb(null, result);
-                        }
-                    });
+                    if (result.token != token) {
+                        Devicetokenmapping.update({
+                            id: userId,
+                            token: token,
+                            updateAt: dateNow
+                        }, function (error, result) {
+                            if (error) {
+                                cb(error);
+                            } else {
+                                cb(null, result);
+                            }
+                        });
+                    } else {
+                        cb(null, result);
+                    }
                 } else {
                     Devicetokenmapping.create({
                         id: userId,
