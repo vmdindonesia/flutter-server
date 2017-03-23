@@ -8,7 +8,8 @@
     "posttest": "npm run lint && nsp check",
     "build:sdk": "./node_modules/.bin/lb-sdk server/server.js ./client/sdk -l angular2 -d ng2web -i enabled",
     "server:deploy": "slc deploy --service pmjakarta-server http://192.168.0.100",
-    "server:deploytesting": "slc deploy --service pmjakarta-testing http://192.168.0.100",
+    "server:deploy-testing": "slc deploy --service pmjakarta-testing http://192.168.0.100",
+    "server:deploy-development": "slc deploy --service pmjakarta-development http://192.168.0.100",
     "server:build": "slc build --npm",
     "server:status": "slc ctl --control http://192.168.0.100 status"
   },
