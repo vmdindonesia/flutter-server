@@ -21,33 +21,33 @@ module.exports = function (Members) {
                 cb(null, err);
                 return;
             }
-            if (param.status == 1) {
-                console.log('SEND NOTIF TO USER');
-                var app = require('../../server/server');
-                var Devicetokenmapping = app.models.Devicetokenmapping;
-                Members.findOne({
-                    where: {
-                        id: id
-                    }
-                }, function (error, result) {
-                    var fullName = '';
-                    if (result) {
-                        fullName = result.fullName;
-                    }
-                    Devicetokenmapping.getUserToken(id, function (error, result) {
-                        var tokens = [];
-                        tokens.push(result);
-                        var message = {
-                            app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
-                            contents: { en: 'Hi ' + fullName + ', your account has been Activated' },
-                            include_player_ids: tokens
-                        };
-                        sendNotification(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
+            // if (param.status == 1) {
+            //     console.log('SEND NOTIF TO USER');
+            //     var app = require('../../server/server');
+            //     var Devicetokenmapping = app.models.Devicetokenmapping;
+            //     Members.findOne({
+            //         where: {
+            //             id: id
+            //         }
+            //     }, function (error, result) {
+            //         var fullName = '';
+            //         if (result) {
+            //             fullName = result.fullName;
+            //         }
+            //         Devicetokenmapping.getUserToken(id, function (error, result) {
+            //             var tokens = [];
+            //             tokens.push(result);
+            //             var message = {
+            //                 app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+            //                 contents: { en: 'Hi ' + fullName + ', your account has been Activated' },
+            //                 include_player_ids: tokens
+            //             };
+            //             sendNotification(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
 
-                    })
+            //         })
 
-                })
-            }
+            //     })
+            // }
             cb(null, result);
         });
     }
