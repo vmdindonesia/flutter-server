@@ -2,6 +2,9 @@
 
 module.exports = function (Memberverifystatus) {
     var app = require('../../server/server');
+    var path = require('path');
+    var moment = require('moment');
+    var config = require('../../server/config.json');
 
     Memberverifystatus.beforeRemote('create', function (context, user, next) {
         var dateNow = new Date();
@@ -85,6 +88,15 @@ module.exports = function (Memberverifystatus) {
 
     });
 
+    Memberverifystatus.remoteMethod('sendEmailVerification', {
+        description: 'Sending Email for Verification',
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'status', type: 'boolean' }
+    })
+
     Memberverifystatus.afterRemote('getVerifyStatusByUserId', function (context, user, next) {
         var Memberphoto = app.models.MemberPhoto;
         Memberphoto.findOne({
@@ -105,6 +117,7 @@ module.exports = function (Memberverifystatus) {
     })
 
     Memberverifystatus.getVerifyStatusByUserId = function (userId, cb) {
+        var Members = app.models.Members;
         var filterMemberVerifyStatus = {
             where: {
                 userId: userId
@@ -112,7 +125,25 @@ module.exports = function (Memberverifystatus) {
         }
         Memberverifystatus.find(filterMemberVerifyStatus, function (error, result) {
             if (result.length > 0) {
-                cb(null, 'OK', result[0], {});
+                var verifyData = result[0];
+                Members.findById(userId, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    } else if (result) {
+                        var email = result.emailVerified;
+                        if (email == null) {
+                            email = 0;
+                        }
+                        verifyData['email'] = email;
+                        cb(null, 'OK', verifyData, {});
+                    } else {
+                        var error = {
+                            status: 404,
+                            message: 'Member Id not Found : ' + userId,
+                        }
+                        cb(error);
+                    }
+                })
             } else {
                 var error = {
                     code: 'member.id.not.found',
@@ -126,12 +157,13 @@ module.exports = function (Memberverifystatus) {
 
     Memberverifystatus.getVerifyScoreByUserId = function (userId, cb) {
         var verifyRate = {
-            phone: 25,
-            ktp: 25,
-            sim: 25,
-            school_certificate: 25,
-            passport: 25,
-            business_card: 25
+            phone: 20,
+            ktp: 20,
+            sim: 20,
+            school_certificate: 20,
+            passport: 20,
+            business_card: 20,
+            email: 20
         }
         var filterMemberVerifyStatus = {
             where: {
@@ -150,7 +182,9 @@ module.exports = function (Memberverifystatus) {
             ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
             ' FROM member_verify_status A UNION ' +
             ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
-            ' FROM member_verify_status A ' +
+            ' FROM member_verify_status A UNION ' +
+            ' SELECT A.id AS \'user_id\', \'email\' AS \'verify_key\', IFNULL(A.email_verified, 0) AS \'verify_value\' ' +
+            ' FROM Members A ' +
             ' ) B WHERE user_id = ? ';
         var params = [userId];
 
@@ -274,6 +308,47 @@ module.exports = function (Memberverifystatus) {
                 }
             }
         });
+    }
+
+    Memberverifystatus.sendEmailVerification = function (options, cb) {
+        var token = options.accessToken;
+        if (token) {
+            var userId = token.userId;
+            var Members = app.models.Members;
+            Members.findById(userId, function (error, result) {
+                var userInstance = result;
+                // Send mail
+                var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
+
+                // Send verify email
+                var url = config.remoteHost + '/api/Members/confirm?uid=' + userInstance.id + '&redirect=/';
+                var options = {
+                    type: 'email',
+                    to: userInstance.email,
+                    from: mailFrom,
+                    subject: 'Thanks for registering.',
+                    template: path.resolve(__dirname, '../views/verify.ejs'),
+                    user: Members,
+                    verifyHref: url,
+                    dateNow: moment().format('DD/MM/YYYY'),
+                    fullName: userInstance.fullName
+                };
+                userInstance.verify(options, function (err, response, nexts) {
+                    if (err) return next(err);
+
+                    console.log('> verification email sent:', response);
+                    // next();
+                    cb(null, true);
+                });
+
+            })
+
+
+        }
+
+
+
+
     }
 
 
