@@ -77,13 +77,13 @@
     "phone": {
       "type": "String",
       "required": false,
-      "length": 13,
+      "length": 15,
       "precision": null,
       "scale": null,
       "mysql": {
         "columnName": "phone",
         "dataType": "varchar",
-        "dataLength": 13,
+        "dataLength": 15,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
@@ -189,13 +189,13 @@
     "hobby": {
       "type": "String",
       "required": false,
-      "length": 255,
+      "length": 65535,
       "precision": null,
       "scale": null,
       "mysql": {
         "columnName": "hobby",
-        "dataType": "varchar",
-        "dataLength": 255,
+        "dataType": "text",
+        "dataLength": 65535,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
@@ -299,17 +299,17 @@
       "_selectable": true
     },
     "kids": {
-      "type": "Number",
+      "type": "String",
       "required": false,
-      "length": null,
-      "precision": 10,
-      "scale": 0,
+      "length": 11,
+      "precision": null,
+      "scale": null,
       "mysql": {
         "columnName": "kids",
-        "dataType": "int",
-        "dataLength": null,
-        "dataPrecision": 10,
-        "dataScale": 0,
+        "dataType": "varchar",
+        "dataLength": 11,
+        "dataPrecision": null,
+        "dataScale": null,
         "nullable": "Y"
       },
       "_selectable": true
@@ -442,6 +442,54 @@
       },
       "_selectable": true
     },
+    "religion": {
+      "type": "String",
+      "required": false,
+      "length": 20,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "religion",
+        "dataType": "varchar",
+        "dataLength": 20,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
+    "zodiac": {
+      "type": "String",
+      "required": false,
+      "length": 50,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "zodiac",
+        "dataType": "varchar",
+        "dataLength": 50,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
+    "age": {
+      "type": "Number",
+      "required": false,
+      "length": null,
+      "precision": 19,
+      "scale": 0,
+      "mysql": {
+        "columnName": "age",
+        "dataType": "bigint",
+        "dataLength": null,
+        "dataPrecision": 19,
+        "dataScale": 0,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
     "phoneVer": {
       "type": "Number",
       "required": false,
@@ -538,14 +586,46 @@
       },
       "_selectable": true
     },
-    "email": {
+    "id": {
+      "type": "Number",
+      "required": false,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "id",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "verify": {
+      "type": "String",
+      "required": false,
+      "length": 0,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "verify",
+        "dataType": "char",
+        "dataLength": 0,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "password": {
       "type": "String",
       "required": false,
       "length": 255,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "email",
+        "columnName": "password",
         "dataType": "varchar",
         "dataLength": 255,
         "dataPrecision": null,
@@ -570,51 +650,18 @@
       },
       "_selectable": false
     },
-    "password": {
+    "email": {
       "type": "String",
       "required": false,
       "length": 255,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "password",
+        "columnName": "email",
         "dataType": "varchar",
         "dataLength": 255,
         "dataPrecision": null,
         "dataScale": null,
-        "nullable": "N"
-      },
-      "_selectable": false
-    },
-    "verify": {
-      "type": "String",
-      "required": false,
-      "length": 0,
-      "precision": null,
-      "scale": null,
-      "mysql": {
-        "columnName": "verify",
-        "dataType": "char",
-        "dataLength": 0,
-        "dataPrecision": null,
-        "dataScale": null,
-        "nullable": "N"
-      },
-      "_selectable": false
-    },
-    "id": {
-      "type": "Number",
-      "id": true,
-      "required": false,
-      "length": null,
-      "precision": 10,
-      "scale": 0,
-      "mysql": {
-        "columnName": "id",
-        "dataType": "int",
-        "dataLength": null,
-        "dataPrecision": 10,
-        "dataScale": 0,
         "nullable": "N"
       },
       "_selectable": false
