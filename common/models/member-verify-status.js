@@ -286,7 +286,9 @@ module.exports = function (Memberverifystatus) {
             ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
             ' FROM member_verify_status A UNION ' +
             ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
-            ' FROM member_verify_status A ' +
+            ' FROM member_verify_status A UNION ' +
+            ' SELECT A.id AS \'user_id\', \'email\' AS \'verify_key\', IFNULL(A.email_verified, 0) AS \'verify_value\' ' +
+            ' FROM Members A ' +
             ' ) B WHERE user_id = ? ';
         var params = [userId];
 
