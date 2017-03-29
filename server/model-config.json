@@ -165,10 +165,6 @@
     "$promise": {},
     "$resolved": true
   },
-  "ViewMember": {
-    "dataSource": "pmjakarta",
-    "public": true
-  },
   "ViewLikeMe": {
     "dataSource": "pmjakarta",
     "public": true,
@@ -182,6 +178,10 @@
     "$resolved": true
   },
   "Devicetokenmapping": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ViewMember": {
     "dataSource": "pmjakarta",
     "public": true
   }
