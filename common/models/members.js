@@ -16,6 +16,7 @@ module.exports = function (Members) {
     });
 
     Members.updateById = function (id, param, cb) {
+        param['deletedAt'] = null;
         Members.upsertWithWhere({ id: id }, param, function (err, result) {
             if (err) {
                 cb(null, err);
@@ -363,8 +364,8 @@ module.exports = function (Members) {
             .concat(' IF(A.living IS NULL, 0, 1) AS \'value\' ')
             .concat(' FROM Members A ')
             .concat(' UNION ')
-            .concat(' SELECT A.id, \'smoke\' AS \'key\', ')
-            .concat(' IF(A.smoke IS NULL, 0, 1) AS \'value\' ')
+            .concat(' SELECT A.id, \'smoke_detail\' AS \'key\', ')
+            .concat(' IF(A.smoke_detail IS NULL, 0, 1) AS \'value\' ')
             .concat(' FROM Members A ')
             .concat(' UNION ')
             .concat(' SELECT A.id, \'race\' AS \'key\', ')

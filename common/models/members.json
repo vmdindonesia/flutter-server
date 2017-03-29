@@ -455,7 +455,7 @@
       "scale": 0,
       "mysql": {
         "columnName": "kids",
-        "dataType": "int",
+        "dataType": "varchar",
         "dataLength": 11,
         "dataPrecision": 10,
         "dataScale": 0,
