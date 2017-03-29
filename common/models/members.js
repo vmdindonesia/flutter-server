@@ -344,19 +344,15 @@ module.exports = function (Members) {
 
     Members.isUserNeedProfile = function (userId, cb) {
 
-        //MAV VALUE IS 9. IF USER < 9 then return TRUE
+        //MAX VALUE IS 14. IF USER < 14 then return TRUE
         var query = '';
         query = query.concat(' SELECT B.id, SUM(value) AS \'value\' FROM ( ')
-            .concat(' SELECT A.id, \'phone\' AS \'key\', ')
-            .concat(' IF(A.phone IS NULL, 0, 1) AS \'value\' ')
-            .concat(' FROM Members A ')
-            .concat(' UNION ')
             .concat(' SELECT A.id, \'religion\' AS \'key\', ')
             .concat(' IF(A.religion IS NULL, 0, 1) AS \'value\' ')
             .concat(' FROM Members A ')
             .concat(' UNION ')
-            .concat(' SELECT A.id, \'profession\' AS \'key\', ')
-            .concat(' IF(A.profession IS NULL, 0, 1) AS \'value\' ')
+            .concat(' SELECT A.id, \'industry\' AS \'key\', ')
+            .concat(' IF(A.industry IS NULL, 0, 1) AS \'value\' ')
             .concat(' FROM Members A ')
             .concat(' UNION ')
             .concat(' SELECT A.id, \'income\' AS \'key\', ')
@@ -379,6 +375,30 @@ module.exports = function (Members) {
             .concat(' IF(A.marital_status IS NULL, 0, 1) AS \'value\' ')
             .concat(' FROM Members A ')
             .concat(' UNION ')
+            .concat(' SELECT A.id, \'kids\' AS \'key\', ')
+            .concat(' IF(A.kids IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'degree\' AS \'key\', ')
+            .concat(' IF(A.degree IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'address\' AS \'key\', ')
+            .concat(' IF(A.address IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'zodiac\' AS \'key\', ')
+            .concat(' IF(A.zodiac IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'about\' AS \'key\', ')
+            .concat(' IF(A.about IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
+            .concat(' SELECT A.id, \'employee_type\' AS \'key\', ')
+            .concat(' IF(A.employee_type IS NULL, 0, 1) AS \'value\' ')
+            .concat(' FROM Members A ')
+            .concat(' UNION ')
             .concat(' SELECT A.id, \'hobby\' AS \'key\', ')
             .concat(' IF(A.hobby IS NULL, 0, 1) AS \'value\' ')
             .concat(' FROM Members A ')
@@ -393,7 +413,7 @@ module.exports = function (Members) {
                 cb(error);
             } else {
                 var count = result[0].value;
-                if (count < 9) {
+                if (count < 14) {
                     cb(null, true);
                 } else {
                     cb(null, false);
