@@ -27,41 +27,83 @@ module.exports = function (Devicetokenmapping) {
     });
 
     Devicetokenmapping.registerToken = function (userId, token, cb) {
-
+        console.log('CEK APAKAH USER SUDAH PUNYA TOKEN');
         Devicetokenmapping.findById(userId, function (error, result) {
             if (error) {
                 cb(error);
             } else {
                 var dateNow = new Date();
                 if (result) {
+                    console.log('USER SUDAH PUNYA TOKEN');
                     if (result.token != token) {
-                        Devicetokenmapping.update({
-                            id: userId,
+                        console.log('TOKEN YANG MAU DIREGISTER BERBEDA');
+                        Devicetokenmapping.updateAll({ id: userId }, {
                             token: token,
                             updateAt: dateNow
                         }, function (error, result) {
                             if (error) {
                                 cb(error);
                             } else {
+                                console.log('UPDATE TOKEN BERHASIL');
                                 cb(null, result);
                             }
                         });
                     } else {
+                        console.log('TOKEN YANG MAU DIREGISTER SUDAH BENAR');
                         cb(null, result);
                     }
                 } else {
-                    Devicetokenmapping.create({
-                        id: userId,
-                        token: token,
-                        createAt: dateNow,
-                        updateAt: dateNow
+                    console.log('USER BELUM TERDAFTAR TOKENNYA');
+                    console.log('MENGECEK TOKEN APAKAH SUDAH ADA USER YANG PAKAI TOKEN TSB');
+                    Devicetokenmapping.findOne({
+                        where: {
+                            token: token
+                        }
                     }, function (error, result) {
                         if (error) {
-                            cb(error);
+                            cb(error)
                         } else {
-                            cb(null, result);
+                            if (result) {
+                                console.log('SUDAH ADA USER YANG REGISTER DENGAN TOKEN INI');
+                                Devicetokenmapping.deleteById(result.id, function (error, result) {
+                                    if (error) {
+                                        cb(error);
+                                    } else {
+                                        console.log('USER BERHASIL DIHAPUS');
+                                        Devicetokenmapping.create({
+                                            id: userId,
+                                            token: token,
+                                            createAt: dateNow,
+                                            updateAt: dateNow
+                                        }, function (error, result) {
+                                            if (error) {
+                                                cb(error);
+                                            } else {
+                                                console.log('BERHASIL MENDAFTARKAN USER');
+                                                cb(null, result);
+                                            }
+                                        });
+                                    }
+
+                                })
+                            } else {
+                                console.log('TOKEN BELUM ADA YANG PUNYA');
+                                Devicetokenmapping.create({
+                                    id: userId,
+                                    token: token,
+                                    createAt: dateNow,
+                                    updateAt: dateNow
+                                }, function (error, result) {
+                                    if (error) {
+                                        cb(error);
+                                    } else {
+                                        console.log('BERHASIL DIBUATKAN');
+                                        cb(null, result);
+                                    }
+                                });
+                            }
                         }
-                    });
+                    })
                 }
             }
         })
