@@ -28,15 +28,15 @@
       "_selectable": false
     },
     "dislikeMamber": {
-      "type": "String",
+      "type": "Number",
       "required": false,
-      "length": 45,
+      "length": 11,
       "precision": null,
       "scale": null,
       "mysql": {
         "columnName": "dislike_mamber",
-        "dataType": "varchar",
-        "dataLength": 45,
+        "dataType": "int",
+        "dataLength": 11,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
@@ -44,15 +44,15 @@
       "_selectable": true
     },
     "dislikeUser": {
-      "type": "String",
+      "type": "Number",
       "required": false,
-      "length": 45,
+      "length": 11,
       "precision": null,
       "scale": null,
       "mysql": {
         "columnName": "dislike_user",
-        "dataType": "varchar",
-        "dataLength": 45,
+        "dataType": "int",
+        "dataLength": 11,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
