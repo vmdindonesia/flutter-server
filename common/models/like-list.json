@@ -30,7 +30,7 @@
     "likeUser": {
       "type": "Number",
       "required": false,
-      "length": 45,
+      "length": 11,
       "precision": null,
       "scale": null,
       "mysql": {
