@@ -28,15 +28,15 @@
       "_selectable": false
     },
     "likeUser": {
-      "type": "String",
+      "type": "Number",
       "required": false,
       "length": 45,
       "precision": null,
       "scale": null,
       "mysql": {
         "columnName": "like_user",
-        "dataType": "varchar",
-        "dataLength": 45,
+        "dataType": "int",
+        "dataLength": 11,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
@@ -44,15 +44,15 @@
       "_selectable": true
     },
     "likeMember": {
-      "type": "String",
+      "type": "Number",
       "required": false,
-      "length": 45,
+      "length": 11,
       "precision": null,
       "scale": null,
       "mysql": {
         "columnName": "like_member",
-        "dataType": "varchar",
-        "dataLength": 45,
+        "dataType": "int",
+        "dataLength": 11,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
