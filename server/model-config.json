@@ -184,5 +184,13 @@
   "ViewMember": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "SettingHome": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ViewHome": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
