@@ -66,9 +66,11 @@ module.exports = function (Viewhome) {
                     cb(error);
                 } else {
                     result.forEach(function (item) {
-                        likeAndDislikeIdList.push(item.likeMember);
+                        if (item) {
+                            likeAndDislikeIdList.push(item.likeMember);
+                        }
                     }, this);
-                    callback(getHomeListByFilter)
+                    callback(getMemberData)
                 }
             })
 
@@ -86,7 +88,9 @@ module.exports = function (Viewhome) {
                     cb(error);
                 } else {
                     result.forEach(function (item) {
-                        likeAndDislikeIdList.push(item.likeMember);
+                        if (item) {
+                            likeAndDislikeIdList.push(item.dislikeMamber);
+                        }
                     }, this);
                     callback(getHomeListByFilter);
                 }
@@ -111,10 +115,10 @@ module.exports = function (Viewhome) {
 
         //FILTER VIEW HOME BY MEMBER SETTING + LIMIT BY PARAMETER FUNCTION5
         function getHomeListByFilter() {
+            var Memberverifystatus = app.models.MemberVerifyStatus;
             console.log('GET HOME LIST BY SETTING');
             var gender = memberData.gender;
-
-            Viewhome.find({
+            var filter = {
                 where: {
                     and: [
                         { age: { between: [homeSettingData.ageLower, homeSettingData.ageUpper] } },
@@ -123,13 +127,69 @@ module.exports = function (Viewhome) {
                     ]
                 },
                 limit: limit
-            }, function (error, result) {
+            };
+            console.log('FILTER : ' + JSON.stringify(filter));
+            Viewhome.find(filter, function (error, result) {
                 if (error) {
                     cb(error);
                 } else {
-                    cb(null, result);
+                    var homeList = result;
+                    asyncLoop(homeList.length, function (loop) {
+                        var index = loop.iteration();
+                        Memberverifystatus.getVerifyScoreByUserId(homeList[index].id, function (error, status, result) {
+                            if (error) {
+                                cb(error)
+                            } else {
+                                console.log('RESULT IN ARRAY : ' + index + '_' + result);
+                                var status = status;
+                                var score = result;
+
+                                if (status == 'OK') {
+                                    homeList[index]['verifyScore'] = score;
+                                } else {
+                                    homeList[index]['verifyScore'] = 0
+                                }
+                                loop.next();
+                            }
+                        })
+                    }, function () {
+                        cb(null, homeList);
+                    })
                 }
             })
         }
+
+        function asyncLoop(iterations, func, callback) {
+            var index = 0;
+            var done = false;
+            var loop = {
+                next: function () {
+                    if (done) {
+                        return;
+                    }
+
+                    if (index < iterations) {
+                        index++;
+                        func(loop);
+
+                    } else {
+                        done = true;
+                        callback();
+                    }
+                },
+
+                iteration: function () {
+                    return index - 1;
+                },
+
+                break: function () {
+                    done = true;
+                    callback();
+                }
+            };
+            loop.next();
+            return loop;
+        }
+
     }
 };
