@@ -16,6 +16,7 @@ module.exports = function (Viewhome) {
     Viewhome.getHomeList = function (limit, options, cb) {
         var homeSettingData = {};
         var likeAndDislikeIdList = [];
+        var memberData = {};
 
         var token = options.accessToken;
         var userId = token.userId;
@@ -87,28 +88,46 @@ module.exports = function (Viewhome) {
                     result.forEach(function (item) {
                         likeAndDislikeIdList.push(item.likeMember);
                     }, this);
-                    callback();
+                    callback(getHomeListByFilter);
                 }
             })
 
         }
 
-        //FILTER VIEW HOME BY MEMBER SETTING + LIMIT BY PARAMETER FUNCTION4
+        //GET MEMBER DATA FUNCTION4
+        function getMemberData(callback) {
+            console.log('GET MEMBER DATA');
+            var Members = app.models.Members;
+            Members.findById(userId, function (error, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    memberData = result;
+                    callback();
+                }
+
+            })
+        }
+
+        //FILTER VIEW HOME BY MEMBER SETTING + LIMIT BY PARAMETER FUNCTION5
         function getHomeListByFilter() {
             console.log('GET HOME LIST BY SETTING');
+            var gender = memberData.gender;
+
             Viewhome.find({
                 where: {
                     and: [
                         { age: { between: [homeSettingData.ageLower, homeSettingData.ageUpper] } },
-                        { id: { nin: likeAndDislikeIdList } }
+                        { id: { nin: likeAndDislikeIdList } },
+                        { gender: { neq: gender } }
                     ]
                 },
                 limit: limit
             }, function (error, result) {
-                if(error){
+                if (error) {
                     cb(error);
-                }else{
-                    cb(null,result);
+                } else {
+                    cb(null, result);
                 }
             })
         }
