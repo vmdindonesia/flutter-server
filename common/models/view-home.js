@@ -24,7 +24,7 @@ module.exports = function (Viewhome) {
 
         //GET HOME SETTING FUNCTION1
         function getHomeSetting(callback) {
-            console.log('GET HOME SETTING');
+            // console.log('GET HOME SETTING');
             var Settinghome = app.models.SettingHome;
             Settinghome.findOne({
                 where: {
@@ -38,8 +38,8 @@ module.exports = function (Viewhome) {
                         homeSettingData = result;
                         callback(getDislikeIdList);
                     } else {
-                        console.log('FAILED TO FIND HOME SETTING');
-                        console.log('OR MAYBE I SHOULD INIT FOR YOU');
+                        // console.log('FAILED TO FIND HOME SETTING');
+                        // console.log('OR MAYBE I SHOULD INIT FOR YOU');
                         Settinghome.registerSettingHome(options, function (error, result) {
                             if (error) {
                                 cb(error);
@@ -56,7 +56,7 @@ module.exports = function (Viewhome) {
 
         //GET LIKE LIST FUNCTION2
         function getLikeIdList(callback) {
-            console.log('GET LIKE LIST');
+            // console.log('GET LIKE LIST');
             var Likelist = app.models.LikeList;
             Likelist.find({
                 fields: { likeMember: true },
@@ -78,7 +78,7 @@ module.exports = function (Viewhome) {
 
         //GET LIKE LIST FUNCTION3
         function getDislikeIdList(callback) {
-            console.log('GET DISLIKE LIST');
+            // console.log('GET DISLIKE LIST');
             var Dislikelist = app.models.DislikeList;
             Dislikelist.find({
                 fields: { dislikeMamber: true },
@@ -100,7 +100,7 @@ module.exports = function (Viewhome) {
 
         //GET MEMBER DATA FUNCTION4
         function getMemberData(callback) {
-            console.log('GET MEMBER DATA');
+            // console.log('GET MEMBER DATA');
             var Members = app.models.Members;
             Members.findById(userId, function (error, result) {
                 if (error) {
@@ -116,7 +116,7 @@ module.exports = function (Viewhome) {
         //FILTER VIEW HOME BY MEMBER SETTING + LIMIT BY PARAMETER FUNCTION5
         function getHomeListByFilter() {
             var Memberverifystatus = app.models.MemberVerifyStatus;
-            console.log('GET HOME LIST BY SETTING');
+            // console.log('GET HOME LIST BY SETTING');
             var gender = memberData.gender;
             var filter = {
                 where: {
@@ -128,7 +128,7 @@ module.exports = function (Viewhome) {
                 },
                 limit: limit
             };
-            console.log('FILTER : ' + JSON.stringify(filter));
+            // console.log('FILTER : ' + JSON.stringify(filter));
             Viewhome.find(filter, function (error, result) {
                 if (error) {
                     cb(error);
@@ -140,7 +140,7 @@ module.exports = function (Viewhome) {
                             if (error) {
                                 cb(error)
                             } else {
-                                console.log('RESULT IN ARRAY : ' + index + '_' + result);
+                                // console.log('RESULT IN ARRAY : ' + index + '_' + result);
                                 var status = status;
                                 var score = result;
 
