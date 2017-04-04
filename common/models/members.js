@@ -6,6 +6,13 @@ var moment = require('moment');
 var config = require('../../server/config.json');
 
 module.exports = function (Members) {
+
+    Members.beforeRemote('create', function (context, user, next) {
+        var dateNow = new Date();
+        context.args.data.createdAt = dateNow;
+        next();
+    })
+
     Members.remoteMethod('updateById', {
         http: { path: '/:id/updateById', verb: 'post' },
         accepts: [
