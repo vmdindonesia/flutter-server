@@ -1,5 +1,5 @@
 {
-  "name": "ChatDetail",
+  "name": "Chatdetail",
   "base": "PersistedModel",
   "idInjection": false,
   "options": {
