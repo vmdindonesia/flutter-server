@@ -61,7 +61,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "likeMembers": {
+      "type": "hasOne",
+      "model": "Members",
+      "foreignKey": "likeMember"
+    }
+  },
   "acls": [],
   "methods": {}
 }
