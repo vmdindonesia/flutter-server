@@ -62,10 +62,15 @@
   },
   "validations": [],
   "relations": {
-    "likeMembers": {
-      "type": "hasOne",
+    "membersLike": {
+      "type": "belongsTo",
       "model": "Members",
       "foreignKey": "likeMember"
+    },
+    "userLike": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "likeUser"
     }
   },
   "acls": [],
