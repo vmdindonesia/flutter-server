@@ -143,4 +143,115 @@ module.exports = function (Likelist) {
         }
     }
 
+    Likelist.remoteMethod('getLikeMeList', {
+        description: 'Get like me list',
+        http: { verb: 'get' },
+        accepts: { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+        returns: { arg: 'result', type: 'array', root: true }
+    })
+
+    Likelist.getLikeMeList = function (options, cb) {
+        var common = require('../common-util.js');
+
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            fields: ['likeUser'],
+            where: { likeMember: userId },
+            include: {
+                relation: 'userLike',
+                scope: {
+                    fields: [
+                        'id',
+                        'fullName',
+                        'online',
+                        'employeeType',
+                        'zodiac',
+                        'religion',
+                        'address',
+                        'bday'
+                    ],
+                    include: 'memberPhotos'
+                }
+            }
+        };
+
+        Likelist.find(filter, function (error, result) {
+            if (error) {
+                cb(error);
+            } else {
+                var likeMeList = result;
+
+                common.asyncLoop(likeMeList.length, function (loop) {
+                    var index = loop.iteration();
+                    var item = likeMeList[index];
+
+                    getLikeStatus(userId, item.likeUser, function (error, result) {
+                        if (error) {
+                            cb(error);
+                        } else {
+                            item['isLiked'] = result;
+
+                            getDislikeStatus(userId, item.likeUser, function (error, result) {
+                                if (error) {
+                                    cb(error);
+                                } else {
+                                    item['isDisliked'] = result;
+                                    loop.next();
+                                }
+                            });
+                        }
+                    });
+                }, function () {
+                    cb(null, likeMeList);
+                });
+            }
+        });
+
+        function getLikeStatus(myUserId, targetUserId, callback) {
+
+            var filter = {
+                where: {
+                    likeUser: myUserId,
+                    likeMember: targetUserId
+                }
+            };
+            Likelist.findOne(filter, function (error, result) {
+                if (error) {
+                    callback(error);
+                } else {
+                    if (result) {
+                        callback(null, true);
+                    } else {
+                        callback(null, false);
+                    }
+                }
+            });
+        }
+
+        function getDislikeStatus(myUserId, targetUserId, callback) {
+            var Dislikelist = app.models.DislikeList;
+
+            var filter = {
+                where: {
+                    dislikeUser: myUserId,
+                    dislikeMamber: targetUserId
+                }
+            };
+            Dislikelist.findOne(filter, function (error, result) {
+                if (error) {
+                    callback(error);
+                } else {
+                    if (result) {
+                        callback(null, true);
+                    } else {
+                        callback(null, false);
+                    }
+                }
+            })
+
+        }
+
+    }
 };
