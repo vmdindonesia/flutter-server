@@ -47,6 +47,15 @@ module.exports = function (Chatdetail) {
                     { matchId: modelInstance.matchId },
                     { membersId: { neq: modelInstance.membersId } }
                 ]
+            },
+            include: {
+                relation: "members",
+                scope: {
+                    fields: ['id', 'fullName', 'online'],
+                    include: {
+                        relation: "memberPhotos"
+                    }
+                }
             }
         }, function (error, result) {
             if (result.length > 0) {
@@ -54,37 +63,8 @@ module.exports = function (Chatdetail) {
                 var targetUserId = result[0].membersId;
 
                 var Pushnotification = require('../push-notification.js');
-                var Devicetokenmapping = app.models.Devicetokenmapping;
-                var Members = app.models.Members;
-
-                console.log('SEND NOTIF');
-                console.log(modelInstance);
-                Members.findById(modelInstance.membersId, function (error, result) {
-                    if (result) {
-                        var userData = result;
-                        Devicetokenmapping.getUserToken(targetUserId, function (error, result) {
-                            if (result) {
-                                var tokens = [];
-                                console.log(result);
-                                tokens.push(result);
-                                var message = {
-                                    app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
-                                    headings: { en: userData.fullName },
-                                    contents: { en: modelInstance.text },
-                                    android_group: 'chat',
-                                    android_group_message: { en: '$[notif_count] new messages' },
-                                    include_player_ids: tokens,
-                                    data: {
-                                        tag: 'chat'
-                                    }
-                                };
-                                Pushnotification.send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
-                            }
-                            console.log('END SEND NOTIF');
-                        })
-
-                    }
-                })
+                console.log(modelInstance.text);
+                Pushnotification.chat(modelInstance.membersId, targetUserId, modelInstance.text, result[0]);
             }
             next();
         })
