@@ -242,7 +242,7 @@ module.exports = function (Members) {
         var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
 
         // Send verify email
-        var url = config.remoteHost + '/api/Members/confirm?uid=' + userInstance.id + '&redirect=/';
+        var url = config.remoteHost + '/api/Members/confirm?uid=' + userInstance.id + '&redirect=/verified';
         var options = {
             type: 'email',
             to: userInstance.email,
@@ -261,6 +261,53 @@ module.exports = function (Members) {
             next();
         });
     });
+
+    Members.remoteMethod(
+        'confirm',
+        {
+            description: 'Confirm a user registration with email verification token.',
+            accepts: [
+                { arg: 'uid', type: 'string', required: true },
+                { arg: 'token', type: 'string', required: true },
+                { arg: 'redirect', type: 'string' },
+                { arg: 'res', type: 'object', http: { source: 'res' } }
+            ],
+            http: { verb: 'get', path: '/confirm' },
+        }
+    );
+
+    Members.confirm = function (uid, token, redirect, res, cb) {
+        Members.findById(uid, function (err, user) {
+            if (err) {
+                cb(err);
+            } else {
+                if (user && user.verificationToken === token) {
+                    user.verificationToken = null;
+                    user.emailVerified = true;
+                    user.save(function (err) {
+                        if (err) {
+                            cb(err);
+                        } else {
+                            cb();
+                        }
+                    });
+                } 
+                else {
+                    if (user) {
+                        err = 'Invalid token: ' + token;
+                    } else {
+                        err = 'User not found';
+                    }
+
+                    console.log(err);
+                    cb(err);
+                    res.render('error-verify', {
+                        error: err
+                    });
+                }
+            }
+        });
+    };
 
     var sendNotification = function (data, someAuth) {
         // var someAuth = 'Basic MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy';
