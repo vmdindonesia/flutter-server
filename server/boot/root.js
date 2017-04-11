@@ -63,5 +63,9 @@ module.exports = function(server) {
     });
   });
 
+  router.get('/verified', function (req, res) {
+    res.render('verified');
+  });
+
   server.use(router);
 };
