@@ -7,13 +7,14 @@ module.exports = function (Viewhome) {
         description: 'Get List of Data for Home Page (Find My Love)',
         http: { verb: 'post' },
         accepts: [
-            { arg: 'limit', type: 'number' },
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'excludeList', type: 'array', description: 'Optional Exclude list', required: false },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'array' }
     })
 
-    Viewhome.getHomeList = function (limit, options, cb) {
+    Viewhome.getHomeList = function (limit, excludeList, options, cb) {
         var homeSettingData = {};
         var likeAndDislikeIdList = [];
         var memberData = {};
@@ -118,11 +119,20 @@ module.exports = function (Viewhome) {
             var Memberverifystatus = app.models.MemberVerifyStatus;
             // console.log('GET HOME LIST BY SETTING');
             var gender = memberData.gender;
+
+            var excludeIdList = [];
+            if (excludeList) {
+                excludeList.forEach(function (item) {
+                    excludeIdList.push(item.id);
+                }, this);
+            }
+
             var filter = {
                 where: {
                     and: [
                         { age: { between: [homeSettingData.ageLower, homeSettingData.ageUpper] } },
                         { id: { nin: likeAndDislikeIdList } },
+                        { id: { nin: excludeIdList } },
                         { gender: { neq: gender } }
                     ]
                 },
