@@ -17,7 +17,10 @@ module.exports = function (Likelist) {
             { arg: 'userId', type: 'number', required: true, description: 'Id of user, who current user like' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
-        returns: { arg: 'isMatch', type: 'boolean' }
+        returns: [
+            { arg: 'isMatch', type: 'boolean' },
+            { arg: 'matchMember', type: 'object' }
+        ]
     })
 
     Likelist.doLike = function (userId, options, cb) {
@@ -64,7 +67,7 @@ module.exports = function (Likelist) {
                     if (result) {
                         callback(addMatchMember);
                     } else {
-                        cb(null, false);
+                        cb(null, false, {});
                     }
                 }
             });
@@ -114,7 +117,29 @@ module.exports = function (Likelist) {
                 } else {
                     Pushnotification.match(newMatchMembers[0].membersId);
                     Pushnotification.match(newMatchMembers[1].membersId);
-                    cb(null, true);
+                    Matchmember.findOne({
+                        where: {
+                            and: [
+                                { membersId: likedUserId },
+                                { matchId: matchId }
+                            ]
+                        },
+                        include: {
+                            relation: 'members',
+                            scope: {
+                                fields: ['id', 'fullName', 'online'],
+                                include: {
+                                    relation: 'memberPhotos'
+                                }
+                            }
+                        }
+                    }, function (error, result) {
+                        if (error) {
+                            cb(error);
+                        } else {
+                            cb(null, true, result);
+                        }
+                    })
                 }
             })
 
