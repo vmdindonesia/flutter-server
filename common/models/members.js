@@ -291,7 +291,7 @@ module.exports = function (Members) {
                             cb();
                         }
                     });
-                } 
+                }
                 else {
                     if (user) {
                         err = 'Invalid token: ' + token;
@@ -360,6 +360,28 @@ module.exports = function (Members) {
             });
         });
     }
+
+    // by-jeje check email 
+    Members.remoteMethod('emailCheck', {
+        http: { path: '/emailCheck', verb: 'post' },
+        accepts: { arg: 'param', type: 'Object', required: true },
+        returns: { arg: 'respon', type: 'Object', root: true }
+    });
+
+    Members.emailCheck = function (param, cb) {
+        Members.find({
+            where: {
+                email: param.email
+            }
+        }, function (err, req) {
+            if (err) {
+                cb(null, []);
+            } else {
+                cb(null, req);
+            }
+        });
+    }
+
 
     Members.on('resetPasswordRequest', function (info) {
         var url = config.remoteHost + '/reset-password?access_token=' + info.accessToken.id;
