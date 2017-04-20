@@ -197,6 +197,10 @@ module.exports = function (Viewhome) {
                 { id: { nin: excludeByFilterList } },
                 { gender: { neq: gender } }
             ];
+            // console.log(JSON.stringify(homeSettingData));
+            if (homeSettingData.religion) {
+                andList.push({ religion: { inq: JSON.parse(homeSettingData.religion) } });
+            }
             if (homeSettingData.verify) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
