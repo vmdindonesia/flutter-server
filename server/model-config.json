@@ -192,5 +192,11 @@
   "ViewHome": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "VisibilityData": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
