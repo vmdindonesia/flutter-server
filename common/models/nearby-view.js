@@ -14,29 +14,33 @@ module.exports = function (Nearbyview) {
 
     Nearbyview.getNearbyLocation = function (id, cb) {
         var Members = app.models.Members;
+        var memberResult;
 
+        // Get setting user
         var filter = {
-            fields: { email: true, fullName: true, id: true },
+            fields: ['email', 'fullName', 'id', 'gender'],
             include: [{
                 relation: 'nearbies',
                 scope: {
                     fields: { geolocation: true }
                 }
-            }, 'memberSetting']
+            }, 'settingHome']
         };
 
         Members.findById(id, filter, function (error, result) {
             if (error) {
                 cb(error);
             } else {
-                var member = result;
+                memberResult = result;
+                // console.log(member);
+
                 //Get near by my location
                 var myLocation = new loopback.GeoPoint({
-                    lat: member.nearbies().geolocation.lat,
-                    lng: member.nearbies().geolocation.lng
+                    lat: memberResult.nearbies().geolocation.lat,
+                    lng: memberResult.nearbies().geolocation.lng
                 });
 
-                var setting = member.memberSetting();
+                var setting = memberResult.settingHome();
 
                 // GET NEARBY MEMBERS
                 getMember(id, myLocation, setting);
@@ -44,40 +48,44 @@ module.exports = function (Nearbyview) {
 
         });
 
+        // Get data from setting user
         function getMember(id, myLocation, setting) {
-
-            // DEFAULT FILTER
+            
             var filter = {
                 where: {
                     id: { neq: id },
+                    gender: { neq: memberResult.gender },
+                    age: {
+                        between: [setting.ageLower, setting.ageUpper]
+                    },
+                    smoke: setting.smoke,
+                    income: setting.income,
                     geolocation: {
                         near: myLocation,
                         maxDistance: setting.distance,
                         unit: 'kilometers'
-                    },
-                    age: {
-                        between: [setting.ageLower, setting.ageUpper]
-                    },
-                    visibility: true
+                    }
                 }
             }
 
-            // Config filter gender
-            if (setting.men && !setting.women) {
-                filter.where['gender'] = 0;
-            } else if (setting.women && !setting.men) {
-                filter.where['gender'] = 1;
-            }
-
             // Config filter religion
-            console.log(setting.religion);
-            if (!lodash.isNull(setting.religion)) {
-                filter.where['religion'] = { inq: JSON.parse(setting.religion) }
+            if (!lodash.isEmpty(setting.religion)) {
+                filter.where['religion'] = { inq: JSON.parse(setting.religion) };
             }
 
-            // Config filter zodiak
+            // Config filter zodiac
             if (!lodash.isNull(setting.zodiac)) {
-                filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) }
+                filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) };
+            }
+
+            // Config filter smoke
+            if (!lodash.isNull(setting.smoke)) {
+                filter.where['smoke'] = setting.smoke;
+            }
+
+            // Config filter verify
+            if(!lodash.isNull(setting.verify)) {
+                filter.where['verify'] = { gte: setting.verify };
             }
 
             // Getting data from db
