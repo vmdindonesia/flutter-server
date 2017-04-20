@@ -31,6 +31,7 @@
     "loopback-ds-timestamp-mixin": "^3.4.0",
     "moment": "^2.18.1",
     "serve-favicon": "^2.4.2",
+    "pug": "^2.0.0-beta11",
     "socket.io": "^1.7.3",
     "strong-error-handler": "^2.0.0",
     "xmlhttprequest": "^1.8.0"
