@@ -249,6 +249,22 @@
         "nullable": "Y"
       },
       "_selectable": true
+    },
+    "verifyScore": {
+      "type": "Number",
+      "required": false,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "verify",
+        "dataType": "int",
+        "dataLength": 10,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "Y"
+      },
+      "_selectable": true
     }
   },
   "validations": [],
