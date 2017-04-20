@@ -2,6 +2,7 @@
 
 module.exports = function (Viewhome) {
     var app = require('../../server/server');
+    var common = require('../common-util.js');
 
     Viewhome.remoteMethod('getHomeList', {
         description: 'Get List of Data for Home Page (Find My Love)',
@@ -18,6 +19,7 @@ module.exports = function (Viewhome) {
         var homeSettingData = {};
         var likeAndDislikeIdList = [];
         var memberData = {};
+        var excludeByFilterList = [];
 
         var token = options.accessToken;
         var userId = token.userId;
@@ -37,7 +39,8 @@ module.exports = function (Viewhome) {
                 } else {
                     if (result) {
                         homeSettingData = result;
-                        callback(getDislikeIdList);
+                        getLikeIdList();
+                        // callback(getDislikeIdList);
                     } else {
                         // console.log('FAILED TO FIND HOME SETTING');
                         // console.log('OR MAYBE I SHOULD INIT FOR YOU');
@@ -46,7 +49,8 @@ module.exports = function (Viewhome) {
                                 cb(error);
                             } else {
                                 homeSettingData = result;
-                                callback(getDislikeIdList);
+                                getLikeIdList();
+                                // callback(getDislikeIdList);
                             }
                         });
                     }
@@ -56,7 +60,7 @@ module.exports = function (Viewhome) {
         }
 
         //GET LIKE LIST FUNCTION2
-        function getLikeIdList(callback) {
+        function getLikeIdList() {
             // console.log('GET LIKE LIST');
             var Likelist = app.models.LikeList;
             Likelist.find({
@@ -71,14 +75,15 @@ module.exports = function (Viewhome) {
                             likeAndDislikeIdList.push(item.likeMember);
                         }
                     }, this);
-                    callback(getMemberData)
+                    getDislikeIdList();
+                    // callback(getMemberData);
                 }
             })
 
         }
 
         //GET LIKE LIST FUNCTION3
-        function getDislikeIdList(callback) {
+        function getDislikeIdList() {
             // console.log('GET DISLIKE LIST');
             var Dislikelist = app.models.DislikeList;
             Dislikelist.find({
@@ -93,14 +98,15 @@ module.exports = function (Viewhome) {
                             likeAndDislikeIdList.push(item.dislikeMamber);
                         }
                     }, this);
-                    callback(getHomeListByFilter);
+                    getMemberData();
+                    // callback(getHomeListByFilter);
                 }
             })
 
         }
 
         //GET MEMBER DATA FUNCTION4
-        function getMemberData(callback) {
+        function getMemberData() {
             // console.log('GET MEMBER DATA');
             var Members = app.models.Members;
             Members.findById(userId, function (error, result) {
@@ -108,10 +114,68 @@ module.exports = function (Viewhome) {
                     cb(error);
                 } else {
                     memberData = result;
-                    callback();
+                    getCurrentUserVerifyScore();
+                    // getHomeListByFilter();
+                    // callback();
                 }
 
             })
+        }
+
+        function getCurrentUserVerifyScore() {
+
+            var Memberverifystatus = app.models.MemberVerifyStatus;
+
+            Memberverifystatus.getVerifyScoreByUserId(userId, function (error, status, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    var status = status;
+                    var score = result;
+
+                    if (status == 'OK') {
+                        memberData['verifyScore'] = score;
+                    } else {
+                        memberData['verifyScore'] = 0
+                    }
+                    getNotIncludedByVisibility();
+                }
+            });
+
+        }
+
+        function getNotIncludedByVisibility() {
+            // AMBIL DATA DARI USER SESUAI DENGAN SETTING YANG DIPAKAI.
+            // MISAL DIMULAI DARI UMUR.
+            memberData['age'] = common.calculateAge(memberData['bday']);
+
+            var Settinghome = app.models.SettingHome;
+
+            var filter = {
+                fields: { memberId: true },
+                where: {
+                    or: [
+                        { ageLower: { gt: memberData.age } },
+                        { ageUpper: { lt: memberData.age } },
+                        { smoke: { neq: memberData.smoke } },
+                        { income: { neq: memberData.income } },
+                        { verify: { lt: memberData.verifyScore } }
+                    ]
+                }
+            }
+            console.log(JSON.stringify(filter));
+            Settinghome.find(filter, function (error, result) {
+                if (error) {
+                    cb(error);
+                }
+                result.forEach(function (item) {
+                    excludeByFilterList.push(item.memberId);
+                }, this);
+                getHomeListByFilter();
+            })
+
+
+
         }
 
         //FILTER VIEW HOME BY MEMBER SETTING + LIMIT BY PARAMETER FUNCTION5
@@ -133,6 +197,7 @@ module.exports = function (Viewhome) {
                         { age: { between: [homeSettingData.ageLower, homeSettingData.ageUpper] } },
                         { id: { nin: likeAndDislikeIdList } },
                         { id: { nin: excludeIdList } },
+                        { id: { nin: excludeByFilterList } },
                         { gender: { neq: gender } }
                     ]
                 },
@@ -144,7 +209,7 @@ module.exports = function (Viewhome) {
                     cb(error);
                 } else {
                     var homeList = result;
-                    asyncLoop(homeList.length, function (loop) {
+                    common.asyncLoop(homeList.length, function (loop) {
                         var index = loop.iteration();
                         Memberverifystatus.getVerifyScoreByUserId(homeList[index].id, function (error, status, result) {
                             if (error) {
@@ -164,42 +229,9 @@ module.exports = function (Viewhome) {
                         })
                     }, function () {
                         cb(null, homeList);
-                    })
+                    });
                 }
             })
         }
-
-        function asyncLoop(iterations, func, callback) {
-            var index = 0;
-            var done = false;
-            var loop = {
-                next: function () {
-                    if (done) {
-                        return;
-                    }
-
-                    if (index < iterations) {
-                        index++;
-                        func(loop);
-
-                    } else {
-                        done = true;
-                        callback();
-                    }
-                },
-
-                iteration: function () {
-                    return index - 1;
-                },
-
-                break: function () {
-                    done = true;
-                    callback();
-                }
-            };
-            loop.next();
-            return loop;
-        }
-
     }
 };
