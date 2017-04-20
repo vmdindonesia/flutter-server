@@ -686,10 +686,10 @@
       "foreignKey": "membersId",
       "primaryKey": "id"
     },
-    "memberSetting": {
+    "settingHome": {
       "type": "hasOne",
-      "model": "MemberSetting",
-      "foreignKey": "membersId"
+      "model": "SettingHome",
+      "foreignKey": "memberId"
     },
     "matchMambers": {
       "type": "hasMany",
