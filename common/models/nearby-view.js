@@ -4,6 +4,7 @@ module.exports = function (Nearbyview) {
     var app = require('../../server/server');
     var loopback = require('loopback');
     var lodash = require('lodash');
+    var common = require('../common-util.js');
 
     Nearbyview.remoteMethod('getNearbyLocation', {
         description: 'Get Nearby Member List of User',
@@ -13,8 +14,12 @@ module.exports = function (Nearbyview) {
     });
 
     Nearbyview.getNearbyLocation = function (id, cb) {
-        var Members = app.models.Members;
         var memberResult;
+        var excludeByFilterList = [];
+        var Members = app.models.Members;
+        var memberData = {};
+        var myLocation;
+        var setting;
 
         // Get setting user
         var filter = {
@@ -27,6 +32,7 @@ module.exports = function (Nearbyview) {
             }, 'settingHome']
         };
 
+        // Function 1
         Members.findById(id, filter, function (error, result) {
             if (error) {
                 cb(error);
@@ -35,25 +41,97 @@ module.exports = function (Nearbyview) {
                 // console.log(member);
 
                 //Get near by my location
-                var myLocation = new loopback.GeoPoint({
+                myLocation = new loopback.GeoPoint({
                     lat: memberResult.nearbies().geolocation.lat,
                     lng: memberResult.nearbies().geolocation.lng
                 });
 
-                var setting = memberResult.settingHome();
+                setting = memberResult.settingHome();
 
                 // GET NEARBY MEMBERS
-                getMember(id, myLocation, setting);
+                // getMember(id, myLocation, setting);
+                getMemberData(id);
             }
 
         });
 
+        // Function 2
+        // Get Data Member
+        function getMemberData(id) {
+            Members.findById(id, function (error, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    memberData = result;
+
+                    getCurrentUserVerifyScore(id);
+                }
+            });
+        }
+
+        // Function 3
+        // Get Verify Score
+        function getCurrentUserVerifyScore(id) {
+            var Memberverifystatus = app.models.MemberVerifyStatus;
+
+            Memberverifystatus.getVerifyScoreByUserId(id, function (error, status, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    var status = status;
+                    var score = result;
+
+                    if (status == 'OK') {
+                        memberData['verifyScore'] = score;
+                    } else {
+                        memberData['verifyScore'] = 0
+                    }
+
+                    getExlcudeList(id);
+                }
+            });
+
+        }
+
+        // Function 3
+        // Get exclude filter
+        function getExlcudeList(id) {
+            memberData['age'] = common.calculateAge(memberData['bday']);
+            var Settinghome = app.models.SettingHome;
+
+            var filter = {
+                fields: { memberId: true },
+                where: {
+                    or: [
+                        { ageLower: { gt: memberData.age } },
+                        { ageUpper: { lt: memberData.age } },
+                        { smoke: { neq: memberData.smoke } },
+                        { income: { neq: memberData.income } },
+                        { verify: { lt: memberData.verifyScore } }
+                    ]
+                }
+            }
+
+            Settinghome.find(filter, function (error, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    result.forEach(function (item) {
+                        excludeByFilterList.push(item.memberId);
+                    }, this);
+
+                    getMember(id);
+                }
+            })
+        }
+
+        // Function 4
         // Get data from setting user
-        function getMember(id, myLocation, setting) {
-            
+        function getMember(id) {
             var filter = {
                 where: {
                     id: { neq: id },
+                    id: { nin: excludeByFilterList },
                     gender: { neq: memberResult.gender },
                     age: {
                         between: [setting.ageLower, setting.ageUpper]
@@ -85,7 +163,7 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter verify
-            if(!lodash.isNull(setting.verify)) {
+            if (!lodash.isNull(setting.verify)) {
                 filter.where['verify'] = { gte: setting.verify };
             }
 
@@ -99,6 +177,7 @@ module.exports = function (Nearbyview) {
             });
         }
 
+        // Function 5
         function getDistance(myLocation, nearbyList) {
             var common = require('../common-util.js');
 
