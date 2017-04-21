@@ -706,6 +706,11 @@
       "type": "hasMany",
       "model": "ChatDetail",
       "foreignKey": "membersId"
+    },
+    "rel_visibility": {
+      "type": "hasMany",
+      "model": "VisibilityData",
+      "foreignKey": "membersId"
     }
   },
   "acls": [
