@@ -3,6 +3,7 @@
 module.exports = function (Viewhome) {
     var app = require('../../server/server');
     var common = require('../common-util.js');
+    var _ = require('lodash');
 
     Viewhome.remoteMethod('getHomeList', {
         description: 'Get List of Data for Home Page (Find My Love)',
@@ -159,7 +160,7 @@ module.exports = function (Viewhome) {
                         { ageUpper: { lt: memberData.age } },
                         { smoke: { neq: memberData.smoke } },
                         { income: { neq: memberData.income } },
-                        { verify: { lte: memberData.verifyScore } }
+                        { verify: { lt: memberData.verifyScore } }
                     ]
                 }
             }
@@ -198,7 +199,7 @@ module.exports = function (Viewhome) {
                 { gender: { neq: gender } }
             ];
             // console.log(JSON.stringify(homeSettingData));
-            if (homeSettingData.religion) {
+            if (!_.isEmpty(JSON.parse(homeSettingData.religion))) {
                 andList.push({ religion: { inq: JSON.parse(homeSettingData.religion) } });
             }
             if (homeSettingData.verify) {

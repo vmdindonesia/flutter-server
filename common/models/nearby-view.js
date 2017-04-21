@@ -69,12 +69,12 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter religion
-            if (!lodash.isEmpty(setting.religion)) {
+            if (!lodash.isEmpty(JSON.parse(setting.religion))) {
                 filter.where['religion'] = { inq: JSON.parse(setting.religion) };
             }
 
             // Config filter zodiac
-            if (!lodash.isNull(setting.zodiac)) {
+            if (!lodash.isEmpty(JSON.parse(setting.zodiac))) {
                 filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) };
             }
 
