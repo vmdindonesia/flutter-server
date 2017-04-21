@@ -60,6 +60,7 @@ module.exports = function (Nearbyview) {
                     },
                     smoke: setting.smoke,
                     income: setting.income,
+                    visibility: setting.visibility,
                     geolocation: {
                         near: myLocation,
                         maxDistance: setting.distance,
