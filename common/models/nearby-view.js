@@ -4,6 +4,8 @@ module.exports = function (Nearbyview) {
     var app = require('../../server/server');
     var loopback = require('loopback');
     var lodash = require('lodash');
+    var common = require('../common-util.js');
+    let async = require("async");
 
     Nearbyview.remoteMethod('getNearbyLocation', {
         description: 'Get Nearby Member List of User',
@@ -13,8 +15,12 @@ module.exports = function (Nearbyview) {
     });
 
     Nearbyview.getNearbyLocation = function (id, cb) {
-        var Members = app.models.Members;
         var memberResult;
+        var excludeByFilterList = [];
+        var Members = app.models.Members;
+        var memberData = {};
+        var myLocation;
+        var setting;
 
         // Get setting user
         var filter = {
@@ -27,6 +33,7 @@ module.exports = function (Nearbyview) {
             }, 'settingHome']
         };
 
+        // Function 1
         Members.findById(id, filter, function (error, result) {
             if (error) {
                 cb(error);
@@ -35,31 +42,105 @@ module.exports = function (Nearbyview) {
                 // console.log(member);
 
                 //Get near by my location
-                var myLocation = new loopback.GeoPoint({
+                myLocation = new loopback.GeoPoint({
                     lat: memberResult.nearbies().geolocation.lat,
                     lng: memberResult.nearbies().geolocation.lng
                 });
 
-                var setting = memberResult.settingHome();
+                setting = memberResult.settingHome();
 
                 // GET NEARBY MEMBERS
-                getMember(id, myLocation, setting);
+                // getMember(id, myLocation, setting);
+                getMemberData(id);
             }
 
         });
 
-        // Get data from setting user
-        function getMember(id, myLocation, setting) {
-            
+        // Function 2
+        // Get Data Member
+        function getMemberData(id) {
+            Members.findById(id, function (error, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    memberData = result;
+
+                    getCurrentUserVerifyScore(id);
+                }
+            });
+        }
+
+        // Function 3
+        // Get Verify Score
+        function getCurrentUserVerifyScore(id) {
+            var Memberverifystatus = app.models.MemberVerifyStatus;
+
+            Memberverifystatus.getVerifyScoreByUserId(id, function (error, status, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    var status = status;
+                    var score = result;
+
+                    if (status == 'OK') {
+                        memberData['verifyScore'] = score;
+                    } else {
+                        memberData['verifyScore'] = 0
+                    }
+
+                    getExlcudeList(id);
+                }
+            });
+
+        }
+
+        // Function 3
+        // Get exclude filter
+        function getExlcudeList(id) {
+            memberData['age'] = common.calculateAge(memberData['bday']);
+            var Settinghome = app.models.SettingHome;
+
             var filter = {
+                fields: { memberId: true },
+                where: {
+                    or: [
+                        { ageLower: { gt: memberData.age } },
+                        { ageUpper: { lt: memberData.age } },
+                        { smoke: { neq: memberData.smoke } },
+                        { income: { neq: memberData.income } },
+                        { verify: { lt: memberData.verifyScore } }
+                    ]
+                }
+            }
+
+            Settinghome.find(filter, function (error, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    result.forEach(function (item) {
+                        excludeByFilterList.push(item.memberId);
+                    }, this);
+
+                    getMember(id);
+                }
+            })
+        }
+
+        // Function 4
+        // Get data from setting user
+        function getMember(id) {
+            var filter = {
+                include: 'rel_visibility',
                 where: {
                     id: { neq: id },
+                    id: { nin: excludeByFilterList },
                     gender: { neq: memberResult.gender },
                     age: {
                         between: [setting.ageLower, setting.ageUpper]
                     },
                     smoke: setting.smoke,
                     income: setting.income,
+                    visibility: setting.visibility,
                     geolocation: {
                         near: myLocation,
                         maxDistance: setting.distance,
@@ -69,12 +150,12 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter religion
-            if (!lodash.isEmpty(setting.religion)) {
+            if (!lodash.isEmpty(JSON.parse(setting.religion))) {
                 filter.where['religion'] = { inq: JSON.parse(setting.religion) };
             }
 
             // Config filter zodiac
-            if (!lodash.isNull(setting.zodiac)) {
+            if (!lodash.isEmpty(JSON.parse(setting.zodiac))) {
                 filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) };
             }
 
@@ -84,7 +165,7 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter verify
-            if(!lodash.isNull(setting.verify)) {
+            if (!lodash.isNull(setting.verify)) {
                 filter.where['verify'] = { gte: setting.verify };
             }
 
@@ -98,6 +179,7 @@ module.exports = function (Nearbyview) {
             });
         }
 
+        // Function 5
         function getDistance(myLocation, nearbyList) {
             var common = require('../common-util.js');
 
@@ -136,8 +218,174 @@ module.exports = function (Nearbyview) {
                 });
             }, function () {
                 //AFTER LOOP
-                cb(null, newResult);
+
+                console.log(newResult);
+
+                // cb(null, newResult);
+                verify(newResult);
             })
+        }
+
+        /**
+         * Function Verify
+         */
+        function verify(params) {
+
+            let isVerify;
+            if (memberData.verifyScore != null) {
+                isVerify = (memberData.verifyScore < 20) ? false : true;
+            } else {
+                isVerify = false;
+            }
+
+            async.eachOfSeries(params, function (value, key, callback) {
+
+                // SORRY, FASTEST WAY IS USING NATIVE QUERY
+                var query = new String();
+                query = query.concat(' SELECT match_id, COUNT(*) AS \'count\' FROM Match_member ')
+                    .concat(' WHERE members_id = ? OR members_id = ? ')
+                    .concat(' GROUP BY match_id HAVING count > 1 ');
+
+                var params = [memberData.id, value.id];
+
+                app.models.NearbyView.dataSource.connector.execute(query, params, function (error, result) {
+                    if (error) {
+                        callback();
+                    } else {
+                        let isMatch;
+                        if (result.length > 0) {
+                            isMatch = true;
+                        } else {
+                            isMatch = false;
+                        }
+
+                        if (value.rel_visibility == null || value.rel_visibility == undefined) {
+                            callback();
+                        } else {
+
+                            if (value.rel_visibility.length == 0) {
+                                callback();
+                            } else {
+
+                                console.log(
+                                    isVerify, isMatch
+                                );
+
+                                async.eachOfSeries(value.rel_visibility, function (value2, key, callback) {
+
+                                    switch (value2.filterId) {
+                                        case 1:
+
+                                            var hasil = value.fullName;
+                                            value.fullName = value.fullName.split(" ")[0] + ' XXX';
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.fullName = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.fullName = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.fullName = hasil;
+                                                }
+                                            }
+
+                                            callback();
+                                            break;
+                                        case 2:
+
+                                            callback();
+                                            break;
+                                        case 3:
+
+                                            var hasil = value.income;
+                                            value.income = 'Privacy';
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.income = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.income = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.income = hasil;
+                                                }
+                                            }
+
+                                            callback();
+                                            break;
+                                        case 4:
+
+                                            var hasil = value.degree;
+                                            value.degree = 'Privacy';
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.degree = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.degree = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.degree = hasil;
+                                                }
+                                            }
+
+                                            callback();
+                                            break;
+                                        case 5:
+
+                                            callback();
+                                            break;
+                                        default:
+                                            callback();
+                                            break;
+                                    }
+
+
+                                }, function (err) {
+                                    if (err) console.error(err.message);
+                                    callback();
+                                });
+
+                            }
+
+                        }
+
+                    }
+                })
+
+            }, function (err) {
+                if (err) console.error(err.message);
+                // configs is now a map of JSON data
+                console.log(
+                    params
+                );
+
+                cb(null, params);
+
+            });
+
         }
 
         function getMatchStatus(userId1, userId2, callback) {
