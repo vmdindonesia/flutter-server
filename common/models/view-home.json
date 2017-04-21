@@ -268,7 +268,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "rel_visibility": {
+      "type": "hasMany",
+      "model": "VisibilityData",
+      "foreignKey": "membersId"
+    }
+  },
   "acls": [],
   "methods": {}
 }

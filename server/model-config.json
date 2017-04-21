@@ -198,5 +198,9 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "Visibility": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }

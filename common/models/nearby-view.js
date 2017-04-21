@@ -5,6 +5,7 @@ module.exports = function (Nearbyview) {
     var loopback = require('loopback');
     var lodash = require('lodash');
     var common = require('../common-util.js');
+    let async = require("async");
 
     Nearbyview.remoteMethod('getNearbyLocation', {
         description: 'Get Nearby Member List of User',
@@ -129,6 +130,7 @@ module.exports = function (Nearbyview) {
         // Get data from setting user
         function getMember(id) {
             var filter = {
+                include: 'rel_visibility',
                 where: {
                     id: { neq: id },
                     id: { nin: excludeByFilterList },
@@ -216,8 +218,174 @@ module.exports = function (Nearbyview) {
                 });
             }, function () {
                 //AFTER LOOP
-                cb(null, newResult);
+
+                console.log(newResult);
+
+                // cb(null, newResult);
+                verify(newResult);
             })
+        }
+
+        /**
+         * Function Verify
+         */
+        function verify(params) {
+
+            let isVerify;
+            if (memberData.verifyScore != null) {
+                isVerify = (memberData.verifyScore < 20) ? false : true;
+            } else {
+                isVerify = false;
+            }
+
+            async.eachOfSeries(params, function (value, key, callback) {
+
+                // SORRY, FASTEST WAY IS USING NATIVE QUERY
+                var query = new String();
+                query = query.concat(' SELECT match_id, COUNT(*) AS \'count\' FROM Match_member ')
+                    .concat(' WHERE members_id = ? OR members_id = ? ')
+                    .concat(' GROUP BY match_id HAVING count > 1 ');
+
+                var params = [memberData.id, value.id];
+
+                app.models.NearbyView.dataSource.connector.execute(query, params, function (error, result) {
+                    if (error) {
+                        callback();
+                    } else {
+                        let isMatch;
+                        if (result.length > 0) {
+                            isMatch = true;
+                        } else {
+                            isMatch = false;
+                        }
+
+                        if (value.rel_visibility == null || value.rel_visibility == undefined) {
+                            callback();
+                        } else {
+
+                            if (value.rel_visibility.length == 0) {
+                                callback();
+                            } else {
+
+                                console.log(
+                                    isVerify, isMatch
+                                );
+
+                                async.eachOfSeries(value.rel_visibility, function (value2, key, callback) {
+
+                                    switch (value2.filterId) {
+                                        case 1:
+
+                                            var hasil = value.fullName;
+                                            value.fullName = value.fullName.split(" ")[0] + ' XXX';
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.fullName = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.fullName = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.fullName = hasil;
+                                                }
+                                            }
+
+                                            callback();
+                                            break;
+                                        case 2:
+
+                                            callback();
+                                            break;
+                                        case 3:
+
+                                            var hasil = value.income;
+                                            value.income = 'Privacy';
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.income = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.income = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.income = hasil;
+                                                }
+                                            }
+
+                                            callback();
+                                            break;
+                                        case 4:
+
+                                            var hasil = value.degree;
+                                            value.degree = 'Privacy';
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.degree = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.degree = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.degree = hasil;
+                                                }
+                                            }
+
+                                            callback();
+                                            break;
+                                        case 5:
+
+                                            callback();
+                                            break;
+                                        default:
+                                            callback();
+                                            break;
+                                    }
+
+
+                                }, function (err) {
+                                    if (err) console.error(err.message);
+                                    callback();
+                                });
+
+                            }
+
+                        }
+
+                    }
+                })
+
+            }, function (err) {
+                if (err) console.error(err.message);
+                // configs is now a map of JSON data
+                console.log(
+                    params
+                );
+
+                cb(null, params);
+
+            });
+
         }
 
         function getMatchStatus(userId1, userId2, callback) {
