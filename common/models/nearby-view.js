@@ -138,8 +138,6 @@ module.exports = function (Nearbyview) {
                     age: {
                         between: [setting.ageLower, setting.ageUpper]
                     },
-                    smoke: setting.smoke,
-                    income: setting.income,
                     visibility: setting.visibility,
                     geolocation: {
                         near: myLocation,
@@ -165,8 +163,18 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter verify
+            if (!lodash.isNull(setting.smoke)) {
+                filter.where['smoke'] = setting.smoke;
+            }
+
+            // Config filter smoke
             if (!lodash.isNull(setting.verify)) {
                 filter.where['verify'] = { gte: setting.verify };
+            }
+
+            // Config filter income
+            if (!lodash.isNull(setting.income)) {
+                filter.where['income'] = { gte: setting.income };
             }
 
             // Getting data from db
@@ -221,8 +229,8 @@ module.exports = function (Nearbyview) {
 
                 console.log(newResult);
 
-                // cb(null, newResult);
-                verify(newResult);
+                cb(null, newResult);
+                // verify(newResult);
             })
         }
 
