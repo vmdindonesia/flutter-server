@@ -229,8 +229,8 @@ module.exports = function (Nearbyview) {
 
                 console.log(newResult);
 
-                cb(null, newResult);
-                // verify(newResult);
+                // cb(null, newResult);
+                verify(newResult);
             })
         }
 
@@ -274,10 +274,6 @@ module.exports = function (Nearbyview) {
                             if (value.rel_visibility.length == 0) {
                                 callback();
                             } else {
-
-                                console.log(
-                                    isVerify, isMatch
-                                );
 
                                 async.eachOfSeries(value.rel_visibility, function (value2, key, callback) {
 
@@ -386,9 +382,6 @@ module.exports = function (Nearbyview) {
             }, function (err) {
                 if (err) console.error(err.message);
                 // configs is now a map of JSON data
-                console.log(
-                    params
-                );
 
                 cb(null, params);
 
