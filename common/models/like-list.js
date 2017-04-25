@@ -296,11 +296,11 @@ module.exports = function (Likelist) {
                             callback();
                         } else {
 
-                            if (value.rel_visibility.length == 0) {
+                            if (value.rel_visibility().length == 0) {
                                 callback();
                             } else {
 
-                                async.eachOfSeries(value.rel_visibility, function (value2, key, callback) {
+                                async.eachOfSeries(value.rel_visibility(), function (value2, key, callback) {
 
                                     switch (value2.filterId) {
                                         case 1:
@@ -544,11 +544,11 @@ module.exports = function (Likelist) {
                             callback();
                         } else {
 
-                            if (value.rel_visibility.length == 0) {
+                            if (value.rel_visibility().length == 0) {
                                 callback();
                             } else {
 
-                                async.eachOfSeries(value.rel_visibility, function (value2, key, callback) {
+                                async.eachOfSeries(value.rel_visibility(), function (value2, key, callback) {
 
                                     switch (value2.filterId) {
                                         case 1:
