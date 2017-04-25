@@ -101,11 +101,12 @@ module.exports = function (Matchmember) {
                             value.hobby = value.hobby.replace("[", "").replace("]", "").replace(/"/gi, '');
                         }
 
-                        if (value.rel_visibility == null || value.rel_visibility == undefined) {
+                        console.log(value.rel_visibility(), 1231313131);
+                        if (value.rel_visibility == null || value.rel_visibility == undefined || value.rel_visibility() == null || value.rel_visibility() == undefined) {
                             callback();
                         } else {
 
-                            if (value.rel_visibility().length == 0) {
+                            if (value.rel_visibility().length == 0 ) {
                                 callback();
                             } else {
 
