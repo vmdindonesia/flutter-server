@@ -86,10 +86,6 @@
     "dataSource": "pmjakarta",
     "public": true
   },
-  "ChatDetail": {
-    "dataSource": "pmjakarta",
-    "public": true
-  },
   "Matches": {
     "dataSource": "pmjakarta",
     "public": true,
@@ -206,6 +202,10 @@
     "$resolved": true
   },
   "Visibility": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "ChatDetail": {
     "dataSource": "pmjakarta",
     "public": true
   }

@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function (Chatdetail) {
-    Chatdetail.remoteMethod('createChat', {
+module.exports = function(Chatdetail) {
+	Chatdetail.remoteMethod('createChat', {
         http: { path: '/createChat', verb: 'post' },
         accepts: { arg: 'param', type: 'Object' },
         returns: { arg: 'response', type: 'array', root: true }
@@ -69,6 +69,5 @@ module.exports = function (Chatdetail) {
             next();
         })
 
-    })
-
+    });
 };
