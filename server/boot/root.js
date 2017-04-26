@@ -57,10 +57,14 @@ module.exports = function(server) {
       , function(err, user) {
         if (err) return res.sendStatus(404);
 
-        var string = encodeURIComponent('Password reset processed successfully');
-        res.redirect('/request-password-reset?message=' + string);
+        // var string = encodeURIComponent('Password reset processed successfully');
+        res.redirect('/success-reset');
       });
     });
+  });
+
+  router.get('/success-reset', function (req, res) {
+    res.render('reset-success');
   });
 
   router.get('/verified', function (req, res) {
