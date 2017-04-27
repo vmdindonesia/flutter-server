@@ -16,7 +16,7 @@ module.exports = function (Settinghome) {
         description: 'Registering Setting Home for Current Authorized User.',
         http: { verb: 'get' },
         accepts: { arg: 'options', type: 'object', http: 'optionsFromRequest' },
-        returns: { arg: 'result', type: 'objec' }
+        returns: { arg: 'result', type: 'object' }
     })
 
     Settinghome.registerSettingHome = function (options, cb) {
