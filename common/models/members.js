@@ -157,11 +157,17 @@ module.exports = function (Members) {
                 var bdayDate = new Date(memberData['bday']);
                 memberData['age'] = common.calculateAge(bdayDate);
 
+
                 memberData['settingHomes'].religion = JSON.parse(memberData['settingHomes'].religion);
                 memberData['settingHomes'].zodiac = JSON.parse(memberData['settingHomes'].zodiac);
+
+
             }
+            var settingHome = JSON.parse(JSON.stringify(memberData['settingHomes']));
+            delete memberData['settingHomes'];
 
             modelInstance['memberData'] = memberData;
+            modelInstance['settingHome'] = settingHome;
             next();
         });
 
@@ -374,6 +380,8 @@ module.exports = function (Members) {
             }
             var inits = [];
             inits.push(initSettingHome);
+            inits.push(initSettingPrivacy);
+
             common.asyncLoop(inits.length, function (loop) {
                 var index = loop.iteration();
                 var item = inits[index];
@@ -381,7 +389,9 @@ module.exports = function (Members) {
                     loop.next();
                 })
             }, function () {
-                cb(null, true);
+                cb(null, {
+                    memberId: result.id
+                });
             });
         });
 
