@@ -157,17 +157,12 @@ module.exports = function (Nearbyview) {
                 filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) };
             }
 
-            // Config filter smoke
+            // // Config filter smoke
             if (!lodash.isNull(setting.smoke)) {
                 filter.where['smoke'] = setting.smoke;
             }
-
+            
             // Config filter verify
-            if (!lodash.isNull(setting.smoke)) {
-                filter.where['smoke'] = setting.smoke;
-            }
-
-            // Config filter smoke
             if (!lodash.isNull(setting.verify)) {
                 filter.where['verify'] = { gte: setting.verify };
             }
