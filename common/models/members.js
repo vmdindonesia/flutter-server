@@ -7,158 +7,20 @@ var config = require('../../server/config.json');
 
 module.exports = function (Members) {
 
+    var app = require('../../server/server');
+    var common = require('../common-util.js');
+
+    // BEGIN BEFORE REMOTE ==================================================================
+
+    // END BEFORE REMOTE ====================================================================
+
+    // BEGIN AFTER REMOTE ===================================================================
+
     Members.beforeRemote('create', function (context, user, next) {
         var dateNow = new Date();
         context.args.data.createdAt = dateNow;
         next();
-    })
-
-    Members.remoteMethod('updateById', {
-        http: { path: '/:id/updateById', verb: 'post' },
-        accepts: [
-            { arg: 'id', type: 'number' },
-            { arg: 'param', type: 'object' }
-        ],
-        returns: { arg: 'respon', type: 'object', root: true }
     });
-
-    Members.updateById = function (id, param, cb) {
-        param['deletedAt'] = null;
-        Members.upsertWithWhere({ id: id }, param, function (err, result) {
-            if (err) {
-                cb(null, err);
-                return;
-            }
-            // if (param.status == 1) {
-            //     console.log('SEND NOTIF TO USER');
-            //     var app = require('../../server/server');
-            //     var Devicetokenmapping = app.models.Devicetokenmapping;
-            //     Members.findOne({
-            //         where: {
-            //             id: id
-            //         }
-            //     }, function (error, result) {
-            //         var fullName = '';
-            //         if (result) {
-            //             fullName = result.fullName;
-            //         }
-            //         Devicetokenmapping.getUserToken(id, function (error, result) {
-            //             var tokens = [];
-            //             tokens.push(result);
-            //             var message = {
-            //                 app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
-            //                 contents: { en: 'Hi ' + fullName + ', your account has been Activated' },
-            //                 include_player_ids: tokens
-            //             };
-            //             sendNotification(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
-
-            //         })
-
-            //     })
-            // }
-            cb(null, result);
-        });
-    }
-
-    Members.remoteMethod('newLogin', {
-        http: { path: '/newLogin', verb: 'post' },
-        accepts: { arg: 'email', type: 'string', required: true },
-        returns: { arg: 'respon', type: 'object', root: true }
-    });
-
-    Members.newLogin = function (email, cb) {
-        var app = require('../../server/server');
-        var accessToken = app.models.AccessToken;
-
-        // Check user already registered or not
-        Members.findOne({
-            where: { email: email },
-            fields: { id: true }
-        }, function (err, member) {
-            if (err) {
-                cb(err);
-                return;
-            }
-
-            accessToken.destroyAll({
-                userId: member.id
-            }, function (err, result) {
-                if (err) {
-                    cb(err);
-                    return;
-                }
-
-                cb(null, result);
-            });
-        });
-
-    }
-
-    Members.remoteMethod('onlineOffline', {
-        http: { path: '/:id/onlineOffline', verb: 'post' },
-        accepts: [
-            { arg: 'id', type: 'number' },
-            { arg: 'param', type: 'object' }
-        ],
-        returns: { arg: 'respon', type: 'object', root: true }
-    });
-
-    Members.onlineOffline = function (id, online, cb) {
-        var socket = Members.app.io;
-
-        Members.upsertWithWhere({ id: id }, online, function (err, result) {
-            if (err) {
-                cb(err);
-                return;
-            }
-
-            socket.emit('online-' + id, result);
-            cb(null, result);
-        });
-    }
-
-    Members.remoteMethod('statistic', {
-        http: { path: '/statistic', verb: 'get' },
-        returns: { arg: 'respon', type: 'object', root: true }
-    });
-
-    Members.statistic = function (cb) {
-        var ds = Members.dataSource;
-        var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive, f.matches " +
-            "FROM" +
-            "(SELECT COUNT(id) AS registered FROM pmjakarta.Members) AS a, " +
-            "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
-            "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
-            "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
-            "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e, " +
-            "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member) AS f";
-
-        ds.connector.execute(sql, function (err, result) {
-            if (err) {
-                cb(err);
-                return;
-            }
-
-            cb(null, result);
-        });
-    }
-
-    Members.remoteMethod('register', {
-        http: { path: '/register', verb: 'post' },
-        accepts: { arg: 'param', type: 'object' },
-        returns: { arg: 'respon', type: 'object', root: true }
-    });
-
-    Members.register = function (param, cb) {
-        Members.create(param, function (err, member) {
-            if (err) {
-                cb(err);
-                return;
-            }
-
-            cb(null, member);
-        });
-    }
 
     Members.afterRemote('register', function (context, remoteMethodOutput, next) {
         var Role = Members.app.models.Role;
@@ -182,33 +44,6 @@ module.exports = function (Members) {
                 next();
             });
         });
-    });
-
-    Members.isSocialRegistered = function (socialId, loginWith, cb) {
-        Members.find({
-            where: {
-                and: [
-                    { socialId: socialId },
-                    { loginWith: loginWith }
-                ]
-            }
-        }, function (error, members) {
-            console.log('ERROR MEMBERS : ' + JSON.stringify(error, null, 2));
-            console.log('MEMBERS RES : ' + JSON.stringify(members, null, 2));
-            var result = false;
-            if (members.length > 0) { //sudah diregister
-                result = true;
-            }
-            cb(null, result);
-        })
-    }
-
-    Members.remoteMethod('isSocialRegistered', {
-        accepts: [
-            { arg: 'socialId', type: 'string', required: true },
-            { arg: 'loginWith', type: 'string', required: true }
-        ],
-        returns: { arg: 'result', type: 'boolean' }
     });
 
     Members.afterRemote('create', function (context, userInstance, next) {
@@ -262,21 +97,362 @@ module.exports = function (Members) {
         });
     });
 
-    Members.remoteMethod(
-        'confirm',
-        {
-            description: 'Confirm a user registration with email verification token.',
-            accepts: [
-                { arg: 'uid', type: 'string', required: true },
-                { arg: 'token', type: 'string', required: true },
-                { arg: 'redirect', type: 'string' },
-                { arg: 'res', type: 'object', http: { source: 'res' } }
-            ],
-            http: { verb: 'get', path: '/confirm' },
-        }
-    );
+    Members.afterRemote('login', function (ctx, modelInstance, next) {
 
-    Members.confirm = function (uid, token, redirect, res, cb) {
+        var userId = modelInstance.userId;
+
+        var filter = {
+            fields: [
+                'id',
+                'fullName',
+                'gender',
+                'about',
+                'employeeType', //occupation
+                'income',
+                'address',
+                'religion',
+                'hobby',
+                'race', //origin
+                'degree',
+                'zodiac',
+                'bday'
+            ],
+            include: [{
+                relation: 'memberPhotos',
+                scope: {
+                    fields: ['src']
+                }
+            }, {
+                relation: 'memberImage',
+                scope: {
+                    fields: ['src']
+                }
+            }, {
+                relation: 'settingHomes',
+                scope: {
+                    fields: [
+                        'religion',
+                        'ageLower',
+                        'ageUpper',
+                        'zodiac',
+                        'visibility',
+                        'distance',
+                        'smoke',
+                        'income',
+                        'verify'
+                    ]
+                }
+            }]
+        }
+
+        Members.findById(userId, filter, function (error, result) {
+
+            if (error) {
+                var memberData = null;
+                // throw error;
+            } else {
+                var memberData = JSON.parse(JSON.stringify(result));
+                memberData['hobby'] = JSON.parse(memberData['hobby']);
+
+                var bdayDate = new Date(memberData['bday']);
+                memberData['age'] = common.calculateAge(bdayDate);
+
+                memberData['settingHomes'].religion = JSON.parse(memberData['settingHomes'].religion);
+                memberData['settingHomes'].zodiac = JSON.parse(memberData['settingHomes'].zodiac);
+            }
+
+            modelInstance['memberData'] = memberData;
+            next();
+        });
+
+    });
+
+    // END AFTER REMOTE =====================================================================
+
+    // BEGIN REMOTE METHOD ==================================================================
+
+    Members.remoteMethod('updateById', {
+        http: { path: '/:id/updateById', verb: 'post' },
+        accepts: [
+            { arg: 'id', type: 'number' },
+            { arg: 'param', type: 'object' }
+        ],
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
+    Members.remoteMethod('newLogin', {
+        http: { path: '/newLogin', verb: 'post' },
+        accepts: { arg: 'email', type: 'string', required: true },
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
+    Members.remoteMethod('onlineOffline', {
+        http: { path: '/:id/onlineOffline', verb: 'post' },
+        accepts: [
+            { arg: 'id', type: 'number' },
+            { arg: 'param', type: 'object' }
+        ],
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
+    Members.remoteMethod('statistic', {
+        http: { path: '/statistic', verb: 'get' },
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
+    Members.remoteMethod('register', {
+        http: { path: '/register', verb: 'post' },
+        accepts: { arg: 'params', type: 'object', required: true },
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
+    Members.remoteMethod('isSocialRegistered', {
+        accepts: [
+            { arg: 'socialId', type: 'string', required: true },
+            { arg: 'loginWith', type: 'string', required: true }
+        ],
+        returns: { arg: 'result', type: 'boolean' }
+    });
+
+    Members.remoteMethod('confirm', {
+        description: 'Confirm a user registration with email verification token.',
+        accepts: [
+            { arg: 'uid', type: 'string', required: true },
+            { arg: 'token', type: 'string', required: true },
+            { arg: 'redirect', type: 'string' },
+            { arg: 'res', type: 'object', http: { source: 'res' } }
+        ],
+        http: { verb: 'get', path: '/confirm' },
+    });
+
+    Members.remoteMethod('passwordReset', {
+        http: { path: '/passwordReset', verb: 'post' },
+        accepts: { arg: 'param', type: 'Object', required: true },
+        returns: { arg: 'respon', type: 'Object', root: true }
+    });
+
+    Members.remoteMethod('emailCheck', {
+        http: { path: '/emailCheck', verb: 'post' },
+        accepts: { arg: 'param', type: 'Object', required: true },
+        returns: { arg: 'respon', type: 'Object', root: true }
+    });
+
+    Members.remoteMethod('isUserNeedProfile', {
+        description: 'Check User need fill profile or not.',
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'userId', type: 'number', required: true }
+        ],
+        returns: [
+            { arg: 'result', type: 'boolean', description: 'result is true or false' }
+        ]
+    });
+
+    // END REMOTE METHOD ====================================================================
+
+    // BEGIN LIST OF FUNCTION ===============================================================
+
+    Members.updateById = updateById;
+    Members.newLogin = newLogin;
+    Members.onlineOffline = onlineOffline;
+    Members.statistic = statistic;
+    Members.register = register;
+    Members.isSocialRegistered = isSocialRegistered;
+    Members.confirm = confirm;
+    Members.passwordReset = passwordReset;
+    Members.emailCheck = emailCheck;
+    Members.isUserNeedProfile = isUserNeedProfile;
+
+    // END LIST OF FUNCTION =================================================================
+
+    function updateById(id, param, cb) {
+        param['deletedAt'] = null;
+        Members.upsertWithWhere({ id: id }, param, function (err, result) {
+            if (err) {
+                cb(null, err);
+                return;
+            }
+            // if (param.status == 1) {
+            //     console.log('SEND NOTIF TO USER');
+            //     var app = require('../../server/server');
+            //     var Devicetokenmapping = app.models.Devicetokenmapping;
+            //     Members.findOne({
+            //         where: {
+            //             id: id
+            //         }
+            //     }, function (error, result) {
+            //         var fullName = '';
+            //         if (result) {
+            //             fullName = result.fullName;
+            //         }
+            //         Devicetokenmapping.getUserToken(id, function (error, result) {
+            //             var tokens = [];
+            //             tokens.push(result);
+            //             var message = {
+            //                 app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+            //                 contents: { en: 'Hi ' + fullName + ', your account has been Activated' },
+            //                 include_player_ids: tokens
+            //             };
+            //             sendNotification(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
+
+            //         })
+
+            //     })
+            // }
+            cb(null, result);
+        });
+    }
+
+    function newLogin(email, cb) {
+        var app = require('../../server/server');
+        var accessToken = app.models.AccessToken;
+
+        // Check user already registered or not
+        Members.findOne({
+            where: { email: email },
+            fields: { id: true }
+        }, function (err, member) {
+            if (err) {
+                cb(err);
+                return;
+            }
+
+            accessToken.destroyAll({
+                userId: member.id
+            }, function (err, result) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+
+                cb(null, result);
+            });
+        });
+
+    }
+
+    function onlineOffline(id, online, cb) {
+        var socket = Members.app.io;
+
+        Members.upsertWithWhere({ id: id }, online, function (err, result) {
+            if (err) {
+                cb(err);
+                return;
+            }
+
+            socket.emit('online-' + id, result);
+            cb(null, result);
+        });
+    }
+
+    function statistic(cb) {
+        var ds = Members.dataSource;
+        var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive, f.matches " +
+            "FROM" +
+            "(SELECT COUNT(id) AS registered FROM pmjakarta.Members) AS a, " +
+            "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
+            "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
+            "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
+            "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e, " +
+            "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member) AS f";
+
+        ds.connector.execute(sql, function (err, result) {
+            if (err) {
+                cb(err);
+                return;
+            }
+
+            cb(null, result);
+        });
+    }
+
+    function register(params, cb) {
+
+        Members.create(params, function (error, result) {
+            if (error) {
+                cb(error);
+            }
+            var inits = [];
+            inits.push(initSettingHome);
+            common.asyncLoop(inits.length, function (loop) {
+                var index = loop.iteration();
+                var item = inits[index];
+                item(result.id, function () {
+                    loop.next();
+                })
+            }, function () {
+                cb(null, true);
+            });
+        });
+
+        function initSettingHome(userId, callback) {
+            var Settinghome = app.models.SettingHome;
+
+            var dateNow = new Date();
+
+            Settinghome.create({
+                memberId: userId,
+                createUserId: userId,
+                createDatetime: dateNow,
+                updateUserId: userId,
+                updateDatetime: dateNow
+            }, function (error, result) {
+                if (error) {
+                    cb(error);
+                } else {
+                    callback();
+                }
+            })
+
+
+        }
+
+        function initSettingPrivacy(userId, callback) {
+
+            var Visibilitydata = app.models.VisibilityData;
+
+            common.asyncLoop(5, function (loop) {
+                var index = loop.iteration();
+                var item = {
+                    unverified: 1,
+                    verified: 1,
+                    match: 1,
+                    membersId: userId,
+                    filterId: index + 1,
+                }
+                Visibilitydata.create(item, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    loop.next();
+                })
+            }, function () {
+                callback();
+            })
+
+        }
+    }
+
+    function isSocialRegistered(socialId, loginWith, cb) {
+        Members.find({
+            where: {
+                and: [
+                    { socialId: socialId },
+                    { loginWith: loginWith }
+                ]
+            }
+        }, function (error, members) {
+            console.log('ERROR MEMBERS : ' + JSON.stringify(error, null, 2));
+            console.log('MEMBERS RES : ' + JSON.stringify(members, null, 2));
+            var result = false;
+            if (members.length > 0) { //sudah diregister
+                result = true;
+            }
+            cb(null, result);
+        })
+    }
+
+    function confirm(uid, token, redirect, res, cb) {
         Members.findById(uid, function (err, user) {
             if (err) {
                 cb(err);
@@ -309,49 +485,7 @@ module.exports = function (Members) {
         });
     };
 
-    var sendNotification = function (data, someAuth) {
-        // var someAuth = 'Basic MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy';
-        // if (flag == true) {
-        //     someAuth = 'Basic ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm';
-        // }
-
-        var headers = {
-            "Content-Type": "application/json; charset=utf-8",
-            "Authorization": "Basic " + someAuth
-        };
-
-        var options = {
-            host: "onesignal.com",
-            port: 443,
-            path: "/api/v1/notifications",
-            method: "POST",
-            headers: headers
-        };
-
-        var https = require('https');
-        var req = https.request(options, function (res) {
-            res.on('data', function (data) {
-                console.log("Response:");
-                console.log(JSON.parse(data));
-            });
-        });
-
-        req.on('error', function (e) {
-            console.log("ERROR:");
-            console.log(e);
-        });
-
-        req.write(JSON.stringify(data));
-        req.end();
-    };
-
-    Members.remoteMethod('passwordReset', {
-        http: { path: '/passwordReset', verb: 'post' },
-        accepts: { arg: 'param', type: 'Object', required: true },
-        returns: { arg: 'respon', type: 'Object', root: true }
-    });
-
-    Members.passwordReset = function (param, cb) {
+    function passwordReset(param, cb) {
         Members.resetPassword(param, function (err, result) {
             if (err) return cb(err)
 
@@ -362,13 +496,7 @@ module.exports = function (Members) {
     }
 
     // by-jeje check email 
-    Members.remoteMethod('emailCheck', {
-        http: { path: '/emailCheck', verb: 'post' },
-        accepts: { arg: 'param', type: 'Object', required: true },
-        returns: { arg: 'respon', type: 'Object', root: true }
-    });
-
-    Members.emailCheck = function (param, cb) {
+    function emailCheck(param, cb) {
         Members.find({
             where: {
                 email: param.email
@@ -381,7 +509,6 @@ module.exports = function (Members) {
             }
         });
     }
-
 
     Members.on('resetPasswordRequest', function (info) {
         var url = config.remoteHost + '/reset-password?access_token=' + info.accessToken.id;
@@ -408,18 +535,7 @@ module.exports = function (Members) {
         });
     });
 
-    Members.remoteMethod('isUserNeedProfile', {
-        description: 'Check User need fill profile or not.',
-        http: { verb: 'post' },
-        accepts: [
-            { arg: 'userId', type: 'number', required: true }
-        ],
-        returns: [
-            { arg: 'result', type: 'boolean', description: 'result is true or false' }
-        ]
-    });
-
-    Members.isUserNeedProfile = function (userId, cb) {
+    function isUserNeedProfile(userId, cb) {
 
         //MAX VALUE IS 14. IF USER < 14 then return TRUE
         var query = '';
@@ -498,4 +614,40 @@ module.exports = function (Members) {
             }
         });
     }
+
+    var sendNotification = function (data, someAuth) {
+        // var someAuth = 'Basic MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy';
+        // if (flag == true) {
+        //     someAuth = 'Basic ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm';
+        // }
+
+        var headers = {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": "Basic " + someAuth
+        };
+
+        var options = {
+            host: "onesignal.com",
+            port: 443,
+            path: "/api/v1/notifications",
+            method: "POST",
+            headers: headers
+        };
+
+        var https = require('https');
+        var req = https.request(options, function (res) {
+            res.on('data', function (data) {
+                console.log("Response:");
+                console.log(JSON.parse(data));
+            });
+        });
+
+        req.on('error', function (e) {
+            console.log("ERROR:");
+            console.log(e);
+        });
+
+        req.write(JSON.stringify(data));
+        req.end();
+    };
 };

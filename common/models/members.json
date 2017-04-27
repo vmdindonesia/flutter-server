@@ -711,6 +711,11 @@
       "type": "hasMany",
       "model": "VisibilityData",
       "foreignKey": "membersId"
+    },
+    "settingHomes": {
+      "type": "hasOne",
+      "model": "SettingHome",
+      "foreignKey": "memberId"
     }
   },
   "acls": [
@@ -764,7 +769,7 @@
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$unauthenticated",
       "permission": "ALLOW",
       "property": "register"
     },
