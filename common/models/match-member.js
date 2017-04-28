@@ -5,6 +5,181 @@ module.exports = function (Matchmember) {
     var common = require('../common-util.js');
     let async = require("async");
 
+    // Matchmember.remoteMethod('getMatchMemberIdList', {
+    //     description: 'Get List of Member Id which is Match with given User Id',
+    //     http: { verb: 'get' },
+    //     accepts: { arg: 'userId', type: 'number', required: true },
+    //     returns: { arg: 'result', type: 'array', root: true, description: 'Array Of Id' }
+    // });
+
+    Matchmember.remoteMethod('getMatchList', {
+        description: 'Get List of Match with given User Id',
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'array', root: true, description: 'Array Of Object' }
+    });
+
+    Matchmember.getMatchList = getMatchList;
+    Matchmember.getMatchMemberIdList = getMatchMemberIdList;
+    Matchmember.getMemberIdMatchList = getMemberIdMatchList;
+
+
+    function getMatchList(limit, offset, options, cb) {
+
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        getMatchMemberIdList(userId, function (error, result) {
+            if (error) {
+                cb(error);
+            }
+            var filter = {
+                fields: ['membersId'],
+                where: {
+                    id: { inq: result }
+                },
+                include: {
+                    relation: 'members',
+                    scope: {
+                        fields: [
+                            'id',
+                            'fullName',
+                            'gender',
+                            'about',
+                            'employeeType', //occupation
+                            'income',
+                            'address',
+                            'religion',
+                            'hobby',
+                            'race', //origin
+                            'degree',
+                            'zodiac',
+                            'bday'
+                        ],
+                        include: [{
+                            relation: 'memberPhotos',
+                            scope: {
+                                fields: ['src']
+                            }
+                        }, {
+                            relation: 'memberImage',
+                            scope: {
+                                fields: ['src']
+                            }
+                        }]
+                    }
+                },
+                limit: limit,
+                skip: offset,
+                order: 'id DESC'
+            }
+
+            Matchmember.find(filter, function (error, result) {
+                if (error) {
+                    cb(error);
+                }
+                var matchList = [];
+                result.forEach(function (item) {
+                    item = JSON.parse(JSON.stringify(item));
+
+                    var memberData = item.members;
+
+                    memberData.hobby = JSON.parse(memberData.hobby);
+
+                    var bdayDate = new Date(memberData.bday);
+                    memberData.age = common.calculateAge(bdayDate);
+
+                    matchList.push(memberData);
+                }, this);
+                cb(null, matchList);
+            })
+
+        });
+
+
+    }
+
+    function getMatchMemberIdList(userId, cb) {
+
+        var filter = {
+            fields: ['matchId'],
+            where: {
+                membersId: userId
+            }
+        }
+        Matchmember.find(filter, function (error, result) {
+            if (error) {
+                cb(error);
+            }
+
+            var matchIdList = [];
+            result.forEach(function (item) {
+                matchIdList.push(item.matchId);
+            }, this);
+
+            getResult(matchIdList);
+        });
+
+        function getResult(matchIdList) {
+
+            var filter = {
+                fields: ['id'],
+                where: {
+                    and: [
+                        { matchId: { inq: matchIdList } },
+                        { membersId: { neq: userId } }
+                    ]
+                }
+            }
+
+            Matchmember.find(filter, function (error, result) {
+                if (error) {
+                    cb(error);
+                }
+
+                var matchMemberIdList = [];
+                result.forEach(function (item) {
+                    matchMemberIdList.push(item.id);
+                }, this);
+                cb(null, matchMemberIdList);
+            });
+
+        }
+
+
+    }
+
+    function getMemberIdMatchList(userId, cb) {
+
+        getMatchMemberIdList(userId, function (error, result) {
+            if (error) {
+                cb(error);
+            }
+            var filter = {
+                fields: ['membersId'],
+                where: {
+                    id: { inq: result }
+                }
+            }
+            Matchmember.find(filter, function (error, result) {
+                if (error) {
+                    cb(error);
+                }
+                var memberIdMatchList = [];
+                result.forEach(function (item) {
+                    memberIdMatchList.push(item.membersId);
+                }, this);
+                cb(null, memberIdMatchList);
+            })
+
+        })
+
+    }
+
     // Matchmember.remoteMethod('createChat', {
     //     http: { path: '/createChat', verb: 'post' },
     //     accepts: { arg: 'param', type: 'Object' },
@@ -106,7 +281,7 @@ module.exports = function (Matchmember) {
                             callback();
                         } else {
 
-                            if (value.rel_visibility().length == 0 ) {
+                            if (value.rel_visibility().length == 0) {
                                 callback();
                             } else {
 

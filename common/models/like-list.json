@@ -71,6 +71,16 @@
       "type": "belongsTo",
       "model": "Members",
       "foreignKey": "likeUser"
+    },
+    "members": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "likeUser"
+    },
+    "members2": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "likeMember"
     }
   },
   "acls": [],
