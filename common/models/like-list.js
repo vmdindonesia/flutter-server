@@ -4,6 +4,7 @@ module.exports = function (Likelist) {
 
     var app = require('../../server/server');
     var Pushnotification = require('../push-notification.js');
+    var filterPrivacy = require('../filter-privacy.js');
     let async = require("async");
     var common = require('../common-util.js');
 
@@ -300,7 +301,13 @@ module.exports = function (Likelist) {
 
                     likeMeList.push(memberData);
                 }, this);
-                cb(null, likeMeList);
+
+                filterPrivacy.apply(userId, likeMeList, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    cb(null, result);
+                });
             })
         })
     }
@@ -376,7 +383,14 @@ module.exports = function (Likelist) {
 
                     iLikeList.push(memberData);
                 }, this);
-                cb(null, iLikeList);
+
+                filterPrivacy.apply(userId, iLikeList, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    cb(null, result);
+                });
+                // cb(null, iLikeList);
             })
         })
     }

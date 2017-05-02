@@ -109,7 +109,14 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "visibilityData": {
+      "type": "hasMany",
+      "model": "VisibilityData",
+      "foreignKey": "membersId",
+      "primaryKey": "membersId"
+    }
+  },
   "acls": [],
   "methods": {}
 }

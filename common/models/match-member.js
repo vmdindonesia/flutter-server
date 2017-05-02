@@ -3,6 +3,7 @@
 module.exports = function (Matchmember) {
     var app = require('../../server/server');
     var common = require('../common-util.js');
+    var filterPrivacy = require('../filter-privacy.js');
     let async = require("async");
 
     // Matchmember.remoteMethod('getMatchMemberIdList', {
@@ -26,6 +27,7 @@ module.exports = function (Matchmember) {
     Matchmember.getMatchList = getMatchList;
     Matchmember.getMatchMemberIdList = getMatchMemberIdList;
     Matchmember.getMemberIdMatchList = getMemberIdMatchList;
+    Matchmember.isUserMatch = isUserMatch;
 
 
     function getMatchList(limit, offset, options, cb) {
@@ -83,6 +85,7 @@ module.exports = function (Matchmember) {
                     cb(error);
                 }
                 var matchList = [];
+
                 result.forEach(function (item) {
                     item = JSON.parse(JSON.stringify(item));
 
@@ -95,7 +98,14 @@ module.exports = function (Matchmember) {
 
                     matchList.push(memberData);
                 }, this);
-                cb(null, matchList);
+                
+                filterPrivacy.apply(userId, matchList, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    cb(null, result);
+                });
+                // cb(null, matchList);
             })
 
         });
@@ -176,6 +186,20 @@ module.exports = function (Matchmember) {
                 cb(null, memberIdMatchList);
             })
 
+        })
+
+    }
+
+    function isUserMatch(userId1, userId2, cb) {
+        getMemberIdMatchList(userId1, function (error, result) {
+            if (error) {
+                cb(error);
+            }
+            if (result.indexOf(userId2) === -1) {
+                cb(null, false);
+            } else {
+                cb(null, true);
+            }
         })
 
     }
