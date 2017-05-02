@@ -290,16 +290,19 @@ module.exports = function (Likelist) {
                 }
                 var likeMeList = [];
                 result.forEach(function (item) {
-                    item = JSON.parse(JSON.stringify(item));
+                    if ('members' in item) {
 
-                    var memberData = item.members;
+                        item = JSON.parse(JSON.stringify(item));
 
-                    memberData.hobby = JSON.parse(memberData.hobby);
+                        var memberData = item.members;
 
-                    var bdayDate = new Date(memberData.bday);
-                    memberData.age = common.calculateAge(bdayDate);
+                        memberData.hobby = JSON.parse(memberData.hobby);
 
-                    likeMeList.push(memberData);
+                        var bdayDate = new Date(memberData.bday);
+                        memberData.age = common.calculateAge(bdayDate);
+
+                        likeMeList.push(memberData);
+                    }
                 }, this);
 
                 filterPrivacy.apply(userId, likeMeList, function (error, result) {
@@ -372,16 +375,19 @@ module.exports = function (Likelist) {
                 }
                 var iLikeList = [];
                 result.forEach(function (item) {
-                    item = JSON.parse(JSON.stringify(item));
+                    if ('members' in item) {
 
-                    var memberData = item.members2;
+                        item = JSON.parse(JSON.stringify(item));
 
-                    memberData.hobby = JSON.parse(memberData.hobby);
+                        var memberData = item.members2;
 
-                    var bdayDate = new Date(memberData.bday);
-                    memberData.age = common.calculateAge(bdayDate);
+                        memberData.hobby = JSON.parse(memberData.hobby);
 
-                    iLikeList.push(memberData);
+                        var bdayDate = new Date(memberData.bday);
+                        memberData.age = common.calculateAge(bdayDate);
+
+                        iLikeList.push(memberData);
+                    }
                 }, this);
 
                 filterPrivacy.apply(userId, iLikeList, function (error, result) {
