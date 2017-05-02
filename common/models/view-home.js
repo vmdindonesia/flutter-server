@@ -309,7 +309,7 @@ module.exports = function (Viewhome) {
                                         case 1:
 
                                             var hasil = value.fullName;
-                                            value.fullName = value.fullName.split(" ")[0] + ' XXX';
+                                            value.fullName = value.fullName.split(" ")[0] + ' ****';
 
                                             if (value2.verified) {
                                                 if (isVerify == true) {
