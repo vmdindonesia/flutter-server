@@ -265,6 +265,22 @@
         "nullable": "Y"
       },
       "_selectable": true
+    },
+    "ktp": {
+      "type": "Number",
+      "required": false,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "ktp",
+        "dataType": "int",
+        "dataLength": 10,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "Y"
+      },
+      "_selectable": true
     }
   },
   "validations": [],
