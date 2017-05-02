@@ -87,18 +87,22 @@ module.exports = function (Matchmember) {
                 var matchList = [];
 
                 result.forEach(function (item) {
-                    item = JSON.parse(JSON.stringify(item));
 
-                    var memberData = item.members;
+                    if ('members' in item) {
 
-                    memberData.hobby = JSON.parse(memberData.hobby);
+                        item = JSON.parse(JSON.stringify(item));
 
-                    var bdayDate = new Date(memberData.bday);
-                    memberData.age = common.calculateAge(bdayDate);
+                        var memberData = item.members;
 
-                    matchList.push(memberData);
+                        memberData.hobby = JSON.parse(memberData.hobby);
+
+                        var bdayDate = new Date(memberData.bday);
+                        memberData.age = common.calculateAge(bdayDate);
+
+                        matchList.push(memberData);
+                    }
                 }, this);
-                
+
                 filterPrivacy.apply(userId, matchList, function (error, result) {
                     if (error) {
                         cb(error);

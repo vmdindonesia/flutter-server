@@ -369,6 +369,11 @@
       "type": "hasMany",
       "model": "VisibilityData",
       "foreignKey": "membersId"
+    },
+    "members": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "id"
     }
   },
   "acls": [

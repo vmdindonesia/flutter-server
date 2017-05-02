@@ -6,6 +6,7 @@ module.exports = function (Nearbyview) {
     var lodash = require('lodash');
     var common = require('../common-util.js');
     let async = require("async");
+    var filterPrivacy = require('../filter-privacy.js');
 
     Nearbyview.remoteMethod('getNearbyLocation', {
         description: 'Get Nearby Member List of User',
@@ -130,7 +131,8 @@ module.exports = function (Nearbyview) {
         // Get data from setting user
         function getMember(id) {
             var filter = {
-                include: 'rel_visibility',
+                fields: ['id', 'geolocation'],
+                // include: 'rel_visibility',
                 where: {
                     id: { neq: id },
                     id: { nin: excludeByFilterList },
@@ -143,6 +145,37 @@ module.exports = function (Nearbyview) {
                         near: myLocation,
                         maxDistance: setting.distance,
                         unit: 'kilometers'
+                    }
+                },
+                include: {
+                    relation: 'members',
+                    scope: {
+                        fields: [
+                            'id',
+                            'fullName',
+                            'gender',
+                            'about',
+                            'employeeType', //occupation
+                            'income',
+                            'address',
+                            'religion',
+                            'hobby',
+                            'race', //origin
+                            'degree',
+                            'zodiac',
+                            'bday'
+                        ],
+                        include: [{
+                            relation: 'memberPhotos',
+                            scope: {
+                                fields: ['src']
+                            }
+                        }, {
+                            relation: 'memberImage',
+                            scope: {
+                                fields: ['src']
+                            }
+                        }]
                     }
                 }
             }
@@ -161,7 +194,7 @@ module.exports = function (Nearbyview) {
             if (!lodash.isNull(setting.smoke)) {
                 filter.where['smoke'] = setting.smoke;
             }
-            
+
             // Config filter verify
             if (!lodash.isNull(setting.verify)) {
                 filter.where['verify'] = { gte: setting.verify };
@@ -177,7 +210,26 @@ module.exports = function (Nearbyview) {
                 if (error) {
                     cb(error);
                 } else {
-                    getDistance(myLocation, result);
+                    var nearbyList = [];
+                    // console.log(result[3]);
+                    result.forEach(function (item) {
+                        if ('members' in item) {
+                            item = JSON.parse(JSON.stringify(item));
+
+                            var memberData = item.members;
+                            var geolocation = item.geolocation;
+                            // console.log(memberData);
+                            // memberData['geolocation'] = geolocation;
+                            memberData.geolocation = geolocation;
+                            memberData.hobby = JSON.parse(memberData.hobby);
+
+                            var bdayDate = new Date(memberData.bday);
+                            memberData.age = common.calculateAge(bdayDate);
+
+                            nearbyList.push(memberData);
+                        }
+                    }, this);
+                    getDistance(myLocation, nearbyList);
                 }
             });
         }
@@ -222,10 +274,19 @@ module.exports = function (Nearbyview) {
             }, function () {
                 //AFTER LOOP
 
-                console.log(newResult);
+                // console.log(newResult);
+
+                filterPrivacy.apply(id, newResult, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    cb(null, result);
+                });
 
                 // cb(null, newResult);
-                verify(newResult);
+
+
+                // verify(newResult);
             })
         }
 
