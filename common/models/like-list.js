@@ -296,12 +296,16 @@ module.exports = function (Likelist) {
 
                         var memberData = item.members;
 
-                        memberData.hobby = JSON.parse(memberData.hobby);
+                        if (typeof memberData !== 'undefined') {
+                            memberData.hobby = JSON.parse(memberData.hobby);
 
-                        var bdayDate = new Date(memberData.bday);
-                        memberData.age = common.calculateAge(bdayDate);
+                            var bdayDate = new Date(memberData.bday);
+                            memberData.age = common.calculateAge(bdayDate);
 
-                        likeMeList.push(memberData);
+                            likeMeList.push(memberData);
+                        }
+
+
                     }
                 }, this);
 
@@ -380,13 +384,16 @@ module.exports = function (Likelist) {
                         item = JSON.parse(JSON.stringify(item));
 
                         var memberData = item.members2;
+                        if (typeof memberData !== 'undefined') {
 
-                        memberData.hobby = JSON.parse(memberData.hobby);
+                            memberData.hobby = JSON.parse(memberData.hobby);
 
-                        var bdayDate = new Date(memberData.bday);
-                        memberData.age = common.calculateAge(bdayDate);
+                            var bdayDate = new Date(memberData.bday);
+                            memberData.age = common.calculateAge(bdayDate);
 
-                        iLikeList.push(memberData);
+                            iLikeList.push(memberData);
+
+                        }
                     }
                 }, this);
 
