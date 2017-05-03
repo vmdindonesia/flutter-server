@@ -140,7 +140,7 @@ module.exports = function (Nearbyview) {
                     age: {
                         between: [setting.ageLower, setting.ageUpper]
                     },
-                    visibility: setting.visibility,
+                    visibility: 1,
                     geolocation: {
                         near: myLocation,
                         maxDistance: setting.distance,
@@ -185,7 +185,7 @@ module.exports = function (Nearbyview) {
                 filter.where['religion'] = { inq: JSON.parse(setting.religion) };
             }
 
-            // Config filter zodiac
+            // // Config filter zodiac
             if (!lodash.isEmpty(JSON.parse(setting.zodiac))) {
                 filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) };
             }
@@ -202,7 +202,7 @@ module.exports = function (Nearbyview) {
 
             // Config filter income
             if (!lodash.isNull(setting.income)) {
-                filter.where['income'] = { gte: setting.income };
+                filter.where['income'] = { gte: parseInt(setting.income) };
             }
 
             // Getting data from db
@@ -221,12 +221,15 @@ module.exports = function (Nearbyview) {
                             // console.log(memberData);
                             // memberData['geolocation'] = geolocation;
                             memberData.geolocation = geolocation;
-                            memberData.hobby = JSON.parse(memberData.hobby);
+                            if (typeof memberData !== 'undefined') {
+                                memberData.hobby = JSON.parse(memberData.hobby);
 
-                            var bdayDate = new Date(memberData.bday);
-                            memberData.age = common.calculateAge(bdayDate);
+                                var bdayDate = new Date(memberData.bday);
+                                memberData.age = common.calculateAge(bdayDate);
 
-                            nearbyList.push(memberData);
+                                nearbyList.push(memberData);
+
+                            }
                         }
                     }, this);
                     getDistance(myLocation, nearbyList);

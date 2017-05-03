@@ -336,17 +336,17 @@
       "_selectable": true
     },
     "income": {
-      "type": "String",
+      "type": "Number",
       "required": false,
-      "length": 20,
-      "precision": null,
-      "scale": null,
+      "length": null,
+      "precision": 3,
+      "scale": 0,
       "mysql": {
         "columnName": "income",
-        "dataType": "varchar",
-        "dataLength": 20,
-        "dataPrecision": null,
-        "dataScale": null,
+        "dataType": "tinyint",
+        "dataLength": null,
+        "dataPrecision": 3,
+        "dataScale": 0,
         "nullable": "Y"
       },
       "_selectable": true

@@ -214,7 +214,7 @@ module.exports = function (Viewhome) {
                 andList.push({ smoke: homeSettingData.smoke });
             }
             if (homeSettingData.income) {
-                andList.push({ income: homeSettingData.income });
+                andList.push({ income: { gte: homeSettingData.income } });
             }
             var filter = {
                 where: {
