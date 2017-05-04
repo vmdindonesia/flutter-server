@@ -266,6 +266,22 @@
       },
       "_selectable": true
     },
+    "bday": {
+      "type": "Date",
+      "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "bday",
+        "dataType": "date",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
     "passportSrc": {
       "type": "String",
       "required": false,
@@ -276,6 +292,22 @@
         "columnName": "passport_src",
         "dataType": "varchar",
         "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
+    "religion": {
+      "type": "String",
+      "required": false,
+      "length": 20,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "religion",
+        "dataType": "varchar",
+        "dataLength": 20,
         "dataPrecision": null,
         "dataScale": null,
         "nullable": "Y"
