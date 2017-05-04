@@ -716,11 +716,13 @@ module.exports = function (Members) {
                 if (error) {
                     cb(error);
                 }
-                result['hobby'] = JSON.parse(result['hobby']);
+                var memberData = JSON.parse(JSON.stringify(result));
+                memberData['hobby'] = JSON.parse(memberData['hobby']);
 
-                var bdayDate = new Date(result['bday']);
-                result['age'] = common.calculateAge(bdayDate);
-                cb(null, result);
+                var bdayDate = new Date(memberData['bday']);
+                memberData['age'] = common.calculateAge(bdayDate);
+
+                cb(null, memberData);
             });
 
         }
