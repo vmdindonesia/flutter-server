@@ -93,13 +93,15 @@ module.exports = function (Matchmember) {
                         item = JSON.parse(JSON.stringify(item));
 
                         var memberData = item.members;
+                        if (typeof memberData !== 'undefined') {
+                            memberData.hobby = JSON.parse(memberData.hobby);
 
-                        memberData.hobby = JSON.parse(memberData.hobby);
+                            var bdayDate = new Date(memberData.bday);
+                            memberData.age = common.calculateAge(bdayDate);
 
-                        var bdayDate = new Date(memberData.bday);
-                        memberData.age = common.calculateAge(bdayDate);
+                            matchList.push(memberData);
 
-                        matchList.push(memberData);
+                        }
                     }
                 }, this);
 

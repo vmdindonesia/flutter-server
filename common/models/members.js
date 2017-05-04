@@ -254,6 +254,16 @@ module.exports = function (Members) {
         ]
     });
 
+    Members.remoteMethod('updateProfile', {
+        description: 'Update Profile',
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'userId', type: 'number', required: true },
+            { arg: 'params', type: 'object', required: true }
+        ],
+        returns: { arg: 'result', type: 'object', root: true, description: 'new Member data' }
+    });
+
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -268,6 +278,7 @@ module.exports = function (Members) {
     Members.passwordReset = passwordReset;
     Members.emailCheck = emailCheck;
     Members.isUserNeedProfile = isUserNeedProfile;
+    Members.updateProfile = updateProfile;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -660,4 +671,61 @@ module.exports = function (Members) {
         req.write(JSON.stringify(data));
         req.end();
     };
+
+    function updateProfile(userId, params, cb) {
+        var where = {
+            id: userId
+        }
+        Members.upsertWithWhere(where, params, function (error, result) {
+            if (error) {
+                cb(error);
+            }
+            getMemberData();
+        });
+
+        function getMemberData() {
+            var filter = {
+                fields: [
+                    'id',
+                    'fullName',
+                    'gender',
+                    'about',
+                    'employeeType', //occupation
+                    'income',
+                    'address',
+                    'religion',
+                    'hobby',
+                    'race', //origin
+                    'degree',
+                    'zodiac',
+                    'bday'
+                ],
+                include: [{
+                    relation: 'memberPhotos',
+                    scope: {
+                        fields: ['src']
+                    }
+                }, {
+                    relation: 'memberImage',
+                    scope: {
+                        fields: ['src']
+                    }
+                }]
+            }
+            Members.findById(userId, filter, function (error, result) {
+                if (error) {
+                    cb(error);
+                }
+                var memberData = JSON.parse(JSON.stringify(result));
+                memberData['hobby'] = JSON.parse(memberData['hobby']);
+
+                var bdayDate = new Date(memberData['bday']);
+                memberData['age'] = common.calculateAge(bdayDate);
+
+                cb(null, memberData);
+            });
+
+        }
+    }
+
 };

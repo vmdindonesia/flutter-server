@@ -117,31 +117,35 @@ function apply(userId, someList, cb) {
             }, this);
 
             someList.forEach(function (item) {
-                var config = lodash.find(result, { membersId: item.id })
-                config['visibilityData'].forEach(function (element) {
-                    if (element.filterId == 1) {
-                        item.fullName = item.fullName.split(" ")[0] + ' ****';
-                    }
+                var config = lodash.find(result, { membersId: item.id });
 
-                    if (element.filterId == 2) {
-                        item.memberImage = [];
-                    }
+                if (typeof config !== 'undefined') {
 
-                    if (element.filterId == 3) {
-                        item.income = '****';
-                    }
+                    config['visibilityData'].forEach(function (element) {
+                        if (element.filterId == 1) {
+                            item.fullName = item.fullName.split(" ")[0] + ' ****';
+                        }
 
-                    if (element.filterId == 4) {
-                        item.degree = '****';
-                    }
+                        if (element.filterId == 2) {
+                            item.memberImage = [];
+                        }
 
-                    if (element.filterId == 5) {
-                        item.bday = '****';
-                    }
+                        if (element.filterId == 3) {
+                            item.income = '****';
+                        }
 
+                        if (element.filterId == 4) {
+                            item.degree = '****';
+                        }
 
-                }, this);
-                
+                        if (element.filterId == 5) {
+                            item.bday = '****';
+                        }
+
+                    }, this);
+
+                }
+
             }, this);
 
             cb(null, someList);
