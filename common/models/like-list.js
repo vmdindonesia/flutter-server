@@ -205,7 +205,7 @@ module.exports = function (Likelist) {
                         cb(error);
                     } else {
                         // callback(result.id);
-                        addmatchMember(result.id);
+                        addMatchMember(result.id);
                     }
                 });
             }
