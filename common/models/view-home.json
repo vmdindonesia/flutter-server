@@ -266,7 +266,7 @@
       },
       "_selectable": true
     },
-     "phoneVer": {
+    "phoneVer": {
       "type": "Number",
       "required": false,
       "length": null,

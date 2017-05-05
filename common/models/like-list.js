@@ -7,6 +7,7 @@ module.exports = function (Likelist) {
     var filterPrivacy = require('../filter-privacy.js');
     let async = require("async");
     var common = require('../common-util.js');
+    var lodash = require('lodash');
 
 
     // BEGIN - BEFORE REMOTE =====================================================================
@@ -97,6 +98,11 @@ module.exports = function (Likelist) {
         returns: { arg: 'result', type: 'array', root: true }
     });
 
+    // Likelist.remoteMethod('testing', {
+    //     http: { verb: 'get' },
+    //     returns: { arg: 'result', type: 'object', root: true }
+    // })
+
     // END - REMOTE METHOD =======================================================================
 
     // BEGIN - FUNCTIONS =========================================================================
@@ -104,6 +110,7 @@ module.exports = function (Likelist) {
     Likelist.doLike = doLike;
     Likelist.getLikeMeList = getLikeMeList;
     Likelist.getILikeList = getILikeList;
+    // Likelist.testing = testing;
 
     // END - FUNCTIONS ===========================================================================
 
@@ -114,93 +121,181 @@ module.exports = function (Likelist) {
         var likedUserId = userId;
         var dateNow = new Date();
 
-        addLike(checkMatch);
+        Likelist.beginTransaction({ isolationLevel: Likelist.Transaction.READ_COMMITTED }, function (err, tx) {
+            if (err) {
+                cb(err);
+            }
 
-        // FUNCTION 1
-        function addLike(callback) {
-            // console.log('ADDING LIKE');
-            var newLike = {
-                likeUser: currentUserId,
-                likeMember: likedUserId
-            };
-            Likelist.create(newLike, function (error, result) {
-                if (error) {
-                    cb(error);
-                } else {
-                    Pushnotification.like(currentUserId, likedUserId);
-                    callback(addMatches);
-                }
-            });
-        }
+            addLike();
 
-        // FUNCTION 2
-        function checkMatch(callback) {
-            // console.log('CHECKING MATCH');
-            var filter = {
-                where: {
-                    and: [
-                        { likeUser: likedUserId },
-                        { likeMember: currentUserId }
-                    ]
-                }
-            };
-            Likelist.findOne(filter, function (error, result) {
-                if (error) {
-                    cb(error);
-                } else {
-                    if (result) {
-                        callback(addMatchMember);
-                    } else {
-                        cb(null, false, {});
+            // FUNCTION 1
+            function addLike() {
+                // console.log('ADDING LIKE');
+
+                var filter = {
+                    where: {
+                        likeUser: currentUserId,
+                        likeMember: likedUserId
                     }
                 }
-            });
-        }
+
+                var newLike = {
+                    likeUser: currentUserId,
+                    likeMember: likedUserId
+                };
+
+                Likelist.findOrCreate(filter, newLike, function (error, result, created) {
+                    if (error) {
+                        tx.rollback(function (err) { });
+                        cb(error);
+                    } else {
+                        if (created) {
+                            Pushnotification.like(currentUserId, likedUserId);
+                        }
+                        // callback(addMatches);
+                        checkMatch(created);
+                    }
+                });
+            }
+
+            // FUNCTION 2
+            function checkMatch(created) {
+                // console.log('CHECKING MATCH');
+                var filter = {
+                    where: {
+                        and: [
+                            { likeUser: likedUserId },
+                            { likeMember: currentUserId }
+                        ]
+                    }
+                };
+                Likelist.findOne(filter, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    } else {
+                        console.log(result);
+                        if (result) {
+                            // callback(addMatchMember);
+                            if (created) {
+                                addMatches();
+                            } else {
+                                findMatchMember();
+                            }
+                        } else {
+                            tx.commit(function (err) { });
+                            cb(null, false, {});
+                        }
+                    }
+                });
+            }
 
 
-        // FUNCTION 3
-        function addMatches(callback) {
-            // console.log('ADD MATCHES');
-            var Matches = app.models.Matches;
+            // FUNCTION 3
+            function addMatches() {
+                // console.log('ADD MATCHES');
+                var Matches = app.models.Matches;
 
-            var newMatches = {
-                title: 'chat',
-                createAt: dateNow
-            };
-            Matches.create(newMatches, function (error, result) {
-                if (error) {
-                    cb(error);
-                } else {
-                    callback(result.id);
+                var newMatches = {
+                    title: 'chat',
+                    createAt: dateNow
+                };
+                Matches.create(newMatches, function (error, result) {
+                    if (error) {
+                        tx.rollback(function (err) { });
+                        cb(error);
+                    } else {
+                        // callback(result.id);
+                        addmatchMember(result.id);
+                    }
+                });
+            }
+
+            // FUNCTION 4
+            function addMatchMember(matchId) {
+                // console.log('ADD MATCH MEMBER');
+
+                var Matchmember = app.models.MatchMember;
+                var newMatchMembers = [];
+
+                newMatchMembers.push({
+                    matchId: matchId,
+                    membersId: currentUserId,
+                    createdDate: dateNow
+                });
+
+                newMatchMembers.push({
+                    matchId: matchId,
+                    membersId: likedUserId,
+                    createdDate: dateNow
+                });
+
+                Matchmember.create(newMatchMembers, function (error, result) {
+                    if (error) {
+                        tx.rollback(function (err) { });
+                        cb(error);
+                    } else {
+                        Pushnotification.match(newMatchMembers[0].membersId);
+                        Pushnotification.match(newMatchMembers[1].membersId);
+                        Matchmember.findOne({
+                            where: {
+                                and: [
+                                    { membersId: likedUserId },
+                                    { matchId: matchId }
+                                ]
+                            },
+                            include: {
+                                relation: 'members',
+                                scope: {
+                                    fields: ['id', 'fullName', 'online'],
+                                    include: {
+                                        relation: 'memberPhotos'
+                                    }
+                                }
+                            }
+                        }, function (error, result) {
+                            if (error) {
+                                cb(error);
+                            } else {
+                                tx.commit(function (err) { });
+                                cb(null, true, result);
+                            }
+                        })
+                    }
+                })
+
+            }
+
+            function findMatchMember() {
+
+                var Matchmember = app.models.MatchMember;
+
+                var filter = {
+                    fields: ['matchId'],
+                    where: {
+                        membersId: currentUserId
+                    },
+                    include: {
+                        relation: 'matchMembers',
+                        scope: {
+                            where: {
+                                membersId: { neq: currentUserId },
+                                membersId: likedUserId
+                            }
+                        }
+                    }
                 }
-            });
-        }
 
-        // FUNCTION 4
-        function addMatchMember(matchId) {
-            // console.log('ADD MATCH MEMBER');
+                Matchmember.find(filter, function (error, result) {
+                    var someObj = lodash.find(result, function (item) {
+                        return item.matchMembers().length != 0;
+                    })
 
-            var Matchmember = app.models.MatchMember;
-            var newMatchMembers = [];
+                    var matchId = someObj.matchId;
+                    getMatchMember(matchId);
+                });
 
-            newMatchMembers.push({
-                matchId: matchId,
-                membersId: currentUserId,
-                createdDate: dateNow
-            });
+                function getMatchMember(matchId) {
 
-            newMatchMembers.push({
-                matchId: matchId,
-                membersId: likedUserId,
-                createdDate: dateNow
-            });
-
-            Matchmember.create(newMatchMembers, function (error, result) {
-                if (error) {
-                    cb(error);
-                } else {
-                    Pushnotification.match(newMatchMembers[0].membersId);
-                    Pushnotification.match(newMatchMembers[1].membersId);
                     Matchmember.findOne({
                         where: {
                             and: [
@@ -221,13 +316,14 @@ module.exports = function (Likelist) {
                         if (error) {
                             cb(error);
                         } else {
+                            tx.commit(function (err) { });
                             cb(null, true, result);
                         }
-                    })
-                }
-            })
+                    });
 
-        }
+                }
+            }
+        });
     }
 
     function getLikeMeList(limit, offset, options, cb) {
