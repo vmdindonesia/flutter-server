@@ -362,6 +362,22 @@
       },
       "_selectable": true
     },
+    "profession": {
+      "type": "String",
+      "required": false,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "profession",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
+    },
     "emailVerified": {
       "type": "Number",
       "required": false,
