@@ -125,12 +125,9 @@ module.exports = function (Likelist) {
             if (err) {
                 cb(err);
             }
+            checkLike();
 
-            addLike();
-
-            // FUNCTION 1
-            function addLike() {
-                // console.log('ADDING LIKE');
+            function checkLike() {
 
                 var filter = {
                     where: {
@@ -139,22 +136,39 @@ module.exports = function (Likelist) {
                     }
                 }
 
+                Likelist.findOne(filter, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    if (result) {
+                        //PERNAH KE LIKE, JGN DI LIKE LAGI
+                        checkMatch(false);
+                    } else {
+                        addLike();
+                    }
+
+                })
+
+            }
+
+            // FUNCTION 1
+            function addLike() {
+                // console.log('ADDING LIKE');
+
+
                 var newLike = {
                     likeUser: currentUserId,
                     likeMember: likedUserId
                 };
 
                 Likelist.create(newLike, function (error, result) {
-                    var created = true;
                     if (error) {
                         tx.rollback(function (err) { });
                         cb(error);
                     } else {
-                        if (created) {
-                            Pushnotification.like(currentUserId, likedUserId);
-                        }
+                        Pushnotification.like(currentUserId, likedUserId);
                         // callback(addMatches);
-                        checkMatch(created);
+                        checkMatch(true);
                     }
                 });
 
@@ -280,67 +294,71 @@ module.exports = function (Likelist) {
             }
 
             function findMatchMember() {
-                tx.commit(function (err) { });
-                cb(null, true, {});
+                // tx.commit(function (err) { });
+                // cb(null, true, {});
 
-                // var Matchmember = app.models.MatchMember;
+                var Matchmember = app.models.MatchMember;
 
-                // var filter = {
-                //     fields: ['matchId'],
-                //     where: {
-                //         membersId: currentUserId
-                //     },
-                //     include: {
-                //         relation: 'matchMembers',
-                //         scope: {
-                //             where: {
-                //                 and: [
-                //                     {membersId: { neq: currentUserId }},
-                //                     {membersId: likedUserId}
-                //                 ]
-                //             }
-                //         }
-                //     }
-                // }
+                var filter = {
+                    fields: ['matchId'],
+                    where: {
+                        membersId: currentUserId
+                    },
+                    include: {
+                        relation: 'matchMembers',
+                        scope: {
+                            where: {
+                                and: [
+                                    { membersId: { neq: currentUserId } },
+                                    { membersId: likedUserId }
+                                ]
+                            }
+                        }
+                    }
+                }
 
-                // Matchmember.find(filter, function (error, result) {
-                //     var someObj = lodash.find(result, function (item) {
-                //         return item.matchMembers().length != 0;
-                //     })
+                Matchmember.find(filter, function (error, result) {
 
-                //     console.log(JSON.stringify(result));
-                //     var matchId = someObj.matchId;
-                //     getMatchMember(matchId);
-                // });
+                    result = JSON.parse(JSON.stringify(result));
+                    var someObj = lodash.find(result, function (item) {
+                        if ('matchMembers' in item) {
+                            return item.matchMembers.length > 0;
+                        } else {
+                            return false;
+                        }
+                    })
+                    var matchId = someObj.matchId;
+                    getMatchMember(matchId);
+                });
 
-                // function getMatchMember(matchId) {
+                function getMatchMember(matchId) {
 
-                //     Matchmember.findOne({
-                //         where: {
-                //             and: [
-                //                 { membersId: likedUserId },
-                //                 { matchId: matchId }
-                //             ]
-                //         },
-                //         include: {
-                //             relation: 'members',
-                //             scope: {
-                //                 fields: ['id', 'fullName', 'online'],
-                //                 include: {
-                //                     relation: 'memberPhotos'
-                //                 }
-                //             }
-                //         }
-                //     }, function (error, result) {
-                //         if (error) {
-                //             cb(error);
-                //         } else {
-                //             tx.commit(function (err) { });
-                //             cb(null, true, result);
-                //         }
-                //     });
+                    Matchmember.findOne({
+                        where: {
+                            and: [
+                                { membersId: likedUserId },
+                                { matchId: matchId }
+                            ]
+                        },
+                        include: {
+                            relation: 'members',
+                            scope: {
+                                fields: ['id', 'fullName', 'online'],
+                                include: {
+                                    relation: 'memberPhotos'
+                                }
+                            }
+                        }
+                    }, function (error, result) {
+                        if (error) {
+                            cb(error);
+                        } else {
+                            tx.commit(function (err) { });
+                            cb(null, true, result);
+                        }
+                    });
 
-                // }
+                }
             }
         });
     }
