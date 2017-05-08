@@ -66,6 +66,12 @@
       "type": "belongsTo",
       "model": "Members",
       "foreignKey": "membersId"
+    },
+    "matchMembers": {
+      "type": "hasMany",
+      "model": "MatchMember",
+      "foreignKey": "matchId",
+      "primaryKey": "matchId"
     }
   },
   "acls": [

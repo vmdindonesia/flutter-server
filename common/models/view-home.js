@@ -207,6 +207,9 @@ module.exports = function (Viewhome) {
             if (!_.isEmpty(JSON.parse(homeSettingData.religion))) {
                 andList.push({ religion: { inq: JSON.parse(homeSettingData.religion) } });
             }
+            if (!_.isEmpty(JSON.parse(homeSettingData.zodiac))) {
+                andList.push({ zodiac: { inq: JSON.parse(homeSettingData.zodiac) } });
+            }
             if (homeSettingData.verify) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
