@@ -134,13 +134,17 @@ module.exports = function (Nearbyview) {
                 fields: ['id', 'geolocation'],
                 // include: 'rel_visibility',
                 where: {
-                    id: { neq: id },
-                    id: { nin: excludeByFilterList },
-                    gender: { neq: memberResult.gender },
-                    age: {
-                        between: [setting.ageLower, setting.ageUpper]
-                    },
-                    visibility: 1,
+                    and: [
+                        { id: { neq: id } },
+                        { id: { nin: excludeByFilterList } },
+                        { gender: { neq: memberResult.gender } },
+                        {
+                            age: {
+                                between: [setting.ageLower, setting.ageUpper]
+                            }
+                        },
+                        { visibility: 1 }
+                    ],
                     geolocation: {
                         near: myLocation,
                         maxDistance: setting.distance,
@@ -190,7 +194,7 @@ module.exports = function (Nearbyview) {
                 filter.where['zodiac'] = { inq: JSON.parse(setting.zodiac) };
             }
 
-            // // Config filter smoke
+            // Config filter smoke
             if (!lodash.isNull(setting.smoke)) {
                 filter.where['smoke'] = setting.smoke;
             }
@@ -279,12 +283,12 @@ module.exports = function (Nearbyview) {
 
                 // console.log(newResult);
 
-                filterPrivacy.apply(id, newResult, function (error, result) {
-                    if (error) {
-                        cb(error);
-                    }
-                    cb(null, result);
-                });
+                // filterPrivacy.apply(id, newResult, function (error, result) {
+                //     if (error) {
+                //         cb(error);
+                //     }
+                cb(null, newResult);
+                // });
 
                 // cb(null, newResult);
 
