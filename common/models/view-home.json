@@ -378,6 +378,22 @@
       },
       "_selectable": true
     },
+    "geolocation": {
+      "type": "GeoPoint",
+      "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "geolocation",
+        "dataType": "point",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
     "emailVerified": {
       "type": "Number",
       "required": false,
