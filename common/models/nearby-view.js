@@ -167,7 +167,8 @@ module.exports = function (Nearbyview) {
                             'race', //origin
                             'degree',
                             'zodiac',
-                            'bday'
+                            'bday',
+                            'online'
                         ],
                         include: [{
                             relation: 'memberPhotos',
