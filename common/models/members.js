@@ -104,6 +104,7 @@ module.exports = function (Members) {
         var filter = {
             fields: [
                 'id',
+                'email',
                 'fullName',
                 'gender',
                 'about',
@@ -687,6 +688,7 @@ module.exports = function (Members) {
             var filter = {
                 fields: [
                     'id',
+                    'email',
                     'fullName',
                     'gender',
                     'about',
