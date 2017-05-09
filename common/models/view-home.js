@@ -336,12 +336,35 @@ module.exports = function (Viewhome) {
                                             break;
                                         case 2:
 
+                                            var hasil = value.memberImage;
+                                            // value.income = 'Privacy';
+                                            value.memberImage = [];
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.memberImage = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.memberImage = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.memberImage = hasil;
+                                                }
+                                            }
+
                                             callback();
                                             break;
                                         case 3:
 
                                             var hasil = value.income;
-                                            value.income = 'Privacy';
+                                            // value.income = 'Privacy';
+                                            value.income = '****';
 
                                             if (value2.verified) {
                                                 if (isVerify == true) {
@@ -366,7 +389,8 @@ module.exports = function (Viewhome) {
                                         case 4:
 
                                             var hasil = value.degree;
-                                            value.degree = 'Privacy';
+                                            // value.degree = 'Privacy';
+                                            value.degree = '****';
 
                                             if (value2.verified) {
                                                 if (isVerify == true) {
@@ -389,6 +413,28 @@ module.exports = function (Viewhome) {
                                             callback();
                                             break;
                                         case 5:
+
+                                            var hasil = value.bday;
+                                            // value.degree = 'Privacy';
+                                            value.bday = '****';
+
+                                            if (value2.verified) {
+                                                if (isVerify == true) {
+                                                    value.bday = hasil;
+                                                }
+                                            }
+
+                                            if (value2.unverified) {
+                                                if (isVerify == false) {
+                                                    value.bday = hasil;
+                                                }
+                                            }
+
+                                            if (value2.match) {
+                                                if (isMatch == true) {
+                                                    value.bday = hasil;
+                                                }
+                                            }
 
                                             callback();
                                             break;
