@@ -103,16 +103,9 @@ function apply(userId, someList, cb) {
 
             result.forEach(function (item) {
                 if (matchUserIdList.indexOf(item.membersId) != -1) {
-                    var delList = [];
-                    for (var i = 0; i < item['visibilityData'].length; i++) {
-                        var loopItem = item['visibilityData'][i];
-                        if (loopItem.match == 1) {
-                            delList.push(i);
-                        }
-                    }
-                    delList.forEach(function (index) {
-                        item['visibilityData'].splice(index, 1);
-                    }, this);
+                    lodash.remove(item['visibilityData'], function (item) {
+                        return item.match == 1;
+                    });
                 }
             }, this);
 
