@@ -282,19 +282,12 @@ module.exports = function (Nearbyview) {
             }, function () {
                 //AFTER LOOP
 
-                // console.log(newResult);
-
-                // filterPrivacy.apply(id, newResult, function (error, result) {
-                //     if (error) {
-                //         cb(error);
-                //     }
-                cb(null, newResult);
-                // });
-
-                // cb(null, newResult);
-
-
-                // verify(newResult);
+                filterPrivacy.apply(id, newResult, function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    cb(null, result);
+                });
             })
         }
 
