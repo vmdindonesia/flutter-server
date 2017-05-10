@@ -174,6 +174,9 @@ module.exports = function (Nearbyview) {
                 andList.push({ verify: { gte: setting.verify } })
             }
 
+            if (setting.income == 0) {
+                setting.income = null;
+            }
             // Config filter income
             if (!lodash.isNull(setting.income)) {
                 // filter.where['income'] = { gte: parseInt(setting.income) };

@@ -135,9 +135,9 @@ module.exports = function (Viewhome) {
                     var status = status;
                     var score = result;
 
-                    console.log(
-                        status, result
-                    );
+                    // console.log(
+                    //     status, result
+                    // );
 
                     if (status == 'OK') {
                         memberData['verifyScore'] = score;
@@ -225,6 +225,11 @@ module.exports = function (Viewhome) {
             if (!_.isNull(homeSettingData.smoke)) {
                 andList.push({ smoke: homeSettingData.smoke });
             }
+
+            //TAMBAHIN KALAU USER INCOMENYA NULL JUGA MASUK
+            if (homeSettingData.income == 0) {
+                homeSettingData.income = null;
+            }
             if (!_.isNull(homeSettingData.income)) {
                 andList.push({ income: { gte: homeSettingData.income } });
             }
@@ -311,9 +316,9 @@ module.exports = function (Viewhome) {
                                 callback();
                             } else {
 
-                                console.log(
-                                    isVerify, isMatch
-                                );
+                                // console.log(
+                                //     isVerify, isMatch
+                                // );
 
                                 async.eachOfSeries(value.rel_visibility(), function (value2, key, callback) {
 
@@ -468,9 +473,9 @@ module.exports = function (Viewhome) {
             }, function (err) {
                 if (err) console.error(err.message);
                 // configs is now a map of JSON data
-                console.log(
-                    params
-                );
+                // console.log(
+                //     params
+                // );
 
                 cb(null, params);
 
