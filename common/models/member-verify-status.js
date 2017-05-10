@@ -189,7 +189,7 @@ module.exports = function (Memberverifystatus) {
         var params = [userId];
 
         Memberverifystatus.dataSource.connector.execute(query, params, function (error, result) {
-            console.log(result);
+            // console.log(result);
             if (result.length > 0) {
                 var score = 0;
                 for (var i = 0; i < result.length; i++) {
