@@ -157,19 +157,30 @@ module.exports = function (Viewhome) {
 
             var Settinghome = app.models.SettingHome;
 
+            var orList = [];
+
+            orList.push({ ageLower: { gt: memberData.age } });
+            orList.push({ ageUpper: { lt: memberData.age } });
+
+            if (!_.isNull(memberData.smoke)) {
+                orList.push({ smoke: { neq: memberData.smoke } });
+            }
+
+            if (!_.isNull(memberData.income)) {
+                orList.push({ income: { gt: memberData.income } });
+            }
+
+            if (!_.isNull(memberData.verify)) {
+                orList.push({ verify: { gt: memberData.verifyScore } });
+            }
+
             var filter = {
                 fields: { memberId: true },
                 where: {
-                    or: [
-                        { ageLower: { gt: memberData.age } },
-                        { ageUpper: { lt: memberData.age } },
-                        { smoke: { neq: memberData.smoke } },
-                        { income: { neq: memberData.income } },
-                        { verify: { lt: memberData.verifyScore } }
-                    ]
+                    or: orList
                 }
             }
-            // console.log(JSON.stringify(filter));
+
             Settinghome.find(filter, function (error, result) {
                 if (error) {
                     cb(error);
@@ -178,9 +189,7 @@ module.exports = function (Viewhome) {
                     excludeByFilterList.push(item.memberId);
                 }, this);
                 getHomeListByFilter();
-            })
-
-
+            });
 
         }
 
@@ -210,13 +219,13 @@ module.exports = function (Viewhome) {
             if (!_.isEmpty(JSON.parse(homeSettingData.zodiac))) {
                 andList.push({ zodiac: { inq: JSON.parse(homeSettingData.zodiac) } });
             }
-            if (homeSettingData.verify) {
+            if (!_.isNull(homeSettingData.verify)) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
-            if (homeSettingData.smoke) {
+            if (!_.isNull(homeSettingData.smoke)) {
                 andList.push({ smoke: homeSettingData.smoke });
             }
-            if (homeSettingData.income) {
+            if (!_.isNull(homeSettingData.income)) {
                 andList.push({ income: { gte: homeSettingData.income } });
             }
             var filter = {
