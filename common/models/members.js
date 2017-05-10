@@ -386,10 +386,15 @@ module.exports = function (Members) {
 
     function register(params, cb) {
 
+        var memberData = {};
+
         Members.create(params, function (error, result) {
             if (error) {
                 cb(error);
             }
+
+            memberData = result;
+
             var inits = [];
             inits.push(initSettingHome);
             inits.push(initSettingPrivacy);
@@ -411,9 +416,26 @@ module.exports = function (Members) {
             var Settinghome = app.models.SettingHome;
 
             var dateNow = new Date();
+            var ageLower = 21;
+            var ageUpper = 100;
+
+            if (memberData[bday]) {
+                var bdayDate = new Date(memberData['bday']);
+                var age = common.calculateAge(bdayDate);
+                ageLower = age - 10;
+                ageUpper = age + 10;
+                if (ageLower < 21) {
+                    ageLower = 21;
+                }
+                if (ageUpper > 100) {
+                    ageUpper = 100;
+                }
+            }
 
             Settinghome.create({
                 memberId: userId,
+                ageLower: ageLower,
+                ageUpper: ageUpper,
                 createUserId: userId,
                 createDatetime: dateNow,
                 updateUserId: userId,
@@ -435,12 +457,22 @@ module.exports = function (Members) {
 
             common.asyncLoop(5, function (loop) {
                 var index = loop.iteration();
-                var item = {
-                    unverified: 1,
-                    verified: 1,
-                    match: 1,
-                    membersId: userId,
-                    filterId: index + 1,
+                if (index == 0) {
+                    var item = {
+                        unverified: 0,
+                        verified: 1,
+                        match: 1,
+                        membersId: userId,
+                        filterId: index + 1,
+                    }
+                } else {
+                    var item = {
+                        unverified: 0,
+                        verified: 0,
+                        match: 0,
+                        membersId: userId,
+                        filterId: index + 1,
+                    }
                 }
                 Visibilitydata.create(item, function (error, result) {
                     if (error) {
