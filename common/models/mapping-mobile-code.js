@@ -25,7 +25,7 @@ module.exports = function (Mappingmobilecode) {
     }
     console.log('AFTER REMOTE');
 
-    var smsGatewayUrl = 'https://secure.gosmsgateway.com/masking/api/send.php?username=flutter&mobile=' + context.args.data.mobileNumber + '&message=Harap+masukkan+' + context.args.data.generatedCode + '+di+Aplikasi+Flutterasia+dalam+30+menit.&password=gosms38246';
+    var smsGatewayUrl = 'https://secure.gosmsgateway.com/masking/api/send.php?username=flutter&mobile=' + context.args.data.mobileNumber + '&message=Please+input+' + context.args.data.generatedCode + '+on+Flutter+Asia+in+30+minutes.&password=gosms38246';
     httpGetAsync(smsGatewayUrl, function () {
       console.log('HTTP DONE');
       // console.log(smsGatewayUrl);
