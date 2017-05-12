@@ -336,7 +336,9 @@ module.exports = function (Memberverifystatus) {
                     fullName: userInstance.fullName
                 };
                 userInstance.verify(options, function (err, response, nexts) {
-                    if (err) return next(err);
+                    if (err) {
+                        cb(err);
+                    };
 
                     console.log('> verification email sent:', response);
                     // next();
