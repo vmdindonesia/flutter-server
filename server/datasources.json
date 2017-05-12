@@ -26,10 +26,10 @@
       {
         "type": "smtp",
         "host": "mail.dataon.com",
-        "secure": true,
+        "secure": false,
         "port": 587,
         "auth": {
-          "user": "donotreply@flutterasia.com",
+          "user": "donotreply-flutterasia@dataon.com",
           "pass": "P@ssw0rdFA"
         }
       }
