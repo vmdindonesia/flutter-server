@@ -524,7 +524,7 @@ module.exports = function (Members) {
                 }
                 else {
                     if (user) {
-                        err = 'Invalid token: ' + token;
+                        err = 'This email has already been verified';
                     } else {
                         err = 'User not found';
                     }
