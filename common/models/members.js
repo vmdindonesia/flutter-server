@@ -126,7 +126,7 @@ module.exports = function (Members) {
             }, {
                 relation: 'memberImage',
                 scope: {
-                    fields: ['src']
+                    fields: ['id', 'src']
                 }
             }, {
                 relation: 'settingHomes',
