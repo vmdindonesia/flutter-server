@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function(Chatdetail) {
-	Chatdetail.remoteMethod('createChat', {
+module.exports = function (Chatdetail) {
+    Chatdetail.remoteMethod('createChat', {
         http: { path: '/createChat', verb: 'post' },
         accepts: { arg: 'param', type: 'Object' },
         returns: { arg: 'response', type: 'array', root: true }
@@ -62,6 +62,15 @@ module.exports = function(Chatdetail) {
                 console.log(result);
                 var targetUserId = result[0].membersId;
 
+                Matchmember.updateAll({
+                    matchId: modelInstance.matchId
+                }, {
+                        updateBy: modelInstance.membersId,
+                        isRead: 1
+                    }, function (error, ress) {
+
+                    })
+
                 var Pushnotification = require('../push-notification.js');
                 console.log(modelInstance.text);
                 Pushnotification.chat(modelInstance.membersId, targetUserId, modelInstance.text, result[0]);
@@ -69,5 +78,23 @@ module.exports = function(Chatdetail) {
             next();
         })
 
+    });
+
+    Chatdetail.afterRemote('find', function (ctx, modelInstance, next) {
+        var app = require('../../server/server');
+        var Matchmember = app.models.MatchMember;
+        try {
+            Matchmember.updateAll({
+                matchId: modelInstance.matchId,
+                membersId: modelInstance.membersId
+            }, {
+                    isRead: 0
+                }, function (error, ress) {
+
+                })
+        } catch (error) {
+
+        }
+        next();
     });
 };
