@@ -97,7 +97,7 @@ function chat(senderUserId, recipientUserId, text, data) {
     })
 }
 
-function match(recipientUserId) {
+function match(recipientUserId, data) {
 
     var message = {
         app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
@@ -106,7 +106,8 @@ function match(recipientUserId) {
             { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
         ],
         data: {
-            tag: 'match'
+            tag: 'match',
+            params: data
         }
     };
     send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
