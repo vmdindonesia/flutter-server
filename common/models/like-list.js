@@ -17,7 +17,7 @@ module.exports = function (Likelist) {
     // BEGIN - AFTER REMOTE ======================================================================
 
     Likelist.afterRemote('create', function (ctx, modelInstance, next) {
-        Pushnotification.like(modelInstance.likeUser, modelInstance.likeMember);
+        // Pushnotification.like(modelInstance.likeUser, modelInstance.likeMember);
         next();
     });
 
@@ -166,7 +166,7 @@ module.exports = function (Likelist) {
                         tx.rollback(function (err) { });
                         cb(error);
                     } else {
-                        Pushnotification.like(currentUserId, likedUserId);
+                        // Pushnotification.like(currentUserId, likedUserId);
                         // callback(addMatches);
                         checkMatch(true);
                     }
@@ -201,7 +201,7 @@ module.exports = function (Likelist) {
                     if (error) {
                         cb(error);
                     } else {
-                        console.log(result);
+                        // console.log(result);
                         if (result) {
                             // callback(addMatchMember);
                             if (created) {
@@ -210,6 +210,7 @@ module.exports = function (Likelist) {
                                 findMatchMember();
                             }
                         } else {
+                            Pushnotification.like(currentUserId, likedUserId);
                             tx.commit(function (err) { });
                             cb(null, false, {});
                         }
