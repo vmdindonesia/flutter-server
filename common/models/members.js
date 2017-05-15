@@ -457,7 +457,7 @@ module.exports = function (Members) {
 
             common.asyncLoop(5, function (loop) {
                 var index = loop.iteration();
-                if (index == 0) {
+                if (index == 0 || index == 1 || index == 3) {
                     var item = {
                         unverified: 0,
                         verified: 1,
