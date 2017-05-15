@@ -18,6 +18,7 @@ module.exports = function (Nearbyview) {
     Nearbyview.getNearbyLocation = function (id, cb) {
         var memberResult;
         var excludeByFilterList = [];
+        var excludeMatchList = [];
         var Members = app.models.Members;
         var memberData = {};
         var myLocation;
@@ -133,9 +134,22 @@ module.exports = function (Nearbyview) {
                         excludeByFilterList.push(item.memberId);
                     }, this);
 
-                    getMember(id);
+                    // getMember(id);
+                    excludeMatch(id);
                 }
             });
+        }
+
+        function excludeMatch(id) {
+            var Matchmember = app.models.MatchMember;
+            Matchmember.getMemberIdMatchList(id, function (error, result) {
+                if (error) {
+                    cb(error);
+                }
+                excludeMatchList = result;
+                getMember(id);
+            });
+
         }
 
         // Function 4
@@ -146,6 +160,7 @@ module.exports = function (Nearbyview) {
 
             andList.push({ id: { neq: id } });
             andList.push({ id: { nin: excludeByFilterList } });
+            andList.push({ id: { nin: excludeMatchList } });
             andList.push({ gender: { neq: memberResult.gender } });
             andList.push({ age: { between: [setting.ageLower, setting.ageUpper] } });
             andList.push({ visibility: 1 });
