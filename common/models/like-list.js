@@ -264,47 +264,33 @@ module.exports = function (Likelist) {
                     } else {
                         // Pushnotification.match(newMatchMembers[0].membersId);
                         // Pushnotification.match(newMatchMembers[1].membersId);
-                        var thisResult = undefined;
-                        common.asyncLoop(newMatchMembers.length, function (loop) {
-                            var index = loop.iteration();
-                            var item = newMatchMembers[index];
 
-                            Matchmember.findOne({
-                                where: {
-                                    and: [
-                                        // { membersId: likedUserId },
-                                        { membersId: item.membersId },
-                                        { matchId: matchId }
-                                    ]
-                                },
-                                include: {
-                                    relation: 'members',
-                                    scope: {
-                                        fields: ['id', 'fullName', 'online'],
-                                        include: {
-                                            relation: 'memberPhotos'
-                                        }
+                        Matchmember.findOne({
+                            where: {
+                                and: [
+                                    { membersId: likedUserId },
+                                    { matchId: matchId }
+                                ]
+                            },
+                            include: {
+                                relation: 'members',
+                                scope: {
+                                    fields: ['id', 'fullName', 'online'],
+                                    include: {
+                                        relation: 'memberPhotos'
                                     }
                                 }
+                            }
 
-                            }, function (error, result) {
-                                if (error) {
-                                    cb(error);
-                                } else {
-                                    Pushnotification.match(item.membersId, result);
-                                    if (item.membersId == likedUserId) {
-                                        thisResult = result;
-                                    }
-                                    loop.next();
-                                }
-                            })
-
-                        }, function () {
-                            tx.commit(function (err) { });
-                            // cb(null, true, result);
-                            cb(null, true, thisResult);
-
-                        });
+                        }, function (error, result) {
+                            if (error) {
+                                cb(error);
+                            } else {
+                                Pushnotification.match(likedUserId, result);
+                                tx.commit(function (err) { });
+                                cb(null, true, result);
+                            }
+                        })
                     }
                 })
 
