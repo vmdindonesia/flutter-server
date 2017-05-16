@@ -4,6 +4,16 @@
   },
   "@mean-expert/loopback-component-realtime": {
     "debug": true,
-    "auth": false
+    "auth": false,
+    "driver": {
+      "name": "socket.io",
+      "options": {}
+    },
+    "modules": [
+      "IO",
+      "PubSub",
+      "FireLoop",
+      "WebRTCSignaler"
+    ]
   }
 }
