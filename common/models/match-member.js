@@ -230,41 +230,41 @@ module.exports = function (Matchmember) {
     //     });
     // };
 
-    Matchmember.afterRemote('find', function (context, remoteMethodOutput, next) {
+    // Matchmember.afterRemote('find', function (context, remoteMethodOutput, next) {
 
-        var memberData = {};
-        var token = context.args.options.accessToken;
-        var userId = token.userId;
+    //     var memberData = {};
+    //     var token = context.args.options.accessToken;
+    //     var userId = token.userId;
 
-        memberData['id'] = userId;
+    //     memberData['id'] = userId;
 
-        getCurrentUserVerifyScore();
+    //     getCurrentUserVerifyScore();
 
-        function getCurrentUserVerifyScore() {
+    //     function getCurrentUserVerifyScore() {
 
-            var Memberverifystatus = app.models.MemberVerifyStatus;
+    //         var Memberverifystatus = app.models.MemberVerifyStatus;
 
-            Memberverifystatus.getVerifyScoreByUserId(userId, function (error, status, result) {
-                if (error) {
-                    cb(error);
-                } else {
-                    var status = status;
-                    var score = result;
+    //         Memberverifystatus.getVerifyScoreByUserId(userId, function (error, status, result) {
+    //             if (error) {
+    //                 cb(error);
+    //             } else {
+    //                 var status = status;
+    //                 var score = result;
 
-                    if (status == 'OK') {
-                        memberData['verifyScore'] = score;
-                    } else {
-                        memberData['verifyScore'] = 0
-                    }
+    //                 if (status == 'OK') {
+    //                     memberData['verifyScore'] = score;
+    //                 } else {
+    //                     memberData['verifyScore'] = 0
+    //                 }
 
-                    privacySettings(app, remoteMethodOutput, memberData, next);
+    //                 privacySettings(app, remoteMethodOutput, memberData, next);
 
-                }
-            });
+    //             }
+    //         });
 
-        }
+    //     }
 
-    });
+    // });
 
     /**
      * Function Verify
