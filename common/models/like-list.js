@@ -266,9 +266,9 @@ module.exports = function (Likelist) {
                         // Pushnotification.match(newMatchMembers[0].membersId);
                         // Pushnotification.match(newMatchMembers[1].membersId);
                         var endResult = undefined;
-                        common.asyncLoop(newMatchmembers.length, function (loop) {
+                        common.asyncLoop(newMatchMembers.length, function (loop) {
                             var index = loop.iteration();
-                            var item = newMatchmembers[index];
+                            var item = newMatchMembers[index];
 
                             Matchmember.findOne({
                                 where: {
