@@ -43,10 +43,15 @@ module.exports = function (Nearbyview) {
 
                 memberResult = result;
                 //Get near by my location
-                myLocation = new loopback.GeoPoint({
-                    lat: memberResult.nearbies().geolocation.lat,
-                    lng: memberResult.nearbies().geolocation.lng
-                });
+                if (memberResult.nearbies()) {
+                    myLocation = new loopback.GeoPoint({
+                        lat: memberResult.nearbies().geolocation.lat,
+                        lng: memberResult.nearbies().geolocation.lng
+                    });
+                } else {
+                    cb(null, []);
+                    return;
+                }
 
                 setting = memberResult.settingHome();
 
