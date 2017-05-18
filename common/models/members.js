@@ -174,6 +174,29 @@ module.exports = function (Members) {
 
     });
 
+    Members.beforeRemote('login', function(ctx, userInstance, next) {
+        var email = ctx.args.credentials.email;
+
+        Members.findOne({
+            where: { email: email },
+            fields: { emailVerified: true }
+        }, function (error, result) {
+            if (error) {
+                next(error);
+            }
+
+            if (result.emailVerified == 1) {
+                next();
+            } else {
+                next({
+                    message: 'Please verify your email address',
+                    name: 'Error',
+                    statusCode: 403
+                });
+            }
+        });
+    });
+
     // END AFTER REMOTE =====================================================================
 
     // BEGIN REMOTE METHOD ==================================================================

@@ -38,7 +38,8 @@
   },
   "Members": {
     "dataSource": "pmjakarta",
-    "public": true
+    "public": true,
+    "emailVerificationRequired": true
   },
   "DislikeList": {
     "dataSource": "pmjakarta",
