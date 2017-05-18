@@ -100,7 +100,7 @@ module.exports = function (Matchmember) {
                             memberData.age = common.calculateAge(bdayDate);
 
                             // memberData.matchId = item.matchId;
-                            memberData.matchMember = result;
+                            memberData.matchMember = JSON.parse(JSON.stringify(item));
 
                             matchList.push(memberData);
 
