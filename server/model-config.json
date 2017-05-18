@@ -208,5 +208,9 @@
   "ChatDetail": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "AppInfo": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
