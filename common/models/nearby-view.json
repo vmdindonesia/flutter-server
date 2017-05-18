@@ -380,19 +380,6 @@
     {
       "accessType": "*",
       "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "DENY"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "$authenticated",
-      "permission": "ALLOW",
-      "property": "getNearbyLocation"
-    },
-    {
-      "accessType": "*",
-      "principalType": "ROLE",
       "principalId": "$unauthenticated",
       "permission": "DENY"
     },
