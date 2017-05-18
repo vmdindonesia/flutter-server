@@ -22,35 +22,35 @@ module.exports = function (Members) {
         next();
     });
 
-    Members.afterRemote('register', function (context, remoteMethodOutput, next) {
-        var Role = Members.app.models.Role;
-        var RoleMapping = Members.app.models.RoleMapping;
+    // Members.afterRemote('register', function (context, remoteMethodOutput, next) {
+    //     var Role = Members.app.models.Role;
+    //     var RoleMapping = Members.app.models.RoleMapping;
 
-        Role.findOne({
-            where: { name: 'admin' }
-        }, function (err, role) {
-            if (err) {
-                cb(err);
-                return;
-            }
+    //     Role.findOne({
+    //         where: { name: 'admin' }
+    //     }, function (err, role) {
+    //         if (err) {
+    //             cb(err);
+    //             return;
+    //         }
 
-            RoleMapping.create({
-                principalType: RoleMapping.USER,
-                principalId: remoteMethodOutput.id,
-                roleId: role.id
-            }, function (err, roleMapping) {
-                if (err) next(err);
+    //         RoleMapping.create({
+    //             principalType: RoleMapping.USER,
+    //             principalId: remoteMethodOutput.id,
+    //             roleId: role.id
+    //         }, function (err, roleMapping) {
+    //             if (err) next(err);
 
-                next();
-            });
-        });
-    });
+    //             next();
+    //         });
+    //     });
+    // });
 
-    Members.afterRemote('create', function (context, userInstance, next) {
+    Members.afterRemote('register', function (context, userInstance, next) {
         //init verify status
         var app = require('../../server/server');
         var Memberverifystatus = app.models.MemberVerifyStatus;
-        console.log('USER ID : ' + userInstance.id);
+        // console.log('USER ID : ' + JSON.stringify(userInstance));
         var dateNow = new Date();
         Memberverifystatus.create({
             userId: userInstance.id,
@@ -406,9 +406,7 @@ module.exports = function (Members) {
                     loop.next();
                 })
             }, function () {
-                cb(null, {
-                    memberId: result.id
-                });
+                cb(null, result);
             });
         });
 
