@@ -174,7 +174,7 @@ module.exports = function (Members) {
 
     });
 
-    Members.beforeRemote('login', function(ctx, userInstance, next) {
+    Members.beforeRemote('login', function (ctx, userInstance, next) {
         var email = ctx.args.credentials.email;
 
         Members.findOne({
@@ -486,10 +486,18 @@ module.exports = function (Members) {
 
             common.asyncLoop(5, function (loop) {
                 var index = loop.iteration();
-                if (index == 0 || index == 1 || index == 3) {
+                if (index == 1) {
                     var item = {
                         unverified: 0,
                         verified: 1,
+                        match: 1,
+                        membersId: userId,
+                        filterId: index + 1,
+                    }
+                } else if (index == 2 || index == 3) {
+                    var item = {
+                        unverified: 0,
+                        verified: 0,
                         match: 1,
                         membersId: userId,
                         filterId: index + 1,
@@ -798,18 +806,18 @@ module.exports = function (Members) {
         Members.upsertWithWhere({
             id: userId
         }, {
-            deletedAt: new Date()
-        }, function (error, result) {
-            if (error) {
-                cb(error);
-            }
-            deleteAccount();
-        });
+                deletedAt: new Date()
+            }, function (error, result) {
+                if (error) {
+                    cb(error);
+                }
+                deleteAccount();
+            });
 
         function deleteAccount() {
             accessToken.destroyAll({
                 userId: userId
-            }, function(error, result) {
+            }, function (error, result) {
                 if (error) {
                     cb(error);
                 }
