@@ -183,6 +183,9 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter smoke
+            if (setting.smoke == 0) {
+                setting.smoke = null;
+            }
             if (!lodash.isNull(setting.smoke)) {
                 // filter.where['smoke'] = setting.smoke;
                 andList.push({ smoke: setting.smoke });

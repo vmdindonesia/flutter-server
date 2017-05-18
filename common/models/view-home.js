@@ -222,11 +222,15 @@ module.exports = function (Viewhome) {
             if (!_.isNull(homeSettingData.verify)) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
+
+            if (homeSettingData.smoke == 0) {
+                homeSettingData.smoke = null;
+            }
             if (!_.isNull(homeSettingData.smoke)) {
                 andList.push({ smoke: homeSettingData.smoke });
             }
 
-            //TAMBAHIN KALAU USER INCOMENYA NULL JUGA MASUK
+            // //TAMBAHIN KALAU USER INCOMENYA NULL JUGA MASUK
             if (homeSettingData.income == 0) {
                 homeSettingData.income = null;
             }
@@ -269,6 +273,7 @@ module.exports = function (Viewhome) {
                     // });
 
                     // cb(null, homeList);
+                    console.log(homeList);
                     verify(homeList);
 
                 }
