@@ -40,7 +40,7 @@ module.exports = function (Matchmember) {
                 cb(error);
             }
             var filter = {
-                fields: ['membersId'],
+                fields: ['membersId', 'matchId'],
                 where: {
                     id: { inq: result }
                 },
@@ -98,6 +98,8 @@ module.exports = function (Matchmember) {
 
                             var bdayDate = new Date(memberData.bday);
                             memberData.age = common.calculateAge(bdayDate);
+
+                            memberData.matchId = item.matchId;
 
                             matchList.push(memberData);
 

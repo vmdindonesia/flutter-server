@@ -213,5 +213,9 @@
   "AppInfo": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "ChatHide": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
