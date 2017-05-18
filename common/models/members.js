@@ -265,6 +265,13 @@ module.exports = function (Members) {
         returns: { arg: 'result', type: 'object', root: true, description: 'new Member data' }
     });
 
+    Members.remoteMethod('deleteAccount', {
+        description: 'Delete Account',
+        http: { path: '/deleteAccout', verb: 'get' },
+        accepts: { arg: 'userId', type: 'number', required: true },
+        returns: { arg: 'respon', type: 'object', root: true }
+    });
+
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -280,6 +287,7 @@ module.exports = function (Members) {
     Members.emailCheck = emailCheck;
     Members.isUserNeedProfile = isUserNeedProfile;
     Members.updateProfile = updateProfile;
+    Members.deleteAccount = deleteAccount;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -757,6 +765,34 @@ module.exports = function (Members) {
                 cb(null, memberData);
             });
 
+        }
+    }
+
+    function deleteAccount(userId, cb) {
+        var app = require('../../server/server');
+        var accessToken = app.models.AccessToken;
+
+        Members.upsertWithWhere({
+            id: userId
+        }, {
+            deletedAt: new Date()
+        }, function (error, result) {
+            if (error) {
+                cb(error);
+            }
+            deleteAccount();
+        });
+
+        function deleteAccount() {
+            accessToken.destroyAll({
+                userId: userId
+            }, function(error, result) {
+                if (error) {
+                    cb(error);
+                }
+
+                cb(null, result);
+            });
         }
     }
 
