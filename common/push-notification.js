@@ -44,6 +44,25 @@ function like(senderUserId, recipientUserId) {
     Members.findById(senderUserId, function (error, result) {
         if (result) {
             var userData = result;
+            // var message = {
+            //     app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+            //     android_group: 'like',
+            //     android_group_message: {
+            //         en: '$[notif_count] people like your profile',
+            //         id: '$[notif_count] orang menyukai profile anda'
+            //     },
+            //     contents:
+            //     {
+            //         en: userData.fullName + ' like your profile',
+            //         id: userData.fullName + ' menyukai profil anda'
+            //     },
+            //     filters: [
+            //         { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
+            //     ],
+            //     data: {
+            //         tag: 'like'
+            //     }
+            // };
             var message = {
                 app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
                 android_group: 'like',
@@ -53,8 +72,8 @@ function like(senderUserId, recipientUserId) {
                 },
                 contents:
                 {
-                    en: userData.fullName + ' like your profile',
-                    id: userData.fullName + ' menyukai profil anda'
+                    en: 'Someone like your profile',
+                    id: 'Seseorang menyukai profil anda'
                 },
                 filters: [
                     { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
@@ -74,14 +93,33 @@ function chat(senderUserId, recipientUserId, text, data) {
     Members.findById(senderUserId, function (error, result) {
         if (result) {
             var userData = result;
+            // var message = {
+            //     app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+            //     headings: { en: userData.fullName },
+            //     contents: { en: text },
+            //     android_group: 'chat',
+            //     android_group_message: {
+            //         en: '$[notif_count] new messages',
+            //         id: '$[notif_count] pesan baru'
+            //     },
+            //     filters: [
+            //         { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
+            //     ],
+            //     data: {
+            //         tag: 'chat',
+            //         params: data
+            //     }
+            // };
+
             var message = {
                 app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
-                headings: { en: userData.fullName },
-                contents: { en: text },
+                // headings: { en: userData.fullName },
+                headings: { en: 'Flutter Asia' },
+                contents: { en: 'You have a new message' },
                 android_group: 'chat',
                 android_group_message: {
-                    en: '$[notif_count] new messages',
-                    id: '$[notif_count] pesan baru'
+                    en: 'You have $[notif_count] new messages',
+                    id: 'Anda memiliki $[notif_count] pesan baru'
                 },
                 filters: [
                     { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
