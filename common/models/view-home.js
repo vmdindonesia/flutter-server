@@ -222,10 +222,6 @@ module.exports = function (Viewhome) {
             if (!_.isNull(homeSettingData.verify)) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
-
-            if (homeSettingData.smoke == 0) {
-                homeSettingData.smoke = null;
-            }
             if (!_.isNull(homeSettingData.smoke)) {
                 andList.push({ smoke: homeSettingData.smoke });
             }
