@@ -93,8 +93,8 @@ module.exports = function (Members) {
             if (err) return next(err);
 
             console.log('> verification email sent:', response);
-            next();
         });
+        next();
     });
 
     Members.afterRemote('login', function (ctx, modelInstance, next) {
