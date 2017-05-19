@@ -327,7 +327,11 @@ module.exports = function (Viewhome) {
                                         case 1:
 
                                             var hasil = value.fullName;
-                                            value.fullName = value.fullName.split(" ")[0] + ' ****';
+                                            var randomNum = Math.random();
+                                            var expectedNum = Math.floor(randomNum * 100000);
+                                            var stringNum = ('0000' + expectedNum).slice(-5);
+                                            value.fullName = value.fullName[0] + stringNum;
+                                            // value.fullName = value.fullName.split(" ")[0] + ' ****';
 
                                             if (value2.verified) {
                                                 if (isVerify == true) {
@@ -378,25 +382,29 @@ module.exports = function (Viewhome) {
                                         case 3:
 
                                             var hasil = value.income;
-                                            // value.income = 'Privacy';
-                                            value.income = '****';
+                                            if (!_.isNull(hasil)) {
 
-                                            if (value2.verified) {
-                                                if (isVerify == true) {
-                                                    value.income = hasil;
-                                                }
-                                            }
+                                                // value.income = 'Privacy';
+                                                value.income = '****';
 
-                                            if (value2.unverified) {
-                                                if (isVerify == false) {
-                                                    value.income = hasil;
+                                                if (value2.verified) {
+                                                    if (isVerify == true) {
+                                                        value.income = hasil;
+                                                    }
                                                 }
-                                            }
 
-                                            if (value2.match) {
-                                                if (isMatch == true) {
-                                                    value.income = hasil;
+                                                if (value2.unverified) {
+                                                    if (isVerify == false) {
+                                                        value.income = hasil;
+                                                    }
                                                 }
+
+                                                if (value2.match) {
+                                                    if (isMatch == true) {
+                                                        value.income = hasil;
+                                                    }
+                                                }
+
                                             }
 
                                             callback();
@@ -404,27 +412,30 @@ module.exports = function (Viewhome) {
                                         case 4:
 
                                             var hasil = value.degree;
-                                            // value.degree = 'Privacy';
-                                            value.degree = '****';
+                                            if (!_.isNull(hasil)) {
 
-                                            if (value2.verified) {
-                                                if (isVerify == true) {
-                                                    value.degree = hasil;
+                                                // value.degree = 'Privacy';
+                                                value.degree = '****';
+
+                                                if (value2.verified) {
+                                                    if (isVerify == true) {
+                                                        value.degree = hasil;
+                                                    }
                                                 }
-                                            }
 
-                                            if (value2.unverified) {
-                                                if (isVerify == false) {
-                                                    value.degree = hasil;
+                                                if (value2.unverified) {
+                                                    if (isVerify == false) {
+                                                        value.degree = hasil;
+                                                    }
                                                 }
-                                            }
 
-                                            if (value2.match) {
-                                                if (isMatch == true) {
-                                                    value.degree = hasil;
+                                                if (value2.match) {
+                                                    if (isMatch == true) {
+                                                        value.degree = hasil;
+                                                    }
                                                 }
-                                            }
 
+                                            }
                                             callback();
                                             break;
                                         case 5:

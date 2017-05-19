@@ -119,8 +119,8 @@ function apply(userId, someList, cb) {
                             var randomNum = Math.random();
                             var expectedNum = Math.floor(randomNum * 100000);
                             var stringNum = ('0000' + expectedNum).slice(-5);
-                            // item.fullName = item.fullName.split(" ")[0] + ' ****';
                             item.fullName = item.fullName[0] + stringNum;
+                            // item.fullName = item.fullName.split(" ")[0] + ' ****';
                         }
 
                         if (element.filterId == 2) {
@@ -128,11 +128,15 @@ function apply(userId, someList, cb) {
                         }
 
                         if (element.filterId == 3) {
-                            item.income = '****';
+                            if (!lodash.isNull(item.income)) {
+                                item.income = '****';
+                            }
                         }
 
                         if (element.filterId == 4) {
-                            item.degree = '****';
+                            if (!lodash.isNull(item.degree)) {
+                                item.degree = '****';
+                            }
                         }
 
                         if (element.filterId == 5) {
