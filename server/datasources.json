@@ -26,7 +26,7 @@
       {
         "type": "smtp",
         "host": "mail3.dataon.com",
-        "secure": true,
+        "secure": false,
         "port": 25,
         "auth": {
           "user": "donotreply@flutterasia.com",
