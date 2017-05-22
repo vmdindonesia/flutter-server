@@ -50,6 +50,7 @@ module.exports = function (Members) {
         //init verify status
         var app = require('../../server/server');
         var Memberverifystatus = app.models.MemberVerifyStatus;
+        var Members = app.models.Members;
         // console.log('USER ID : ' + JSON.stringify(userInstance));
         var dateNow = new Date();
         Memberverifystatus.create({
@@ -90,7 +91,13 @@ module.exports = function (Members) {
             fullName: userInstance.fullName
         };
         userInstance.verify(options, function (err, response, nexts) {
-            if (err) return next(err);
+            if (err) {
+                Members.updateById(userInstance.id, {
+                    emailSent: 0
+                }, function (error, result) {
+                    return next(err);
+                });
+            }
 
             console.log('> verification email sent:', response);
         });
@@ -193,7 +200,7 @@ module.exports = function (Members) {
                         statusCode: 403
                     });
                 }
-            }else{
+            } else {
                 next();
             }
 
