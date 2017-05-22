@@ -91,17 +91,24 @@ module.exports = function (Members) {
             fullName: userInstance.fullName
         };
         userInstance.verify(options, function (err, response, nexts) {
+            console.log(err, 'Error send email');
             if (err) {
-                Members.updateById(userInstance.id, {
-                    emailSent: 0
-                }, function (error, result) {
-                    return next(err);
-                });
+                return next(err);
             }
 
+            Members.updateById(userInstance.id, {
+                emailSent: 1
+            }, function (error, result) {
+                if (error) {
+                    return next(err);
+                }
+
+                next();
+            });
+
             console.log('> verification email sent:', response);
+            // next();
         });
-        next();
     });
 
     Members.afterRemote('login', function (ctx, modelInstance, next) {
