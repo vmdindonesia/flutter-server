@@ -12,7 +12,8 @@ module.exports = function (Chatdetail) {
         var memberPhoto = app.models.MemberPhoto;
         var _ = require('lodash');
         var socket = Chatdetail.app.io;
-
+        var dateNow = new Date();
+        data.createdDate = dateNow;
         Chatdetail.create(data, function (err, result) {
             if (err) {
                 cb(err);
