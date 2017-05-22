@@ -25,12 +25,12 @@
     "transports": [
       {
         "type": "smtp",
-        "host": "mail.dataon.com",
-        "secure": false,
-        "port": 587,
+        "host": "mail3.dataon.com",
+        "secure": true,
+        "port": 25,
         "auth": {
-          "user": "donotreply-flutterasia@dataon.com",
-          "pass": "P@ssw0rdFA"
+          "user": "donotreply@flutterasia.com",
+          "pass": "P@ssw0rd"
         }
       }
     ]
