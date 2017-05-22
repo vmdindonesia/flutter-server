@@ -126,24 +126,24 @@ module.exports = function (Memberverifystatus) {
         Memberverifystatus.find(filterMemberVerifyStatus, function (error, result) {
             if (result.length > 0) {
                 var verifyData = result[0];
-                Members.findById(userId, function (error, result) {
-                    if (error) {
-                        cb(error);
-                    } else if (result) {
-                        var email = result.emailVerified;
-                        if (email == null) {
-                            email = 0;
-                        }
-                        verifyData['email'] = email;
-                        cb(null, 'OK', verifyData, {});
-                    } else {
-                        var error = {
-                            status: 404,
-                            message: 'Member Id not Found : ' + userId,
-                        }
-                        cb(error);
-                    }
-                })
+                // Members.findById(userId, function (error, result) {
+                //     if (error) {
+                //         cb(error);
+                //     } else if (result) {
+                //         // var email = result.emailVerified;
+                //         // if (email == null) {
+                //         //     email = 0;
+                //         // }
+                //         // verifyData['email'] = email;
+                //     } else {
+                //         var error = {
+                //             status: 404,
+                //             message: 'Member Id not Found : ' + userId,
+                //         }
+                //         cb(error);
+                //     }
+                // })
+                cb(null, 'OK', verifyData, {});
             } else {
                 var error = {
                     code: 'member.id.not.found',
@@ -162,8 +162,7 @@ module.exports = function (Memberverifystatus) {
             sim: 20,
             school_certificate: 20,
             passport: 20,
-            business_card: 20,
-            email: 20
+            business_card: 20
         }
         var filterMemberVerifyStatus = {
             where: {
@@ -182,9 +181,7 @@ module.exports = function (Memberverifystatus) {
             ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
             ' FROM member_verify_status A UNION ' +
             ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
-            ' FROM member_verify_status A UNION ' +
-            ' SELECT A.id AS \'user_id\', \'email\' AS \'verify_key\', IFNULL(A.email_verified, 0) AS \'verify_value\' ' +
-            ' FROM Members A ' +
+            ' FROM member_verify_status A ' +
             ' ) B WHERE user_id = ? ';
         var params = [userId];
 
@@ -286,9 +283,7 @@ module.exports = function (Memberverifystatus) {
             ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
             ' FROM member_verify_status A UNION ' +
             ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
-            ' FROM member_verify_status A UNION ' +
-            ' SELECT A.id AS \'user_id\', \'email\' AS \'verify_key\', IFNULL(A.email_verified, 0) AS \'verify_value\' ' +
-            ' FROM Members A ' +
+            ' FROM member_verify_status A ' +
             ' ) B WHERE user_id = ? ';
         var params = [userId];
 
