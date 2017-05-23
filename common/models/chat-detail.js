@@ -14,6 +14,9 @@ module.exports = function (Chatdetail) {
         var socket = Chatdetail.app.io;
         var dateNow = new Date();
         data.createdDate = dateNow;
+
+        data.text = decodeURIComponent(data.text);
+
         Chatdetail.create(data, function (err, result) {
             if (err) {
                 cb(err);

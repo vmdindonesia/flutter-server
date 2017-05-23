@@ -4,6 +4,7 @@ var loopback = require("loopback");
 var path = require('path');
 var moment = require('moment');
 var config = require('../../server/config.json');
+var lodash = require('lodash');
 
 module.exports = function (Members) {
 
@@ -764,6 +765,16 @@ module.exports = function (Members) {
         var where = {
             id: userId
         }
+
+        // SPECIAL CHARACTER HANDLER
+        if (!lodash.isNull(params['address'])) {
+            params['address'] = decodeURIComponent(params['address']);
+        }
+
+        if (!lodash.isNull(params['about'])) {
+            params['about'] = decodeURIComponent(params['about']);
+        }
+
         Members.upsertWithWhere(where, params, function (error, result) {
             if (error) {
                 cb(error);
