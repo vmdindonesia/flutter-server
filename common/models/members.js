@@ -73,42 +73,43 @@ module.exports = function (Members) {
             included_segments: ["All"]
         };
         sendNotification(message, 'MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy');
+        next();
 
-        // Send mail
-        var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
+        // // Send mail
+        // var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
 
-        // Send verify email
-        var url = config.remoteHost + '/api/Members/confirm?uid=' + userInstance.id + '&redirect=/verified';
-        var options = {
-            type: 'email',
-            to: userInstance.email,
-            from: mailFrom,
-            subject: 'Thanks for registering.',
-            template: path.resolve(__dirname, '../views/verify.ejs'),
-            user: Members,
-            verifyHref: url,
-            dateNow: moment().format('DD/MM/YYYY'),
-            fullName: userInstance.fullName
-        };
-        userInstance.verify(options, function (err, response, nexts) {
-            console.log(err, 'Error send email');
-            if (err) {
-                return next(err);
-            }
+        // // Send verify email
+        // var url = config.remoteHost + '/api/Members/confirm?uid=' + userInstance.id + '&redirect=/verified';
+        // var options = {
+        //     type: 'email',
+        //     to: userInstance.email,
+        //     from: mailFrom,
+        //     subject: 'Thanks for registering.',
+        //     template: path.resolve(__dirname, '../views/verify.ejs'),
+        //     user: Members,
+        //     verifyHref: url,
+        //     dateNow: moment().format('DD/MM/YYYY'),
+        //     fullName: userInstance.fullName
+        // };
+        // userInstance.verify(options, function (err, response, nexts) {
+        //     console.log(err, 'Error send email');
+        //     if (err) {
+        //         return next(err);
+        //     }
 
-            Members.updateById(userInstance.id, {
-                emailSent: 1
-            }, function (error, result) {
-                if (error) {
-                    return next(err);
-                }
+        //     Members.updateById(userInstance.id, {
+        //         emailSent: 1
+        //     }, function (error, result) {
+        //         if (error) {
+        //             return next(err);
+        //         }
 
-                next();
-            });
+        //         next();
+        //     });
 
-            console.log('> verification email sent:', response);
-            // next();
-        });
+        //     console.log('> verification email sent:', response);
+        //     // next();
+        // });
     });
 
     Members.afterRemote('login', function (ctx, modelInstance, next) {
