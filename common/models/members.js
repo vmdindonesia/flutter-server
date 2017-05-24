@@ -470,8 +470,8 @@ module.exports = function (Members) {
             if (memberData['bday']) {
                 var bdayDate = new Date(memberData['bday']);
                 var age = common.calculateAge(bdayDate);
-                ageLower = age - 10;
-                ageUpper = age + 10;
+                ageLower = age - 20;
+                ageUpper = age + 20;
                 if (ageLower < 21) {
                     ageLower = 21;
                 }

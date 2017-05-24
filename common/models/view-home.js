@@ -166,7 +166,7 @@ module.exports = function (Viewhome) {
                 orList.push({ smoke: { neq: memberData.smoke } });
             }
 
-            orList.push({ smoke: { neq: 2 } });
+            // orList.push({ smoke: { neq: 2 } });
 
             if (!_.isNull(memberData.income)) {
                 orList.push({ income: { gt: memberData.income } });
@@ -225,9 +225,9 @@ module.exports = function (Viewhome) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
 
-            if(homeSettingData.smoke == 2){
-                homeSettingData.smoke = null;
-            }
+            // if(homeSettingData.smoke == 2){
+            //     homeSettingData.smoke = null;
+            // }
             if (!_.isNull(homeSettingData.smoke)) {
                 andList.push({ smoke: homeSettingData.smoke });
             }
@@ -252,28 +252,28 @@ module.exports = function (Viewhome) {
                     cb(error);
                 } else {
                     var homeList = result;
-                    common.asyncLoop(homeList.length, function (loop) {
-                        var index = loop.iteration();
-                        Memberverifystatus.getVerifyScoreByUserId(homeList[index].id, function (error, status, result) {
-                            if (error) {
-                                cb(error)
-                            } else {
-                                // console.log('RESULT IN ARRAY : ' + index + '_' + result);
-                                var status = status;
-                                var score = result;
+                    // common.asyncLoop(homeList.length, function (loop) {
+                    //     var index = loop.iteration();
+                    //     Memberverifystatus.getVerifyScoreByUserId(homeList[index].id, function (error, status, result) {
+                    //         if (error) {
+                    //             cb(error)
+                    //         } else {
+                    //             // console.log('RESULT IN ARRAY : ' + index + '_' + result);
+                    //             var status = status;
+                    //             var score = result;
 
-                                if (status == 'OK') {
-                                    homeList[index]['verifyScore'] = score;
-                                } else {
-                                    homeList[index]['verifyScore'] = 0
-                                }
-                                loop.next();
-                            }
-                        })
-                    }, function () {
-                        // cb(null, homeList);
-                        verify(homeList);
-                    });
+                    //             if (status == 'OK') {
+                    //                 homeList[index]['verifyScore'] = score;
+                    //             } else {
+                    //                 homeList[index]['verifyScore'] = 0
+                    //             }
+                    //             loop.next();
+                    //         }
+                    //     })
+                    // }, function () {
+                    //     // cb(null, homeList);
+                    //     verify(homeList);
+                    // });
 
                     // cb(null, homeList);
                     // console.log(homeList);
