@@ -1053,9 +1053,9 @@ module.exports = function (Likelist) {
             if (err) console.error(err.message);
             // configs is now a map of JSON data
 
-            console.log(
-                'Hasil', params
-            );
+            // console.log(
+            //     'Hasil', params
+            // );
 
             next();
 

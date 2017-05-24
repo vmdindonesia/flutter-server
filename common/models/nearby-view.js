@@ -116,6 +116,8 @@ module.exports = function (Nearbyview) {
                 orList.push({ smoke: { neq: memberData.smoke } });
             }
 
+            orList.push({ smoke: { neq: 2 } });
+
             if (!lodash.isNull(memberData.income)) {
                 orList.push({ income: { gt: memberData.income } });
             }
@@ -183,6 +185,9 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter smoke
+            if (setting.smoke == 2) {
+                setting.smoke = null;
+            }
             if (!lodash.isNull(setting.smoke)) {
                 // filter.where['smoke'] = setting.smoke;
                 andList.push({ smoke: setting.smoke });

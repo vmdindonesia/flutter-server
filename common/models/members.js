@@ -767,11 +767,11 @@ module.exports = function (Members) {
         }
 
         // SPECIAL CHARACTER HANDLER
-        if (!lodash.isNull(params['address'])) {
+        if ('address' in params) {
             params['address'] = decodeURIComponent(params['address']);
         }
 
-        if (!lodash.isNull(params['about'])) {
+        if ('about' in params) {
             params['about'] = decodeURIComponent(params['about']);
         }
 
