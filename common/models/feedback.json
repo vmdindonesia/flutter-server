@@ -10,31 +10,79 @@
     "table": "Feedback"
   },
   "properties": {
-    "reason": {
+    "memberId": {
+      "type": "Number",
+      "required": true,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "member_id",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "message": {
       "type": "String",
-      "required": false,
+      "required": true,
       "length": 65535,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "reason",
+        "columnName": "message",
         "dataType": "text",
         "dataLength": 65535,
         "dataPrecision": null,
         "dataScale": null,
-        "nullable": "Y"
+        "nullable": "N"
       },
-      "_selectable": true
+      "_selectable": false
     },
-    "createdDate": {
+    "appVersion": {
+      "type": "String",
+      "required": true,
+      "length": 45,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "app_version",
+        "dataType": "varchar",
+        "dataLength": 45,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "appPlatform": {
+      "type": "String",
+      "required": true,
+      "length": 7,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "app_platform",
+        "dataType": "enum",
+        "dataLength": 7,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "createdAt": {
       "type": "Date",
       "required": false,
       "length": null,
       "precision": null,
       "scale": null,
       "mysql": {
-        "columnName": "created_date",
-        "dataType": "timestamp",
+        "columnName": "created_at",
+        "dataType": "datetime",
         "dataLength": null,
         "dataPrecision": null,
         "dataScale": null,
@@ -42,7 +90,7 @@
       },
       "_selectable": true
     },
-    "id": {
+    "feedbackId": {
       "type": "Number",
       "id": true,
       "required": false,
@@ -50,7 +98,7 @@
       "precision": 10,
       "scale": 0,
       "mysql": {
-        "columnName": "id",
+        "columnName": "feedback_id",
         "dataType": "int",
         "dataLength": null,
         "dataPrecision": 10,

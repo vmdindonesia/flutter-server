@@ -168,12 +168,6 @@
     "$promise": {},
     "$resolved": true
   },
-  "Feedback": {
-    "dataSource": "pmjakarta",
-    "public": true,
-    "$promise": {},
-    "$resolved": true
-  },
   "Devicetokenmapping": {
     "dataSource": "pmjakarta",
     "public": true
@@ -215,6 +209,10 @@
     "public": true
   },
   "ChatHide": {
+    "dataSource": "pmjakarta",
+    "public": true
+  },
+  "Feedback": {
     "dataSource": "pmjakarta",
     "public": true
   }
