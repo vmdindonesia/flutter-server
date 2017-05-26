@@ -32,14 +32,14 @@ module.exports = function (Feedback) {
     function addFeedback(message, appVersion, appPlatform, options, cb) {
         var token = options.accessToken;
         var userId = token.userId;
-
-        console.log(new Date());
+        var dateNow = new Date();
 
         var newFeedback = {
             memberId: userId,
             appVersion: appVersion,
             appPlatform: appPlatform,
             message: message,
+            createdAt: dateNow
         }
         Feedback.create(newFeedback, function (error, result) {
             if (error) {
