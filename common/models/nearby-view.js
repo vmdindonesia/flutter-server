@@ -113,8 +113,17 @@ module.exports = function (Nearbyview) {
             orList.push({ ageUpper: { lt: memberData.age } });
 
             if (!lodash.isNull(memberData.smoke)) {
-                orList.push({ smoke: { neq: memberData.smoke } });
+                orList.push({
+                    and: [
+                        { smoke: { neq: 2 } },
+                        { smoke: { neq: memberData.smoke } }
+                    ]
+                });
             }
+
+            // if (!lodash.isNull(memberData.smoke)) {
+            //     orList.push({ smoke: { neq: memberData.smoke } });
+            // }
 
             // orList.push({ smoke: { neq: 2 } });
 
@@ -185,9 +194,9 @@ module.exports = function (Nearbyview) {
             }
 
             // Config filter smoke
-            // if (setting.smoke == 2) {
-            //     setting.smoke = null;
-            // }
+            if (setting.smoke == 2) {
+                setting.smoke = null;
+            }
             if (!lodash.isNull(setting.smoke)) {
                 // filter.where['smoke'] = setting.smoke;
                 andList.push({ smoke: setting.smoke });

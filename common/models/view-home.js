@@ -163,8 +163,20 @@ module.exports = function (Viewhome) {
             orList.push({ ageUpper: { lt: memberData.age } });
 
             if (!_.isNull(memberData.smoke)) {
-                orList.push({ smoke: { neq: memberData.smoke } });
+                orList.push(
+                    {
+                        and: [
+                            { smoke: { neq: memberData.smoke } },
+                            { smoke: { neq: 2 } }
+                        ]
+                    }
+
+                );
             }
+
+            // if (!_.isNull(memberData.smoke)) {
+            //     orList.push({ smoke: { neq: memberData.smoke } });
+            // }
 
             // orList.push({ smoke: { neq: 2 } });
 
@@ -225,9 +237,9 @@ module.exports = function (Viewhome) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
 
-            // if(homeSettingData.smoke == 2){
-            //     homeSettingData.smoke = null;
-            // }
+            if(homeSettingData.smoke == 2){
+                homeSettingData.smoke = null;
+            }
             if (!_.isNull(homeSettingData.smoke)) {
                 andList.push({ smoke: homeSettingData.smoke });
             }
