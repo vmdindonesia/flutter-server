@@ -438,6 +438,9 @@ module.exports = function (Members) {
 
         var memberData = {};
 
+        var dateNow = new Date();
+        params.createdAt = dateNow;
+
         Members.create(params, function (error, result) {
             if (error) {
                 cb(error);
