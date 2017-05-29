@@ -209,7 +209,7 @@ module.exports = function (Viewhome) {
 
         //FILTER VIEW HOME BY MEMBER SETTING + LIMIT BY PARAMETER FUNCTION5
         function getHomeListByFilter() {
-            // var Memberverifystatus = app.models.MemberVerifyStatus;
+            var Memberverifystatus = app.models.MemberVerifyStatus;
             // console.log('GET HOME LIST BY SETTING');
             var gender = memberData.gender;
 
@@ -237,7 +237,7 @@ module.exports = function (Viewhome) {
                 andList.push({ verifyScore: { gte: homeSettingData.verify } });
             }
 
-            if(homeSettingData.smoke == 2){
+            if (homeSettingData.smoke == 2) {
                 homeSettingData.smoke = null;
             }
             if (!_.isNull(homeSettingData.smoke)) {
@@ -264,32 +264,32 @@ module.exports = function (Viewhome) {
                     cb(error);
                 } else {
                     var homeList = result;
-                    // common.asyncLoop(homeList.length, function (loop) {
-                    //     var index = loop.iteration();
-                    //     Memberverifystatus.getVerifyScoreByUserId(homeList[index].id, function (error, status, result) {
-                    //         if (error) {
-                    //             cb(error)
-                    //         } else {
-                    //             // console.log('RESULT IN ARRAY : ' + index + '_' + result);
-                    //             var status = status;
-                    //             var score = result;
+                    common.asyncLoop(homeList.length, function (loop) {
+                        var index = loop.iteration();
+                        var item = homeList[index];
+                        Memberverifystatus.getVerifyScoreByUserId(item.id, function (error, status, result) {
+                            if (error) {
+                                return cb(error);
+                            }
+                            // console.log('RESULT IN ARRAY : ' + index + '_' + result);
+                            var status = status;
+                            var score = result;
 
-                    //             if (status == 'OK') {
-                    //                 homeList[index]['verifyScore'] = score;
-                    //             } else {
-                    //                 homeList[index]['verifyScore'] = 0
-                    //             }
-                    //             loop.next();
-                    //         }
-                    //     })
-                    // }, function () {
-                    //     // cb(null, homeList);
-                    //     verify(homeList);
-                    // });
+                            if (status == 'OK') {
+                                item['verifyScore'] = score;
+                            } else {
+                                item['verifyScore'] = 0
+                            }
+                            loop.next();
+                        });
+                    }, function () {
+                        // cb(null, homeList);
+                        verify(homeList);
+                    });
 
                     // cb(null, homeList);
                     // console.log(homeList);
-                    verify(homeList);
+                    // verify(homeList);
 
                 }
             })
