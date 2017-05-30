@@ -67,7 +67,8 @@ module.exports = function (Chatdetail) {
                 var targetUserId = result[0].membersId;
 
                 Matchmember.updateAll({
-                    matchId: modelInstance.matchId
+                    matchId: modelInstance.matchId,
+                    membersId: modelInstance.membersId
                 }, {
                         updateBy: modelInstance.membersId,
                         isRead: 1
