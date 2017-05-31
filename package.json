@@ -29,12 +29,11 @@
     "loopback-component-explorer": "^4.2.0",
     "loopback-component-storage": "^3.2.0",
     "loopback-connector-mysql": "^4.0.0",
-    "loopback-datasource-juggler": "3.4.1",
     "loopback-ds-timestamp-mixin": "^3.4.0",
     "moment": "^2.18.1",
     "pug": "^2.0.0-beta11",
     "serve-favicon": "^2.4.2",
-    "socket.io": "^1.7.3",
+    "socket.io": "^2.0.1",
     "strong-error-handler": "^2.0.0",
     "xmlhttprequest": "^1.8.0"
   },
