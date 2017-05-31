@@ -160,7 +160,13 @@ module.exports = function (Viewhome) {
             var orList = [];
 
             orList.push({ ageLower: { gt: memberData.age } });
-            orList.push({ ageUpper: { lt: memberData.age } });
+
+            if (memberData.age >= 60) {
+                orList.push({ and: [{ ageUpper: { lt: memberData.age } }, { ageUpper: { neq: 60 } }] });
+            } else {
+                orList.push({ ageUpper: { lt: memberData.age } });
+            }
+
 
             if (!_.isNull(memberData.smoke)) {
                 orList.push(
@@ -220,12 +226,18 @@ module.exports = function (Viewhome) {
                 }, this);
             }
             var andList = [
-                { age: { between: [homeSettingData.ageLower, homeSettingData.ageUpper] } },
                 { id: { nin: likeAndDislikeIdList } },
                 { id: { nin: excludeIdList } },
                 { id: { nin: excludeByFilterList } },
                 { gender: { neq: gender } }
             ];
+
+            if (homeSettingData.ageUpper >= 60) {
+                andList.push({ age: { gte: homeSettingData.ageLower } });
+            } else {
+                andList.push({ age: { between: [homeSettingData.ageLower, homeSettingData.ageUpper] } });
+            }
+
             // console.log(JSON.stringify(homeSettingData));
             if (!_.isEmpty(JSON.parse(homeSettingData.religion))) {
                 andList.push({ religion: { inq: JSON.parse(homeSettingData.religion) } });

@@ -110,7 +110,12 @@ module.exports = function (Nearbyview) {
             var orList = [];
 
             orList.push({ ageLower: { gt: memberData.age } });
-            orList.push({ ageUpper: { lt: memberData.age } });
+
+            if (memberData.age >= 60) {
+                orList.push({ and: [{ ageUpper: { lt: memberData.age } }, { ageUpper: { neq: 60 } }] });
+            } else {
+                orList.push({ ageUpper: { lt: memberData.age } });
+            }
 
             if (!lodash.isNull(memberData.smoke)) {
                 orList.push({
@@ -178,8 +183,13 @@ module.exports = function (Nearbyview) {
             andList.push({ id: { nin: excludeByFilterList } });
             andList.push({ id: { nin: excludeMatchList } });
             andList.push({ gender: { neq: memberResult.gender } });
-            andList.push({ age: { between: [setting.ageLower, setting.ageUpper] } });
             andList.push({ visibility: 1 });
+
+            if (setting.ageUpper >= 60) {
+                andList.push({ age: { gte: setting.ageLower } });
+            } else {
+                andList.push({ age: { between: [setting.ageLower, setting.ageUpper] } });
+            }
 
             // Config filter religion
             if (!lodash.isEmpty(JSON.parse(setting.religion))) {
