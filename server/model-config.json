@@ -215,5 +215,35 @@
   "Feedback": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "FeedbackChoice": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "FeedbackMemberAnswer": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "FeedbackQuestion": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "FeedbackType": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "FeedbackQuestionTypeChoice": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
