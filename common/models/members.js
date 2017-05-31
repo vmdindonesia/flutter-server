@@ -478,8 +478,8 @@ module.exports = function (Members) {
                 if (ageLower < 21) {
                     ageLower = 21;
                 }
-                if (ageUpper > 100) {
-                    ageUpper = 100;
+                if (ageUpper > 60) {
+                    ageUpper = 60;
                 }
             }
 
