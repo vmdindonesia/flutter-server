@@ -436,114 +436,242 @@ module.exports = function (Members) {
 
     function register(params, cb) {
 
-        var memberData = {};
-
-        var dateNow = new Date();
-        params.createdAt = dateNow;
-
-        Members.create(params, function (error, result) {
-            if (error) {
-                cb(error);
-            }
-
-            memberData = result;
-
-            var inits = [];
-            inits.push(initSettingHome);
-            inits.push(initSettingPrivacy);
-
-            common.asyncLoop(inits.length, function (loop) {
-                var index = loop.iteration();
-                var item = inits[index];
-                item(result.id, function () {
-                    loop.next();
-                })
-            }, function () {
-                cb(null, result);
-            });
-        });
-
-        function initSettingHome(userId, callback) {
-            var Settinghome = app.models.SettingHome;
+        Members.beginTransaction({
+            isolationLevel: Members.Transaction.READ_COMMITTED
+        }, function (error, tx) {
+            var memberData = {};
 
             var dateNow = new Date();
-            var ageLower = 21;
-            var ageUpper = 100;
+            params.createdAt = dateNow;
 
-            if (memberData['bday']) {
-                var bdayDate = new Date(memberData['bday']);
-                var age = common.calculateAge(bdayDate);
-                ageLower = age - 20;
-                ageUpper = age + 20;
-                if (ageLower < 21) {
-                    ageLower = 21;
-                }
-                if (ageUpper > 60) {
-                    ageUpper = 60;
-                }
-            }
-
-            Settinghome.create({
-                memberId: userId,
-                ageLower: ageLower,
-                ageUpper: ageUpper,
-                createUserId: userId,
-                createDatetime: dateNow,
-                updateUserId: userId,
-                updateDatetime: dateNow
-            }, function (error, result) {
+            Members.create(params, function (error, result) {
                 if (error) {
                     cb(error);
-                } else {
-                    callback();
                 }
-            })
 
+                memberData = result;
 
-        }
+                var inits = [];
+                inits.push(initSettingHome);
+                inits.push(initSettingPrivacy);
 
-        function initSettingPrivacy(userId, callback) {
+                common.asyncLoop(inits.length, function (loop) {
+                    var index = loop.iteration();
+                    var item = inits[index];
+                    item(result.id, function () {
+                        loop.next();
+                    })
+                }, function () {
+                    return tx.commit(function (err) {
+                        if (err) {
+                            return cb(err);
+                        }
+                        return cb(null, result);
+                    })
+                });
+            });
 
-            var Visibilitydata = app.models.VisibilityData;
+            function initSettingHome(userId, callback) {
+                var Settinghome = app.models.SettingHome;
 
-            common.asyncLoop(5, function (loop) {
-                var index = loop.iteration();
-                if (index == 1) {
-                    var item = {
-                        unverified: 0,
-                        verified: 1,
-                        match: 1,
-                        membersId: userId,
-                        filterId: index + 1,
+                var dateNow = new Date();
+                var ageLower = 21;
+                var ageUpper = 100;
+
+                if (memberData['bday']) {
+                    var bdayDate = new Date(memberData['bday']);
+                    var age = common.calculateAge(bdayDate);
+                    ageLower = age - 20;
+                    ageUpper = age + 20;
+                    if (ageLower < 21) {
+                        ageLower = 21;
                     }
-                } else if (index == 2 || index == 3) {
-                    var item = {
-                        unverified: 0,
-                        verified: 0,
-                        match: 1,
-                        membersId: userId,
-                        filterId: index + 1,
-                    }
-                } else {
-                    var item = {
-                        unverified: 0,
-                        verified: 0,
-                        match: 0,
-                        membersId: userId,
-                        filterId: index + 1,
+                    if (ageUpper > 60) {
+                        ageUpper = 60;
                     }
                 }
-                Visibilitydata.create(item, function (error, result) {
+
+                Settinghome.create({
+                    memberId: userId,
+                    ageLower: ageLower,
+                    ageUpper: ageUpper,
+                    createUserId: userId,
+                    createDatetime: dateNow,
+                    updateUserId: userId,
+                    updateDatetime: dateNow
+                }, { transaction: tx }, function (error, result) {
                     if (error) {
-                        cb(error);
+                        return tx.rollback(function (err) {
+                            if (err) {
+                                return cb(err);
+                            }
+                            return cb(error);
+                        });
+                    } else {
+                        callback();
                     }
-                    loop.next();
                 })
-            }, function () {
-                callback();
-            })
 
-        }
+
+            }
+
+            function initSettingPrivacy(userId, callback) {
+
+                var Visibilitydata = app.models.VisibilityData;
+
+                common.asyncLoop(5, function (loop) {
+                    var index = loop.iteration();
+                    if (index == 1) {
+                        var item = {
+                            unverified: 0,
+                            verified: 1,
+                            match: 1,
+                            membersId: userId,
+                            filterId: index + 1,
+                        }
+                    } else if (index == 2 || index == 3) {
+                        var item = {
+                            unverified: 0,
+                            verified: 0,
+                            match: 1,
+                            membersId: userId,
+                            filterId: index + 1,
+                        }
+                    } else {
+                        var item = {
+                            unverified: 0,
+                            verified: 0,
+                            match: 0,
+                            membersId: userId,
+                            filterId: index + 1,
+                        }
+                    }
+                    Visibilitydata.create(item, { transaction: tx }, function (error, result) {
+                        if (error) {
+                            return tx.rollback(function (err) {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                return cb(error);
+                            })
+                        }
+                        loop.next();
+                    })
+                }, function () {
+                    callback();
+                })
+
+            }
+        })
+
+        // var memberData = {};
+
+        // var dateNow = new Date();
+        // params.createdAt = dateNow;
+
+        // Members.create(params, function (error, result) {
+        //     if (error) {
+        //         cb(error);
+        //     }
+
+        //     memberData = result;
+
+        //     var inits = [];
+        //     inits.push(initSettingHome);
+        //     inits.push(initSettingPrivacy);
+
+        //     common.asyncLoop(inits.length, function (loop) {
+        //         var index = loop.iteration();
+        //         var item = inits[index];
+        //         item(result.id, function () {
+        //             loop.next();
+        //         })
+        //     }, function () {
+        //         cb(null, result);
+        //     });
+        // });
+
+        // function initSettingHome(userId, callback) {
+        //     var Settinghome = app.models.SettingHome;
+
+        //     var dateNow = new Date();
+        //     var ageLower = 21;
+        //     var ageUpper = 100;
+
+        //     if (memberData['bday']) {
+        //         var bdayDate = new Date(memberData['bday']);
+        //         var age = common.calculateAge(bdayDate);
+        //         ageLower = age - 20;
+        //         ageUpper = age + 20;
+        //         if (ageLower < 21) {
+        //             ageLower = 21;
+        //         }
+        //         if (ageUpper > 60) {
+        //             ageUpper = 60;
+        //         }
+        //     }
+
+        //     Settinghome.create({
+        //         memberId: userId,
+        //         ageLower: ageLower,
+        //         ageUpper: ageUpper,
+        //         createUserId: userId,
+        //         createDatetime: dateNow,
+        //         updateUserId: userId,
+        //         updateDatetime: dateNow
+        //     }, function (error, result) {
+        //         if (error) {
+        //             cb(error);
+        //         } else {
+        //             callback();
+        //         }
+        //     })
+
+
+        // }
+
+        // function initSettingPrivacy(userId, callback) {
+
+        //     var Visibilitydata = app.models.VisibilityData;
+
+        //     common.asyncLoop(5, function (loop) {
+        //         var index = loop.iteration();
+        //         if (index == 1) {
+        //             var item = {
+        //                 unverified: 0,
+        //                 verified: 1,
+        //                 match: 1,
+        //                 membersId: userId,
+        //                 filterId: index + 1,
+        //             }
+        //         } else if (index == 2 || index == 3) {
+        //             var item = {
+        //                 unverified: 0,
+        //                 verified: 0,
+        //                 match: 1,
+        //                 membersId: userId,
+        //                 filterId: index + 1,
+        //             }
+        //         } else {
+        //             var item = {
+        //                 unverified: 0,
+        //                 verified: 0,
+        //                 match: 0,
+        //                 membersId: userId,
+        //                 filterId: index + 1,
+        //             }
+        //         }
+        //         Visibilitydata.create(item, function (error, result) {
+        //             if (error) {
+        //                 cb(error);
+        //             }
+        //             loop.next();
+        //         })
+        //     }, function () {
+        //         callback();
+        //     })
+
+        // }
     }
 
     function isSocialRegistered(socialId, loginWith, cb) {
