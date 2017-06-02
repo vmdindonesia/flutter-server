@@ -245,5 +245,11 @@
     "public": true,
     "$promise": {},
     "$resolved": true
+  },
+  "InactiveReason": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
   }
 }
