@@ -34,7 +34,8 @@ module.exports = function (Chatdetail) {
                 result['src'] = _.isNull(photo) ? null : photo.src;
 
                 // Send with socket
-                socket.in(data.matchId).emit('chating', result);
+                Chatdetail.app.mx.IO.emit('chating:' + result.matchId, result);
+                // socket.in(data.matchId).emit('chating', result);
 
                 // Result object
                 cb(null, result);
@@ -63,7 +64,7 @@ module.exports = function (Chatdetail) {
             }
         }, function (error, result) {
             if (result.length > 0) {
-                console.log(result);
+                // console.log(result);
                 var targetUserId = result[0].membersId;
 
                 Matchmember.updateAll({
@@ -77,7 +78,7 @@ module.exports = function (Chatdetail) {
                     })
 
                 var Pushnotification = require('../push-notification.js');
-                console.log(modelInstance.text);
+                // console.log(modelInstance.text);
                 Pushnotification.chat(modelInstance.membersId, targetUserId, modelInstance.text, result[0]);
             }
             next();
