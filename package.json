@@ -6,7 +6,7 @@
     "lint": "eslint .",
     "start": "node .",
     "posttest": "npm run lint && nsp check",
-    "build:sdk": "./node_modules/.bin/lb-sdk server/server.js ./client/sdk -l angular2 -d ng2web -i disabled",
+    "build:sdk": "./node_modules/.bin/lb-sdk server/server.js ./client/sdk -l angular2 -d ng2web --io enabled",
     "server:deploy": "slc deploy --service pmjakarta-server http://192.168.0.100",
     "server:deploy-testing": "slc deploy --service pmjakarta-testing http://192.168.0.100",
     "server:deploy-development": "slc deploy --service pmjakarta-development http://192.168.0.100",
