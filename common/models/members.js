@@ -446,7 +446,12 @@ module.exports = function (Members) {
 
             Members.create(params, function (error, result) {
                 if (error) {
-                    cb(error);
+                    return tx.rollback(function (err) {
+                        if (err) {
+                            return cb(err);
+                        }
+                        return cb(error);
+                    });
                 }
 
                 memberData = result;
