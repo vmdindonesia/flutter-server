@@ -7,7 +7,32 @@ module.exports = function (Chatdetail) {
         returns: { arg: 'response', type: 'array', root: true }
     });
 
-    Chatdetail.createChat = function (data, cb) {
+    Chatdetail.remoteMethod('getChatDetail', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'matchId', type: 'number', required: true },
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
+    Chatdetail.remoteMethod('sendChat', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'matchId', type: 'number', required: true },
+            { arg: 'message', type: 'string', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    })
+
+    Chatdetail.createChat = createChat;
+    Chatdetail.getChatDetail = getChatDetail;
+    Chatdetail.sendChat = sendChat;
+
+    function createChat(data, cb) {
         var app = require('../../server/server');
         var memberPhoto = app.models.MemberPhoto;
         var _ = require('lodash');
@@ -102,4 +127,73 @@ module.exports = function (Chatdetail) {
         }
         next();
     });
+
+    function getChatDetail(matchId, limit, offset, options, cb) {
+
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            where: {
+                matchId: matchId,
+                membersId: userId
+            }
+        }
+        Chatdetail.findOne(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            if (result) {
+                getDetail();
+            } else {
+                return cb({
+                    name: 'match.id.not.authorized',
+                    status: 404,
+                    message: 'You dont have authorization for match id : ' + matchId
+                });
+            }
+        });
+
+        function getDetail() {
+            var filter = {
+                where: {
+                    matchId: matchId
+                },
+                limit: limit,
+                offset: offset,
+                order: 'createdDate DESC'
+            }
+            Chatdetail.find(filter, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                return cb(null, result);
+            });
+
+        }
+
+    }
+
+    function sendChat(matchId, message, options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var dateNow = new Date();
+
+        var newChat = {
+            matchId: matchId,
+            membersId: userId,
+            text: decodeURIComponent(message),
+            createdDate: dateNow
+        }
+
+        Chatdetail.create(newChat, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            return cb(null, result);
+        });
+
+    }
 };

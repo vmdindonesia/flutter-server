@@ -11,7 +11,18 @@ module.exports = function (Chathide) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Chathide.remoteMethod('hide', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'matchId', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     Chathide.unhide = unhide;
+    Chathide.hide = hide;
+    Chathide.getHideList = getHideList;
 
     function unhide(memberId, matchId, cb) {
         var filter = {
@@ -26,6 +37,52 @@ module.exports = function (Chathide) {
             }
             cb(null, result);
         })
+    }
+
+    function hide(matchId, options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var dateNow = new Date();
+
+        var newChathide = {
+            memberId: userId,
+            matchId: matchId,
+            createdAt: dateNow,
+            updatedAt: dateNow
+        }
+
+        Chathide.create(newChathide, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            return cb(null, result);
+        });
+    }
+
+    function getHideList(options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            fields: ['matchId'],
+            where: {
+                memberId: userId
+            }
+        }
+        Chathide.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            var hideMatchIdList = [];
+            result.forEach(function (item) {
+                hideMatchIdList.push(item['matchId'])
+            }, this);
+            return cb(null, hideMatchIdList)
+        });
+
+
+
     }
 
 };
