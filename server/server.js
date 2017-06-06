@@ -35,7 +35,7 @@ if (require.main === module) {
   // app.start();
   app.io = require('socket.io')(app.start());
   var redis = require('socket.io-redis');
-  app.io.adapter(redis({ host: 'localhost', port: 6379 }));
+  // app.io.adapter(redis({ host: 'localhost', port: 6379 }));
 
   app.io.on('connection', function (socket) {
     console.log('socket is connected');
