@@ -99,7 +99,7 @@ module.exports = function (Matchmember) {
                             var bdayDate = new Date(memberData.bday);
                             memberData.age = common.calculateAge(bdayDate);
 
-                            // memberData.matchId = item.matchId;
+                            memberData.matchId = item.matchId;
                             memberData.matchMember = JSON.parse(JSON.stringify(item));
 
                             matchList.push(memberData);
