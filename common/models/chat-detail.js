@@ -179,9 +179,11 @@ module.exports = function (Chatdetail) {
         }
 
         function updateRead(matchId, memberId, callback) {
+            var Matchmember = app.models.MatchMember;
+
             var filter = {
                 matchId: matchId,
-                membersId: memberId
+                membersId: { neq: memberId }
             }
 
             var newValue = {
@@ -225,12 +227,18 @@ module.exports = function (Chatdetail) {
                     });
                 }
 
-                changeRead(matchId, userId);
+                changeRead(matchId, userId, function () {
+                    return tx.commit(function (err) {
+                        // BUAT BALIKAN SEND CHAT
+                        Chatdetail.app.mx.IO.emit('chating:' + result.matchId, result);
+                        return cb(null, result);
+                    });
+                });
 
                 // return cb(null, result);
             });
 
-            function changeRead(matchId, memberId) {
+            function changeRead(matchId, memberId, callback) {
 
                 var Matchmember = app.models.MatchMember;
 
@@ -246,11 +254,18 @@ module.exports = function (Chatdetail) {
 
                 Matchmember.findOne(filter, { transaction: tx }, function (error, result) {
                     if (error) {
-                        return cb(error);
+                        return tx.callback(function (err) {
+                            if (err) {
+                                return cb(err);
+                            }
+                            return cb(error);
+                        });
                     }
                     if (result) {
-                        updateRead(result.membersId, function () {
-                            Pushnotification.chat(userId, memberId, message, result);
+                        updateRead(userId, function () {
+                            console.log(userId, result.membersId);
+                            Pushnotification.chat(userId, result.membersId, decodeURIComponent(message), result);
+                            callback();
                         });
                     } else {
                         return tx.rollback(function (err) {
