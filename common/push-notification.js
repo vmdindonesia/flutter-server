@@ -90,8 +90,24 @@ function like(senderUserId, recipientUserId) {
 function chat(senderUserId, recipientUserId, text, data) {
     var app = require('../server/server');
     var Members = app.models.Members;
-    Members.findById(senderUserId, function (error, result) {
+    var filter = {
+        include: [
+            {
+                relation: 'rel_visibility',
+                scope: {
+                    where: { filterId: 1 }
+                }
+            }
+        ]
+    }
+    Members.findById(senderUserId, filter, function (error, result) {
         if (result) {
+            if (result.rel_visibility()[0]['match'] == 0) {
+                var randomNum = Math.random();
+                var expectedNum = Math.floor(randomNum * 100000);
+                var stringNum = ('0000' + expectedNum).slice(-5);
+                result.fullName = item.fullName[0] + stringNum;
+            }
             var userData = result;
             // var message = {
             //     app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',

@@ -1,6 +1,10 @@
 'use strict';
 
 module.exports = function (Chatdetail) {
+
+    var app = require('../../server/server');
+    var Pushnotification = require('../push-notification');
+
     Chatdetail.remoteMethod('createChat', {
         http: { path: '/createChat', verb: 'post' },
         accepts: { arg: 'param', type: 'Object' },
@@ -167,9 +171,28 @@ module.exports = function (Chatdetail) {
                 if (error) {
                     return cb(error);
                 }
-                return cb(null, result);
+                updateRead(matchId, userId, function () {
+                    return cb(null, result);
+                });
             });
 
+        }
+
+        function updateRead(matchId, memberId, callback) {
+            var filter = {
+                matchId: matchId,
+                membersId: memberId
+            }
+
+            var newValue = {
+                isRead: 0
+            }
+            Matchmember.updateAll(filter, newValue, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                callback();
+            })
         }
 
     }
@@ -178,22 +201,116 @@ module.exports = function (Chatdetail) {
         var token = options.accessToken;
         var userId = token.userId;
 
-        var dateNow = new Date();
-
-        var newChat = {
-            matchId: matchId,
-            membersId: userId,
-            text: decodeURIComponent(message),
-            createdDate: dateNow
-        }
-
-        Chatdetail.create(newChat, function (error, result) {
+        Chatdetail.beginTransaction({ isolationLevel: Chatdetail.Transaction.READ_COMMITTED }, function (error, tx) {
             if (error) {
                 return cb(error);
             }
 
-            return cb(null, result);
+            var dateNow = new Date();
+
+            var newChat = {
+                matchId: matchId,
+                membersId: userId,
+                text: decodeURIComponent(message),
+                createdDate: dateNow
+            }
+
+            Chatdetail.create(newChat, { transaction: tx }, function (error, result) {
+                if (error) {
+                    return tx.rollback(function (err) {
+                        if (err) {
+                            return cb(err);
+                        }
+                        return cb(error);
+                    });
+                }
+
+                changeRead(matchId, userId);
+
+                // return cb(null, result);
+            });
+
+            function changeRead(matchId, memberId) {
+
+                var Matchmember = app.models.MatchMember;
+
+                var filter = {
+                    fields: ['membersId'],
+                    where: {
+                        and: [
+                            { matchId: matchId },
+                            { membersId: { neq: memberId } }
+                        ]
+                    }
+                }
+
+                Matchmember.findOne(filter, { transaction: tx }, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    if (result) {
+                        updateRead(result.membersId, function () {
+                            Pushnotification.chat(userId, memberId, message, result);
+                        });
+                    } else {
+                        return tx.rollback(function (err) {
+                            if (err) {
+                                return cb(err);
+                            }
+                            return cb({
+                                name: 'match.member.data.not.found',
+                                status: 404,
+                                message: 'There is no match member data : ' + matchId
+                            });
+                        });
+                    }
+                });
+
+                function updateRead(memberId, callback) {
+                    var filter = {
+                        matchId: matchId,
+                        membersId: memberId
+                    }
+                    var newValue = {
+                        updateBy: userId,
+                        isRead: 1
+                    }
+                    Matchmember.updateAll(filter, newValue, { transaction: tx }, function (error, result) {
+                        if (error) {
+                            return tx.rollback(function (err) {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                return cb(error);
+                            });
+                        }
+                        doUnhide(tx, function () {
+                            callback();
+                        });
+                    });
+                }
+
+                function doUnhide(tx, callback) {
+                    var Chathide = app.models.ChatHide;
+
+                    Chathide.unhide(userId, matchId, function (error, result) {
+                        if (error) {
+                            return tx.rollback(function (err) {
+                                if (err) {
+                                    cb(err);
+                                }
+                                return cb(error);
+                            });
+                        }
+                        callback();
+                    });
+                }
+
+
+            }
+
         });
+
 
     }
 };
