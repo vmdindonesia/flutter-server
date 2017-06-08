@@ -356,7 +356,9 @@ module.exports = function (Likelist) {
 
                                                 memberData.matchId = item.matchId;
                                                 memberData.isRead = item.isRead;
-                                                filterPrivacy.apply(userId, [].push(memberData), function (error, result) {
+                                                var memberList = [];
+                                                memberList.push(memberData);
+                                                filterPrivacy.apply(userId, memberList, function (error, result) {
                                                     if (error) {
                                                         return tx.rollback(function (err) {
                                                             if (err) {
