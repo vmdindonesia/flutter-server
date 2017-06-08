@@ -121,10 +121,16 @@ module.exports = function (Likelist) {
         var likedUserId = userId;
         var dateNow = new Date();
 
-        Likelist.beginTransaction({ isolationLevel: Likelist.Transaction.READ_COMMITTED }, function (err, tx) {
-            if (err) {
-                cb(err);
+        Likelist.beginTransaction({ isolationLevel: Likelist.Transaction.READ_COMMITTED }, function (error, tx) {
+            if (error) {
+                return tx.rollback(function (err) {
+                    if (err) {
+                        return cb(err);
+                    }
+                    return cb(error);
+                });
             }
+
             checkLike();
 
             function checkLike() {
@@ -138,7 +144,7 @@ module.exports = function (Likelist) {
 
                 Likelist.findOne(filter, function (error, result) {
                     if (error) {
-                        cb(error);
+                        return cb(error);
                     }
                     if (result) {
                         //PERNAH KE LIKE, JGN DI LIKE LAGI
@@ -161,10 +167,14 @@ module.exports = function (Likelist) {
                     likeMember: likedUserId
                 };
 
-                Likelist.create(newLike, function (error, result) {
+                Likelist.create(newLike, { transaction: tx }, function (error, result) {
                     if (error) {
-                        tx.rollback(function (err) { });
-                        cb(error);
+                        return tx.rollback(function (err) {
+                            if (err) {
+                                return cb(err);
+                            }
+                            return cb(error);
+                        });
                     } else {
                         // Pushnotification.like(currentUserId, likedUserId);
                         // callback(addMatches);
@@ -197,9 +207,14 @@ module.exports = function (Likelist) {
                         ]
                     }
                 };
-                Likelist.findOne(filter, function (error, result) {
+                Likelist.findOne(filter, { transaction: tx }, function (error, result) {
                     if (error) {
-                        cb(error);
+                        return tx.rollback(function (err) {
+                            if (err) {
+                                return cb(err);
+                            }
+                            return cb(error);
+                        })
                     } else {
                         // console.log(result);
                         if (result) {
@@ -211,8 +226,9 @@ module.exports = function (Likelist) {
                             }
                         } else {
                             Pushnotification.like(currentUserId, likedUserId);
-                            tx.commit(function (err) { });
-                            cb(null, false, {});
+                            return tx.commit(function (err) {
+                                return cb(null, false, {});
+                            });
                         }
                     }
                 });
@@ -228,10 +244,14 @@ module.exports = function (Likelist) {
                     title: 'chat',
                     createAt: dateNow
                 };
-                Matches.create(newMatches, function (error, result) {
+                Matches.create(newMatches, { transaction: tx }, function (error, result) {
                     if (error) {
-                        tx.rollback(function (err) { });
-                        cb(error);
+                        return tx.rollback(function (err) {
+                            if (err) {
+                                return cb(err);
+                            }
+                            return cb(error);
+                        });
                     } else {
                         // callback(result.id);
                         addMatchMember(result.id);
@@ -258,10 +278,14 @@ module.exports = function (Likelist) {
                     createdDate: dateNow
                 });
 
-                Matchmember.create(newMatchMembers, function (error, result) {
+                Matchmember.create(newMatchMembers, { transaction: tx }, function (error, result) {
                     if (error) {
-                        tx.rollback(function (err) { });
-                        cb(error);
+                        return tx.rollback(function (err) {
+                            if (err) {
+                                return cb(err);
+                            }
+                            return cb(error);
+                        });
                     } else {
                         // Pushnotification.match(newMatchMembers[0].membersId);
                         // Pushnotification.match(newMatchMembers[1].membersId);
@@ -280,19 +304,61 @@ module.exports = function (Likelist) {
                                 include: {
                                     relation: 'members',
                                     scope: {
-                                        fields: ['id', 'fullName', 'online'],
-                                        include: {
-                                            relation: 'memberPhotos'
-                                        }
+                                        fields: [
+                                            'id',
+                                            'fullName',
+                                            'gender',
+                                            'about',
+                                            'employeeType', //occupation
+                                            'income',
+                                            'address',
+                                            'religion',
+                                            'hobby',
+                                            'race', //origin
+                                            'degree',
+                                            'zodiac',
+                                            'bday',
+                                            'online'
+                                        ],
+                                        include: [{
+                                            relation: 'memberPhotos',
+                                            scope: {
+                                                fields: ['src']
+                                            }
+                                        }, {
+                                            relation: 'memberImage',
+                                            scope: {
+                                                fields: ['src']
+                                            }
+                                        }]
                                     }
                                 }
-
-                            }, function (error, result) {
+                            }, { transaction: tx }, function (error, result) {
                                 if (error) {
-                                    cb(error);
+                                    return tx.rollback(function (err) {
+                                        if (err) {
+                                            return cb(err);
+                                        }
+                                        return cb(error);
+                                    })
                                 } else {
                                     if (item.membersId == likedUserId) {
-                                        endResult = result;
+                                        if ('members' in result) {
+
+                                            result = JSON.parse(JSON.stringify(result));
+
+                                            var memberData = result.members;
+                                            if (typeof memberData !== 'undefined') {
+                                                memberData.hobby = JSON.parse(memberData.hobby);
+
+                                                var bdayDate = new Date(memberData.bday);
+                                                memberData.age = common.calculateAge(bdayDate);
+
+                                                memberData.matchId = item.matchId;
+                                                memberData.isRead = item.isRead;
+                                                endResult = memberData;
+                                            }
+                                        }
                                     } else {
                                         Pushnotification.match(likedUserId, result);
                                     }
@@ -302,8 +368,9 @@ module.exports = function (Likelist) {
 
 
                         }, function () {
-                            tx.commit(function (err) { });
-                            cb(null, true, endResult);
+                            return tx.commit(function (err) {
+                                return cb(null, true, endResult);
+                            });
                         });
 
                         // Matchmember.findOne({
