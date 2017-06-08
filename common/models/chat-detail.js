@@ -243,6 +243,7 @@ module.exports = function (Chatdetail) {
             function changeRead(matchId, memberId, callback) {
 
                 var Matchmember = app.models.MatchMember;
+                var Chat = app.models.Chat;
 
                 var filter = {
                     fields: ['membersId'],
@@ -251,6 +252,38 @@ module.exports = function (Chatdetail) {
                             { matchId: matchId },
                             { membersId: { neq: memberId } }
                         ]
+                    },
+                    include: {
+                        relation: 'members',
+                        scope: {
+                            fields: [
+                                'id',
+                                'fullName',
+                                'gender',
+                                'about',
+                                'employeeType', //occupation
+                                'income',
+                                'address',
+                                'religion',
+                                'hobby',
+                                'race', //origin
+                                'degree',
+                                'zodiac',
+                                'bday',
+                                'online'
+                            ],
+                            include: [{
+                                relation: 'memberPhotos',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }, {
+                                relation: 'memberImage',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }]
+                        }
                     }
                 }
 
@@ -264,11 +297,41 @@ module.exports = function (Chatdetail) {
                         });
                     }
                     if (result) {
-                        updateRead(userId, function () {
-                            console.log(userId, result.membersId);
-                            Pushnotification.chat(userId, result.membersId, decodeURIComponent(message), result);
-                            callback();
-                        });
+                        if ('members' in result) {
+
+                            result = JSON.parse(JSON.stringify(result));
+
+                            var memberData = result.members;
+                            if (typeof memberData !== 'undefined') {
+                                memberData.hobby = JSON.parse(memberData.hobby);
+
+                                var bdayDate = new Date(memberData.bday);
+                                memberData.age = common.calculateAge(bdayDate);
+
+                                memberData.matchId = result.matchId;
+                                var memberList = [];
+                                memberList.push(memberData);
+                                filterPrivacy.apply(userId, memberList, function (error, result) {
+                                    if (error) {
+                                        return tx.rollback(function (err) {
+                                            if (err) {
+                                                return cb(err);
+                                            }
+                                            return cb(error);
+                                        });
+                                    }
+                                    var endResult = result[0];
+                                    Chat.getLatestChat(memberData.matchId, function (result) {
+                                        endResult.chatDetail = result;
+                                        updateRead(userId, function () {
+                                            Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
+                                            callback();
+                                        });
+                                    });
+                                });
+                            }
+                        }
+
                     } else {
                         return tx.rollback(function (err) {
                             if (err) {

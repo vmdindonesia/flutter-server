@@ -18,6 +18,7 @@ module.exports = function (Chat) {
     });
 
     Chat.getChatRoomList = getChatRoomList;
+    Chat.getLatestChat = getLatestChat;
 
     function getChatRoomList(limit, offset, options, cb) {
 
@@ -170,25 +171,26 @@ module.exports = function (Chat) {
             })
         }
 
-        function getLatestChat(matchId, callback) {
-            var Chatdetail = app.models.ChatDetail;
 
-            var filter = {
-                where: {
-                    matchId: matchId
-                },
-                limit: 20,
-                order: 'createdDate DESC'
-            }
-            Chatdetail.find(filter, function (error, result) {
-                if (error) {
-                    return cb(error);
-                }
-                callback(result);
-            })
 
+    }
+
+    function getLatestChat(matchId, callback) {
+        var Chatdetail = app.models.ChatDetail;
+
+        var filter = {
+            where: {
+                matchId: matchId
+            },
+            limit: 20,
+            order: 'createdDate DESC'
         }
-
+        Chatdetail.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            callback(result);
+        })
 
     }
 

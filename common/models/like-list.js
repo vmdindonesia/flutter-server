@@ -342,41 +342,15 @@ module.exports = function (Likelist) {
                                         return cb(error);
                                     })
                                 } else {
-                                    if (item.membersId == likedUserId) {
-                                        if ('members' in result) {
-
-                                            result = JSON.parse(JSON.stringify(result));
-
-                                            var memberData = result.members;
-                                            if (typeof memberData !== 'undefined') {
-                                                memberData.hobby = JSON.parse(memberData.hobby);
-
-                                                var bdayDate = new Date(memberData.bday);
-                                                memberData.age = common.calculateAge(bdayDate);
-
-                                                memberData.matchId = item.matchId;
-                                                memberData.isRead = item.isRead;
-                                                var memberList = [];
-                                                memberList.push(memberData);
-                                                filterPrivacy.apply(userId, memberList, function (error, result) {
-                                                    if (error) {
-                                                        return tx.rollback(function (err) {
-                                                            if (err) {
-                                                                return cb(err);
-                                                            }
-                                                            return cb(error);
-                                                        });
-                                                    }
-                                                    endResult = result[0];
-                                                    endResult.chatDetail = [];
-                                                    loop.next();
-                                                });
-                                            }
+                                    rearrangeData(result, function (response) {
+                                        if (item.membersId == likedUserId) {
+                                            endResult = response;
+                                        } else {
+                                            Pushnotification.match(likedUserId, response);
                                         }
-                                    } else {
-                                        Pushnotification.match(likedUserId, result);
                                         loop.next();
-                                    }
+
+                                    })
                                 }
                             })
 
@@ -386,35 +360,40 @@ module.exports = function (Likelist) {
                                 return cb(null, true, endResult);
                             });
                         });
-
-                        // Matchmember.findOne({
-                        //     where: {
-                        //         and: [
-                        //             { membersId: likedUserId },
-                        //             { matchId: matchId }
-                        //         ]
-                        //     },
-                        //     include: {
-                        //         relation: 'members',
-                        //         scope: {
-                        //             fields: ['id', 'fullName', 'online'],
-                        //             include: {
-                        //                 relation: 'memberPhotos'
-                        //             }
-                        //         }
-                        //     }
-
-                        // }, function (error, result) {
-                        //     if (error) {
-                        //         cb(error);
-                        //     } else {
-                        //         Pushnotification.match(likedUserId, result);
-                        //         tx.commit(function (err) { });
-                        //         cb(null, true, result);
-                        //     }
-                        // })
                     }
                 })
+
+                function rearrangeData(item, callback) {
+                    if ('members' in item) {
+
+                        item = JSON.parse(JSON.stringify(item));
+
+                        var memberData = item.members;
+                        if (typeof memberData !== 'undefined') {
+                            memberData.hobby = JSON.parse(memberData.hobby);
+
+                            var bdayDate = new Date(memberData.bday);
+                            memberData.age = common.calculateAge(bdayDate);
+
+                            memberData.matchId = item.matchId;
+                            var memberList = [];
+                            memberList.push(memberData);
+                            filterPrivacy.apply(userId, memberList, function (error, result) {
+                                if (error) {
+                                    return tx.rollback(function (err) {
+                                        if (err) {
+                                            return cb(err);
+                                        }
+                                        return cb(error);
+                                    });
+                                }
+                                var endResult = result[0];
+                                endResult.chatDetail = [];
+                                callback(endResult);
+                            });
+                        }
+                    }
+                }
 
             }
 
