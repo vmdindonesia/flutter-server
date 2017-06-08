@@ -133,9 +133,10 @@ module.exports = function (Chatdetail) {
     });
 
     function getChatDetail(matchId, limit, offset, options, cb) {
-
         var token = options.accessToken;
         var userId = token.userId;
+
+        var Matchmember = app.models.MatchMember;
 
         var filter = {
             where: {
@@ -143,7 +144,8 @@ module.exports = function (Chatdetail) {
                 membersId: userId
             }
         }
-        Chatdetail.findOne(filter, function (error, result) {
+
+        Matchmember.findOne(filter, function (error, result) {
             if (error) {
                 return cb(error);
             }
