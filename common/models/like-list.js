@@ -356,13 +356,25 @@ module.exports = function (Likelist) {
 
                                                 memberData.matchId = item.matchId;
                                                 memberData.isRead = item.isRead;
-                                                endResult = memberData;
+                                                filterPrivacy.apply(userId, [].push(memberData), function (error, result) {
+                                                    if (error) {
+                                                        return tx.rollback(function (err) {
+                                                            if (err) {
+                                                                return cb(err);
+                                                            }
+                                                            return cb(error);
+                                                        });
+                                                    }
+                                                    endResult = result[0];
+                                                    endResult.chatDetail = [];
+                                                    loop.next();
+                                                });
                                             }
                                         }
                                     } else {
                                         Pushnotification.match(likedUserId, result);
+                                        loop.next();
                                     }
-                                    loop.next();
                                 }
                             })
 
