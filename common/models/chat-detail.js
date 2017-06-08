@@ -4,6 +4,8 @@ module.exports = function (Chatdetail) {
 
     var app = require('../../server/server');
     var Pushnotification = require('../push-notification');
+    var common = require('../common-util.js');
+    var filterPrivacy = require('../filter-privacy.js');
 
     Chatdetail.remoteMethod('createChat', {
         http: { path: '/createChat', verb: 'post' },
@@ -246,7 +248,7 @@ module.exports = function (Chatdetail) {
                 var Chat = app.models.Chat;
 
                 var filter = {
-                    fields: ['membersId'],
+                    fields: ['membersId', 'matchId'],
                     where: {
                         and: [
                             { matchId: matchId },
@@ -321,13 +323,19 @@ module.exports = function (Chatdetail) {
                                         });
                                     }
                                     var endResult = result[0];
-                                    Chat.getLatestChat(memberData.matchId, function (result) {
-                                        endResult.chatDetail = result;
-                                        updateRead(userId, function () {
-                                            Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
-                                            callback();
-                                        });
+                                    endResult.chatDetail = [];
+                                    updateRead(userId, function () {
+                                        console.log(endResult);
+                                        Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
+                                        callback();
                                     });
+                                    // Chat.getLatestChat(memberData.matchId, function (result) {
+                                    //     endResult.chatDetail = result;
+                                    //     updateRead(userId, function () {
+                                    //         Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
+                                    //         callback();
+                                    //     });
+                                    // });
                                 });
                             }
                         }
