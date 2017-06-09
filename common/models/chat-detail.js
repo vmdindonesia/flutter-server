@@ -29,6 +29,7 @@ module.exports = function (Chatdetail) {
         accepts: [
             { arg: 'matchId', type: 'number', required: true },
             { arg: 'message', type: 'string', required: true },
+            { arg: 'type', type: 'string', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -203,9 +204,23 @@ module.exports = function (Chatdetail) {
 
     }
 
-    function sendChat(matchId, message, options, cb) {
+    function sendChat(matchId, message, type, options, cb) {
         var token = options.accessToken;
         var userId = token.userId;
+
+        // VALIDATE TYPE
+        var enumType = [
+            'IMAGE',
+            'TEXT'
+        ];
+
+        if (enumType.indexOf(type) < 0) {
+            return cb({
+                name: 'chat.type.not.found',
+                status: 404,
+                message: 'There is no chat type for : ' + type + '. Please use ' + JSON.stringify(enumType)
+            });
+        }
 
         Chatdetail.beginTransaction({ isolationLevel: Chatdetail.Transaction.READ_COMMITTED }, function (error, tx) {
             if (error) {
@@ -218,6 +233,7 @@ module.exports = function (Chatdetail) {
                 matchId: matchId,
                 membersId: userId,
                 text: decodeURIComponent(message),
+                type: type,
                 createdDate: dateNow
             }
 
