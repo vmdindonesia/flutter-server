@@ -16,7 +16,7 @@
   "dependencies": {
     "@mean-expert/fireloop": "^1.0.0-beta.2.4",
     "@mean-expert/loopback-component-realtime": "^1.0.0-rc.9",
-    "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.10.5",
+    "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.10.4",
     "@mean-expert/loopback-stats-mixin": "^1.2.0",
     "async": "^2.3.0",
     "body-parser": "^1.17.1",
