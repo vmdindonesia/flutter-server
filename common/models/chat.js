@@ -185,12 +185,14 @@ module.exports = function (Chat) {
                         matchId: item.matchId
                     }
                 }
-                Chatdetail.count(filter, function (error, result) {
+                console.log(filter);
+                Chatdetail.find(filter, function (error, result) {
                     if (error) {
                         return cb(error);
                     }
-                    item.countChat = result;
-                    return loop.next();
+                    item.countChat = result.length;
+                    console.log(result);
+                    loop.next();
                 });
 
             }, function () {
