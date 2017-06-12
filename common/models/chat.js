@@ -167,8 +167,35 @@ module.exports = function (Chat) {
                 });
 
             }, function () {
-                return cb(null, chatRoomList);
+                countChat(chatRoomList);
+                // return cb(null, chatRoomList);
             })
+        }
+
+        function countChat(chatRoomList) {
+            common.asyncLoop(chatRoomList.length, function (loop) {
+
+                var index = loop.iteration();
+                var item = chatRoomList[index];
+
+                var Chatdetail = app.models.ChatDetail;
+
+                var filter = {
+                    where: {
+                        matchId: item.matchId
+                    }
+                }
+                Chatdetail.count(filter, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    item.countChat = result;
+                    return loop.next();
+                });
+
+            }, function () {
+                return cb(null, chatRoomList);
+            });
         }
 
 

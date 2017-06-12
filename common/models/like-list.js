@@ -470,90 +470,109 @@ module.exports = function (Likelist) {
     function getLikeMeList(limit, offset, options, cb) {
 
         var Matchmember = app.models.MatchMember;
+        var Dislikelist = app.models.DislikeList
 
         var token = options.accessToken;
         var userId = token.userId;
 
-        Matchmember.getMemberIdMatchList(userId, function (error, result) {
-            if (error) {
-                cb(error);
-            }
-            var filter = {
-                fields: ['likeUser'],
-                where: {
-                    and: [
-                        { likeMember: userId },
-                        { likeUser: { nin: result } }
-                    ]
-                },
-                include: {
-                    relation: 'members',
-                    scope: {
-                        fields: [
-                            'id',
-                            'fullName',
-                            'gender',
-                            'about',
-                            'employeeType', //occupation
-                            'income',
-                            'address',
-                            'religion',
-                            'hobby',
-                            'race', //origin
-                            'degree',
-                            'zodiac',
-                            'bday'
-                        ],
-                        include: [{
-                            relation: 'memberPhotos',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }, {
-                            relation: 'memberImage',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }]
-                    }
-                },
-                limit: limit,
-                skip: offset,
-                order: 'id DESC'
-            }
-            Likelist.find(filter, function (error, result) {
+        getDislikeList(getResult);
+
+        function getDislikeList(callback) {
+            Dislikelist.getDislikeMemberIdList(options, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                callback(result);
+            });
+        }
+
+        function getResult(dislikeIdList) {
+
+            Matchmember.getMemberIdMatchList(userId, function (error, result) {
                 if (error) {
                     cb(error);
                 }
-                var likeMeList = [];
-                result.forEach(function (item) {
-                    if ('members' in item) {
-
-                        item = JSON.parse(JSON.stringify(item));
-
-                        var memberData = item.members;
-
-                        if (typeof memberData !== 'undefined') {
-                            memberData.hobby = JSON.parse(memberData.hobby);
-
-                            var bdayDate = new Date(memberData.bday);
-                            memberData.age = common.calculateAge(bdayDate);
-
-                            likeMeList.push(memberData);
+                var filter = {
+                    fields: ['likeUser'],
+                    where: {
+                        and: [
+                            { likeMember: userId },
+                            { likeUser: { nin: result } },
+                            { likeUser: { nin: dislikeIdList } }
+                        ]
+                    },
+                    include: {
+                        relation: 'members',
+                        scope: {
+                            fields: [
+                                'id',
+                                'fullName',
+                                'gender',
+                                'about',
+                                'employeeType', //occupation
+                                'income',
+                                'address',
+                                'religion',
+                                'hobby',
+                                'race', //origin
+                                'degree',
+                                'zodiac',
+                                'bday'
+                            ],
+                            include: [{
+                                relation: 'memberPhotos',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }, {
+                                relation: 'memberImage',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }]
                         }
-
-
-                    }
-                }, this);
-
-                filterPrivacy.apply(userId, likeMeList, function (error, result) {
+                    },
+                    limit: limit,
+                    skip: offset,
+                    order: 'id DESC'
+                }
+                Likelist.find(filter, function (error, result) {
                     if (error) {
                         cb(error);
                     }
-                    cb(null, result);
-                });
+                    var likeMeList = [];
+                    result.forEach(function (item) {
+                        if ('members' in item) {
+
+                            item = JSON.parse(JSON.stringify(item));
+
+                            var memberData = item.members;
+
+                            if (typeof memberData !== 'undefined') {
+                                memberData.hobby = JSON.parse(memberData.hobby);
+
+                                var bdayDate = new Date(memberData.bday);
+                                memberData.age = common.calculateAge(bdayDate);
+
+                                likeMeList.push(memberData);
+                            }
+
+
+                        }
+                    }, this);
+
+                    filterPrivacy.apply(userId, likeMeList, function (error, result) {
+                        if (error) {
+                            cb(error);
+                        }
+                        cb(null, result);
+                    });
+                })
             })
-        })
+        }
+
+
+
     }
 
     function getILikeList(limit, offset, options, cb) {
