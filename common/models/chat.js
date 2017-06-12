@@ -191,7 +191,7 @@ module.exports = function (Chat) {
                         return cb(error);
                     }
                     item.countChat = result.length;
-                    console.log(result);
+                    // console.log(result);
                     loop.next();
                 });
 
