@@ -38,15 +38,17 @@ module.exports = function (Matchmember) {
         var excludeBlockList = [];
 
         excludeBlock(function () {
+            console.log(excludeBlockList);
             getMatchMemberIdList(userId, function (error, result) {
                 if (error) {
                     cb(error);
                 }
+                console.log('APA INI : ' + result);
                 var filter = {
                     where: {
                         and: [
                             { id: { inq: result } },
-                            { id: { nin: excludeBlockList } }
+                            { membersId: { nin: excludeBlockList } }
                         ]
                     },
                     include: {

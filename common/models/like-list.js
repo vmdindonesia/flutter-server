@@ -606,9 +606,9 @@ module.exports = function (Likelist) {
             })
         })
 
-        function getExcludeBlock(callback) {
+        function excludeBlock(callback) {
             var Block = app.models.Block;
-            Block.getMemberIdBlockMeList(options, function (error, result) {
+            Block.getExcludeBlock(options, function (error, result) {
                 if (error) {
                     return cb(error);
                 }
