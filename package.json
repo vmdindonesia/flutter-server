@@ -14,10 +14,12 @@
     "server:status": "slc ctl --control http://192.168.0.100 status"
   },
   "dependencies": {
+    "@mean-expert/boot-script": "^1.0.0",
     "@mean-expert/fireloop": "^1.0.0-beta.2.4",
     "@mean-expert/loopback-component-realtime": "^1.0.0-rc.9",
     "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.10.4",
     "@mean-expert/loopback-stats-mixin": "^1.2.0",
+    "@types/node": "^7.0.31",
     "async": "^2.3.0",
     "body-parser": "^1.17.1",
     "compression": "^1.0.3",
@@ -36,6 +38,8 @@
     "socket.io": "^2.0.2",
     "socket.io-redis": "^5.1.0",
     "strong-error-handler": "^2.0.0",
+    "ts-node": "^3.0.6",
+    "typescript": "^2.3.4",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
@@ -45,8 +49,8 @@
     "nsp": "^2.1.0"
   },
   "repository": {
-    "type": "",
-    "url": ""
+    "type": "git",
+    "url": "http://imron.rosdiana@git.dataon.com/pmjakarta/pmjakarta-server.git"
   },
   "license": "UNLICENSED",
   "description": "pmjakarta-server"
