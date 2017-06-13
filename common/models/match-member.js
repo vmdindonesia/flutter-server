@@ -35,89 +35,108 @@ module.exports = function (Matchmember) {
         var token = options.accessToken;
         var userId = token.userId;
 
-        getMatchMemberIdList(userId, function (error, result) {
-            if (error) {
-                cb(error);
-            }
-            var filter = {
-                where: {
-                    id: { inq: result }
-                },
-                include: {
-                    relation: 'members',
-                    scope: {
-                        fields: [
-                            'id',
-                            'fullName',
-                            'gender',
-                            'about',
-                            'employeeType', //occupation
-                            'income',
-                            'address',
-                            'religion',
-                            'hobby',
-                            'race', //origin
-                            'degree',
-                            'zodiac',
-                            'bday',
-                            'online'
-                        ],
-                        include: [{
-                            relation: 'memberPhotos',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }, {
-                            relation: 'memberImage',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }]
-                    }
-                },
-                limit: limit,
-                skip: offset,
-                order: 'id DESC'
-            }
+        var excludeBlockList = [];
 
-            Matchmember.find(filter, function (error, result) {
+        excludeBlock(function () {
+            getMatchMemberIdList(userId, function (error, result) {
                 if (error) {
                     cb(error);
                 }
-                var matchList = [];
-
-                result.forEach(function (item) {
-
-                    if ('members' in item) {
-
-                        item = JSON.parse(JSON.stringify(item));
-
-                        var memberData = item.members;
-                        if (typeof memberData !== 'undefined') {
-                            memberData.hobby = JSON.parse(memberData.hobby);
-
-                            var bdayDate = new Date(memberData.bday);
-                            memberData.age = common.calculateAge(bdayDate);
-
-                            // memberData.matchId = item.matchId;
-                            memberData.matchMember = JSON.parse(JSON.stringify(item));
-
-                            matchList.push(memberData);
-
+                var filter = {
+                    where: {
+                        and: [
+                            { id: { inq: result } },
+                            { id: { nin: excludeBlockList } }
+                        ]
+                    },
+                    include: {
+                        relation: 'members',
+                        scope: {
+                            fields: [
+                                'id',
+                                'fullName',
+                                'gender',
+                                'about',
+                                'employeeType', //occupation
+                                'income',
+                                'address',
+                                'religion',
+                                'hobby',
+                                'race', //origin
+                                'degree',
+                                'zodiac',
+                                'bday',
+                                'online'
+                            ],
+                            include: [{
+                                relation: 'memberPhotos',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }, {
+                                relation: 'memberImage',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }]
                         }
-                    }
-                }, this);
+                    },
+                    limit: limit,
+                    skip: offset,
+                    order: 'id DESC'
+                }
 
-                filterPrivacy.apply(userId, matchList, function (error, result) {
+                Matchmember.find(filter, function (error, result) {
                     if (error) {
                         cb(error);
                     }
-                    cb(null, result);
-                });
-                // cb(null, matchList);
-            })
+                    var matchList = [];
 
+                    result.forEach(function (item) {
+
+                        if ('members' in item) {
+
+                            item = JSON.parse(JSON.stringify(item));
+
+                            var memberData = item.members;
+                            if (typeof memberData !== 'undefined') {
+                                memberData.hobby = JSON.parse(memberData.hobby);
+
+                                var bdayDate = new Date(memberData.bday);
+                                memberData.age = common.calculateAge(bdayDate);
+
+                                // memberData.matchId = item.matchId;
+                                memberData.matchMember = JSON.parse(JSON.stringify(item));
+
+                                matchList.push(memberData);
+
+                            }
+                        }
+                    }, this);
+
+                    filterPrivacy.apply(userId, matchList, function (error, result) {
+                        if (error) {
+                            cb(error);
+                        }
+                        cb(null, result);
+                    });
+                    // cb(null, matchList);
+                })
+
+            });
         });
+
+        function excludeBlock(callback) {
+            var Block = app.models.Block;
+            Block.getMemberIdBlockMeList(option, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                excludeBlockList = result;
+                return callback();
+            });
+
+        }
 
 
     }

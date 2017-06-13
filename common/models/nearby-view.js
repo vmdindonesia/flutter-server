@@ -11,18 +11,28 @@ module.exports = function (Nearbyview) {
     Nearbyview.remoteMethod('getNearbyLocation', {
         description: 'Get Nearby Member List of User',
         http: { path: '/:id/getNearbyLocation', verb: 'get' },
-        accepts: { arg: 'id', type: 'number', required: true },
+        accepts: [
+            { arg: 'id', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
         returns: { arg: 'location', type: 'Object', root: true }
     });
 
-    Nearbyview.getNearbyLocation = function (id, cb) {
+    Nearbyview.getNearbyLocation = function (id, options, cb) {
+
+        var token = options.accessToken;
+        var userId = token.userId;
+
         var memberResult;
         var excludeByFilterList = [];
         var excludeMatchList = [];
+        var excludeBlockList = [];
         var Members = app.models.Members;
         var memberData = {};
         var myLocation;
         var setting;
+
+        id = userId;
 
         // Get setting user
         var filter = {
@@ -168,6 +178,19 @@ module.exports = function (Nearbyview) {
                     cb(error);
                 }
                 excludeMatchList = result;
+                // getMember(id);
+                excludeBlock(id);
+            });
+
+        }
+
+        function excludeBlock(id) {
+            var Block = app.models.Block;
+            Block.getMemberIdBlockMeList(options, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                excludeBlockList = result;
                 getMember(id);
             });
 
@@ -182,6 +205,7 @@ module.exports = function (Nearbyview) {
             andList.push({ id: { neq: id } });
             andList.push({ id: { nin: excludeByFilterList } });
             andList.push({ id: { nin: excludeMatchList } });
+            andList.push({ id: { nin: excludeBlockList } });
             andList.push({ gender: { neq: memberResult.gender } });
             andList.push({ visibility: 1 });
 

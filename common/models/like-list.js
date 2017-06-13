@@ -414,86 +414,102 @@ module.exports = function (Likelist) {
         var token = options.accessToken;
         var userId = token.userId;
 
-        Matchmember.getMemberIdMatchList(userId, function (error, result) {
-            if (error) {
-                cb(error);
-            }
-            var filter = {
-                fields: ['likeUser'],
-                where: {
-                    and: [
-                        { likeMember: userId },
-                        { likeUser: { nin: result } }
-                    ]
-                },
-                include: {
-                    relation: 'members',
-                    scope: {
-                        fields: [
-                            'id',
-                            'fullName',
-                            'gender',
-                            'about',
-                            'employeeType', //occupation
-                            'income',
-                            'address',
-                            'religion',
-                            'hobby',
-                            'race', //origin
-                            'degree',
-                            'zodiac',
-                            'bday'
-                        ],
-                        include: [{
-                            relation: 'memberPhotos',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }, {
-                            relation: 'memberImage',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }]
-                    }
-                },
-                limit: limit,
-                skip: offset,
-                order: 'id DESC'
-            }
-            Likelist.find(filter, function (error, result) {
+        var excludeBlockList = [];
+
+        excludeBlock(function () {
+            Matchmember.getMemberIdMatchList(userId, function (error, result) {
                 if (error) {
                     cb(error);
                 }
-                var likeMeList = [];
-                result.forEach(function (item) {
-                    if ('members' in item) {
-
-                        item = JSON.parse(JSON.stringify(item));
-
-                        var memberData = item.members;
-
-                        if (typeof memberData !== 'undefined') {
-                            memberData.hobby = JSON.parse(memberData.hobby);
-
-                            var bdayDate = new Date(memberData.bday);
-                            memberData.age = common.calculateAge(bdayDate);
-
-                            likeMeList.push(memberData);
+                var filter = {
+                    fields: ['likeUser'],
+                    where: {
+                        and: [
+                            { likeMember: userId },
+                            { likeUser: { nin: result } },
+                            { likeUser: { nin: excludeBlockList } }
+                        ]
+                    },
+                    include: {
+                        relation: 'members',
+                        scope: {
+                            fields: [
+                                'id',
+                                'fullName',
+                                'gender',
+                                'about',
+                                'employeeType', //occupation
+                                'income',
+                                'address',
+                                'religion',
+                                'hobby',
+                                'race', //origin
+                                'degree',
+                                'zodiac',
+                                'bday'
+                            ],
+                            include: [{
+                                relation: 'memberPhotos',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }, {
+                                relation: 'memberImage',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }]
                         }
-
-
-                    }
-                }, this);
-
-                filterPrivacy.apply(userId, likeMeList, function (error, result) {
+                    },
+                    limit: limit,
+                    skip: offset,
+                    order: 'id DESC'
+                }
+                Likelist.find(filter, function (error, result) {
                     if (error) {
                         cb(error);
                     }
-                    cb(null, result);
-                });
+                    var likeMeList = [];
+                    result.forEach(function (item) {
+                        if ('members' in item) {
+
+                            item = JSON.parse(JSON.stringify(item));
+
+                            var memberData = item.members;
+
+                            if (typeof memberData !== 'undefined') {
+                                memberData.hobby = JSON.parse(memberData.hobby);
+
+                                var bdayDate = new Date(memberData.bday);
+                                memberData.age = common.calculateAge(bdayDate);
+
+                                likeMeList.push(memberData);
+                            }
+
+
+                        }
+                    }, this);
+
+                    filterPrivacy.apply(userId, likeMeList, function (error, result) {
+                        if (error) {
+                            cb(error);
+                        }
+                        cb(null, result);
+                    });
+                })
             })
-        })
+        });
+
+        function excludeBlock(callback) {
+            var Block = app.models.Block;
+            Block.getMemberIdBlockMeList(option, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                excludeBlockList = result;
+                return callback();
+            });
+        }
     }
 
     function getILikeList(limit, offset, options, cb) {
@@ -503,86 +519,102 @@ module.exports = function (Likelist) {
         var token = options.accessToken;
         var userId = token.userId;
 
-        Matchmember.getMemberIdMatchList(userId, function (error, result) {
-            if (error) {
-                cb(error);
-            }
-            var filter = {
-                fields: ['likeMember'],
-                where: {
-                    and: [
-                        { likeUser: userId },
-                        { likeMember: { nin: result } }
-                    ]
-                },
-                include: {
-                    relation: 'members2',
-                    scope: {
-                        fields: [
-                            'id',
-                            'fullName',
-                            'gender',
-                            'about',
-                            'employeeType', //occupation
-                            'income',
-                            'address',
-                            'religion',
-                            'hobby',
-                            'race', //origin
-                            'degree',
-                            'zodiac',
-                            'bday'
-                        ],
-                        include: [{
-                            relation: 'memberPhotos',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }, {
-                            relation: 'memberImage',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }]
-                    }
-                },
-                limit: limit,
-                skip: offset,
-                order: 'id DESC'
-            }
-            Likelist.find(filter, function (error, result) {
+        var excludeBlockList = [];
+
+        excludeBlock(function () {
+            Matchmember.getMemberIdMatchList(userId, function (error, result) {
                 if (error) {
                     cb(error);
                 }
-                var iLikeList = [];
-                result.forEach(function (item) {
-                    if ('members' in item) {
-
-                        item = JSON.parse(JSON.stringify(item));
-
-                        var memberData = item.members2;
-                        if (typeof memberData !== 'undefined') {
-
-                            memberData.hobby = JSON.parse(memberData.hobby);
-
-                            var bdayDate = new Date(memberData.bday);
-                            memberData.age = common.calculateAge(bdayDate);
-
-                            iLikeList.push(memberData);
-
+                var filter = {
+                    fields: ['likeMember'],
+                    where: {
+                        and: [
+                            { likeUser: userId },
+                            { likeMember: { nin: result } },
+                            { likeMember: { nin: excludeBlockList } }
+                        ]
+                    },
+                    include: {
+                        relation: 'members2',
+                        scope: {
+                            fields: [
+                                'id',
+                                'fullName',
+                                'gender',
+                                'about',
+                                'employeeType', //occupation
+                                'income',
+                                'address',
+                                'religion',
+                                'hobby',
+                                'race', //origin
+                                'degree',
+                                'zodiac',
+                                'bday'
+                            ],
+                            include: [{
+                                relation: 'memberPhotos',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }, {
+                                relation: 'memberImage',
+                                scope: {
+                                    fields: ['src']
+                                }
+                            }]
                         }
-                    }
-                }, this);
-
-                filterPrivacy.apply(userId, iLikeList, function (error, result) {
+                    },
+                    limit: limit,
+                    skip: offset,
+                    order: 'id DESC'
+                }
+                Likelist.find(filter, function (error, result) {
                     if (error) {
                         cb(error);
                     }
-                    cb(null, result);
-                });
-                // cb(null, iLikeList);
+                    var iLikeList = [];
+                    result.forEach(function (item) {
+                        if ('members' in item) {
+
+                            item = JSON.parse(JSON.stringify(item));
+
+                            var memberData = item.members2;
+                            if (typeof memberData !== 'undefined') {
+
+                                memberData.hobby = JSON.parse(memberData.hobby);
+
+                                var bdayDate = new Date(memberData.bday);
+                                memberData.age = common.calculateAge(bdayDate);
+
+                                iLikeList.push(memberData);
+
+                            }
+                        }
+                    }, this);
+
+                    filterPrivacy.apply(userId, iLikeList, function (error, result) {
+                        if (error) {
+                            cb(error);
+                        }
+                        cb(null, result);
+                    });
+                    // cb(null, iLikeList);
+                })
             })
         })
+
+        function excludeBlock(callback) {
+            var Block = app.models.Block;
+            Block.getMemberIdBlockMeList(option, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                excludeBlockList = result;
+                return callback();
+            });
+        }
     }
 
     // function getLikeMeList(options, cb) {

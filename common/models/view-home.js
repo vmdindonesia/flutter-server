@@ -22,6 +22,7 @@ module.exports = function (Viewhome) {
         var likeAndDislikeIdList = [];
         var memberData = {};
         var excludeByFilterList = [];
+        var excludeBlockList = [];
 
         var token = options.accessToken;
         var userId = token.userId;
@@ -208,6 +209,19 @@ module.exports = function (Viewhome) {
                 result.forEach(function (item) {
                     excludeByFilterList.push(item.memberId);
                 }, this);
+                // getHomeListByFilter();
+                excludeBlock();
+            });
+
+        }
+
+        function excludeBlock() {
+            var Block = app.models.Block;
+            Block.getMemberIdBlockMeList(options, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                excludeBlockList = result;
                 getHomeListByFilter();
             });
 
@@ -229,6 +243,7 @@ module.exports = function (Viewhome) {
                 { id: { nin: likeAndDislikeIdList } },
                 { id: { nin: excludeIdList } },
                 { id: { nin: excludeByFilterList } },
+                { id: { nin: excludeBlockList } },
                 { gender: { neq: gender } }
             ];
 
