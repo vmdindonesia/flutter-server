@@ -34,6 +34,8 @@ module.exports = function (Block) {
 
     Block.addBlock = addBlock;
     Block.getMemberIdBlockMeList = getMemberIdBlockMeList;
+    Block.getMemberIdBlockList = getMemberIdBlockList;
+    Block.getExcludeBlock = getExcludeBlock;
     Block.getBlockList = getBlockList;
     Block.removeBlock = removeBlock;
 
@@ -59,6 +61,31 @@ module.exports = function (Block) {
             }
             return cb(null, result);
         });
+    }
+
+    function getMemberIdBlockList(options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            fileds: ['targetId'],
+            where: {
+                memberId: userId
+            }
+        }
+
+        Block.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            var memberIdList = [];
+            result.forEach(function (item) {
+                memberIdList.push(item.targetId);
+            }, this);
+
+            return cb(null, memberIdList);
+        });
+
     }
 
     function getMemberIdBlockMeList(options, cb) {
@@ -190,6 +217,32 @@ module.exports = function (Block) {
             return cb(null, result);
         });
 
+
+    }
+
+    function getExcludeBlock(options, cb) {
+        var funcList = [];
+        funcList.push(getMemberIdBlockList);
+        funcList.push(getMemberIdBlockMeList);
+
+        var memberIdList = [];
+
+        common.asyncLoop(funcList.length, function (loop) {
+            var index = loop.iteration();
+            var item = funcList[index];
+
+            item(options, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                memberIdList = memberIdList.concat(result);
+                loop.next();
+            })
+
+
+        }, function () {
+            return cb(null, memberIdList);
+        })
 
     }
 
