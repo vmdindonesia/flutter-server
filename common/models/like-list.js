@@ -502,11 +502,12 @@ module.exports = function (Likelist) {
 
         function excludeBlock(callback) {
             var Block = app.models.Block;
-            Block.getMemberIdBlockMeList(option, function (error, result) {
+            Block.getExcludeBlock(options, function (error, result) {
                 if (error) {
                     return cb(error);
                 }
                 excludeBlockList = result;
+                console.log(excludeBlockList);
                 return callback();
             });
         }
@@ -605,9 +606,9 @@ module.exports = function (Likelist) {
             })
         })
 
-        function excludeBlock(callback) {
+        function getExcludeBlock(callback) {
             var Block = app.models.Block;
-            Block.getMemberIdBlockMeList(option, function (error, result) {
+            Block.getMemberIdBlockMeList(options, function (error, result) {
                 if (error) {
                     return cb(error);
                 }

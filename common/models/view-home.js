@@ -217,7 +217,7 @@ module.exports = function (Viewhome) {
 
         function excludeBlock() {
             var Block = app.models.Block;
-            Block.getMemberIdBlockMeList(options, function (error, result) {
+            Block.getExcludeBlock(options, function (error, result) {
                 if (error) {
                     return cb(error);
                 }

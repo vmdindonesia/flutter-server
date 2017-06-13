@@ -128,7 +128,7 @@ module.exports = function (Matchmember) {
 
         function excludeBlock(callback) {
             var Block = app.models.Block;
-            Block.getMemberIdBlockMeList(option, function (error, result) {
+            Block.getExcludeBlock(options, function (error, result) {
                 if (error) {
                     return cb(error);
                 }
