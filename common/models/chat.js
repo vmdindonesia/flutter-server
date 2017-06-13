@@ -185,7 +185,7 @@ module.exports = function (Chat) {
                         matchId: item.matchId
                     }
                 }
-                console.log(filter);
+                // console.log(filter);
                 Chatdetail.find(filter, function (error, result) {
                     if (error) {
                         return cb(error);
