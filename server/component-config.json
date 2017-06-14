@@ -7,7 +7,12 @@
     "auth": true,
     "driver": {
       "name": "socket.io",
-      "options": {}
+      "options": {
+        "adapter": {
+          "name": "socket.io-adapter-mongo",
+          "datasource": "mongo"
+        }
+      }
     },
     "modules": [
       "IO",
