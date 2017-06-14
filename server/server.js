@@ -6,6 +6,11 @@ var boot = require('loopback-boot');
 var app = module.exports = loopback();
 var path = require('path');
 var bodyParser = require('body-parser');
+var realtime = require('@mean-expert/loopback-component-realtime');
+realtime.options.driver.options['adapter'] = {
+  name: "socket.io-adapter-mongo",
+  datasource: "mongo"
+};
 
 // configure view handler
 app.set('view engine', 'ejs');
