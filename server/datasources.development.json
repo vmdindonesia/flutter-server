@@ -34,5 +34,15 @@
         }
       }
     ]
+  },
+  "mongo": {
+    "host": "192.168.0.100",
+    "port": 27017,
+    "url": "",
+    "database": "pmjakarta",
+    "password": "DataOn123!",
+    "name": "mongo",
+    "user": "admin",
+    "connector": "mongodb"
   }
 }

@@ -14,10 +14,12 @@
     "server:status": "slc ctl --control http://192.168.0.100 status"
   },
   "dependencies": {
+    "@mean-expert/boot-script": "^1.0.0",
     "@mean-expert/fireloop": "^1.0.0-beta.2.4",
-    "@mean-expert/loopback-component-realtime": "^1.0.0-rc.4",
-    "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.10.3",
+    "@mean-expert/loopback-component-realtime": "^1.0.0-rc.9",
+    "@mean-expert/loopback-sdk-builder": "^2.1.0-rc.10.4",
     "@mean-expert/loopback-stats-mixin": "^1.2.0",
+    "@types/node": "^7.0.31",
     "async": "^2.3.0",
     "body-parser": "^1.17.1",
     "compression": "^1.0.3",
@@ -25,17 +27,21 @@
     "helmet": "^3.5.0",
     "jimp": "^0.2.27",
     "loopback": "3.6.0",
-    "loopback-boot": "^2.24.0",
+    "loopback-boot": "^2.24.1",
     "loopback-component-explorer": "^4.2.0",
     "loopback-component-storage": "^3.2.0",
-    "loopback-connector-mysql": "^4.0.0",
+    "loopback-connector-mongodb": "^3.1.0",
+    "loopback-connector-mysql": "^4.1.1",
     "loopback-ds-timestamp-mixin": "^3.4.0",
     "moment": "^2.18.1",
-    "pug": "^2.0.0-beta11",
+    "pug": "^2.0.0-rc.2",
     "serve-favicon": "^2.4.2",
-    "socket.io": "^2.0.1",
+    "socket.io": "^2.0.2",
+    "socket.io-adapter-mongo": "^1.0.1",
     "socket.io-redis": "^5.1.0",
     "strong-error-handler": "^2.0.0",
+    "ts-node": "^3.0.6",
+    "typescript": "^2.3.4",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
@@ -45,8 +51,8 @@
     "nsp": "^2.1.0"
   },
   "repository": {
-    "type": "",
-    "url": ""
+    "type": "git",
+    "url": "http://imron.rosdiana@git.dataon.com/pmjakarta/pmjakarta-server.git"
   },
   "license": "UNLICENSED",
   "description": "pmjakarta-server"

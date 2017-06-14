@@ -90,36 +90,33 @@ function like(senderUserId, recipientUserId) {
 function chat(senderUserId, recipientUserId, text, data) {
     var app = require('../server/server');
     var Members = app.models.Members;
-    Members.findById(senderUserId, function (error, result) {
+    var filter = {
+        include: [
+            {
+                relation: 'rel_visibility',
+                scope: {
+                    where: { filterId: 1 }
+                }
+            }
+        ]
+    }
+    Members.findById(senderUserId, filter, function (error, result) {
         if (result) {
+            if (result.rel_visibility()[0]['match'] == 0) {
+                var randomNum = Math.random();
+                var expectedNum = Math.floor(randomNum * 100000);
+                var stringNum = ('0000' + expectedNum).slice(-5);
+                result.fullName = result.fullName[0] + stringNum;
+            }
             var userData = result;
-            // var message = {
-            //     app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
-            //     headings: { en: userData.fullName },
-            //     contents: { en: text },
-            //     android_group: 'chat',
-            //     android_group_message: {
-            //         en: '$[notif_count] new messages',
-            //         id: '$[notif_count] pesan baru'
-            //     },
-            //     filters: [
-            //         { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
-            //     ],
-            //     data: {
-            //         tag: 'chat',
-            //         params: data
-            //     }
-            // };
-
             var message = {
                 app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
-                // headings: { en: userData.fullName },
-                headings: { en: 'Flutter Asia' },
-                contents: { en: 'You have a new message' },
+                headings: { en: userData.fullName },
+                contents: { en: text },
                 android_group: 'chat',
                 android_group_message: {
-                    en: 'You have $[notif_count] new messages',
-                    id: 'Anda memiliki $[notif_count] pesan baru'
+                    en: '$[notif_count] new messages',
+                    id: '$[notif_count] pesan baru'
                 },
                 filters: [
                     { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
@@ -129,6 +126,25 @@ function chat(senderUserId, recipientUserId, text, data) {
                     params: data
                 }
             };
+
+            // var message = {
+            //     app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+            //     // headings: { en: userData.fullName },
+            //     headings: { en: 'Flutter Asia' },
+            //     contents: { en: 'You have a new message' },
+            //     android_group: 'chat',
+            //     android_group_message: {
+            //         en: 'You have $[notif_count] new messages',
+            //         id: 'Anda memiliki $[notif_count] pesan baru'
+            //     },
+            //     filters: [
+            //         { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
+            //     ],
+            //     data: {
+            //         tag: 'chat',
+            //         params: data
+            //     }
+            // };
 
             send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
         }

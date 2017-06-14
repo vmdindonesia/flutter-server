@@ -400,7 +400,7 @@ module.exports = function (Members) {
     }
 
     function onlineOffline(id, online, cb) {
-        var socket = Members.app.io;
+        // var socket = Members.app.io;
 
         Members.upsertWithWhere({ id: id }, online, function (err, result) {
             if (err) {
@@ -408,7 +408,8 @@ module.exports = function (Members) {
                 return;
             }
 
-            socket.emit('online-' + id, result);
+            // socket.emit('online-' + id, result);
+            Members.app.mx.IO.emit('online-' + id, result);
             cb(null, result);
         });
     }
