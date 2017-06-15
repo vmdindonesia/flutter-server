@@ -180,17 +180,17 @@ module.exports = function (Chat) {
 
                 var Chatdetail = app.models.ChatDetail;
 
-                var filter = {
-                    where: {
-                        matchId: item.matchId
-                    }
+                var where = {
+                    matchId: item.matchId,
+                    membersId: { neq: userId },
+                    read: 0
                 }
-                // console.log(filter);
-                Chatdetail.find(filter, function (error, result) {
+
+                Chatdetail.count(where, function (error, result) {
                     if (error) {
                         return cb(error);
                     }
-                    item.countChat = result.length;
+                    item.countChat = result;
                     // console.log(result);
                     loop.next();
                 });
