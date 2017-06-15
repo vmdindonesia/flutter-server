@@ -38,6 +38,7 @@ module.exports = function (Chatdetail) {
     Chatdetail.remoteMethod('setRead', {
         http: { verb: 'post' },
         accepts: [
+            { arg: 'matchId', type: 'number', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -431,7 +432,7 @@ module.exports = function (Chatdetail) {
             matchId: matchId,
             membersId: { neq: userId }
         }
-        
+
         var newValue = {
             read: 1
         }
