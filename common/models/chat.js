@@ -163,6 +163,11 @@ module.exports = function (Chat) {
 
                 getLatestChat(item.matchId, function (result) {
                     item.chatDetail = result;
+                    if (result[0]) {
+                        item.lastChatTime = result[0].createdDate;
+                    } else {
+                        item.lastChatTime = new Date(0);
+                    }
                     loop.next();
                 });
 
@@ -180,23 +185,26 @@ module.exports = function (Chat) {
 
                 var Chatdetail = app.models.ChatDetail;
 
-                var filter = {
-                    where: {
-                        matchId: item.matchId
-                    }
+                var where = {
+                    matchId: item.matchId,
+                    membersId: { neq: userId },
+                    read: 0
                 }
-                // console.log(filter);
-                Chatdetail.find(filter, function (error, result) {
+
+                Chatdetail.count(where, function (error, result) {
                     if (error) {
                         return cb(error);
                     }
-                    item.countChat = result.length;
+                    item.countChat = result;
                     // console.log(result);
                     loop.next();
                 });
 
             }, function () {
-                return cb(null, chatRoomList);
+                var sortedList = lodash.sortBy(chatRoomList, ['lastChatTime']);
+                lodash.reverse(sortedList);
+                // return cb(null, chatRoomList);
+                return cb(null, sortedList);
             });
         }
 
