@@ -33,11 +33,20 @@ module.exports = function (Chatdetail) {
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
-    })
+    });
+
+    Chatdetail.remoteMethod('setRead', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
 
     Chatdetail.createChat = createChat;
     Chatdetail.getChatDetail = getChatDetail;
     Chatdetail.sendChat = sendChat;
+    Chatdetail.setRead = setRead;
 
     function createChat(data, cb) {
         var app = require('../../server/server');
@@ -409,12 +418,31 @@ module.exports = function (Chatdetail) {
                         callback();
                     });
                 }
-
-
             }
-
         });
-
-
     }
+
+    function setRead(matchId, options, cb) {
+
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var where = {
+            matchId: matchId,
+            membersId: { neq: userId }
+        }
+        
+        var newValue = {
+            read: 1
+        }
+
+        Chatdetail.updateAll(where, newValue, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            return cb(null, result);
+        });
+    }
+
+
 };

@@ -163,6 +163,11 @@ module.exports = function (Chat) {
 
                 getLatestChat(item.matchId, function (result) {
                     item.chatDetail = result;
+                    if (result[0]) {
+                        item.lastChatTime = result[0].createdDate;
+                    } else {
+                        item.lastChatTime = null;
+                    }
                     loop.next();
                 });
 
@@ -196,7 +201,10 @@ module.exports = function (Chat) {
                 });
 
             }, function () {
-                return cb(null, chatRoomList);
+                var sortedList = lodash.sortBy(chatRoomList, ['lastChatTime']);
+                lodash.reverse(sortedList);
+                // return cb(null, chatRoomList);
+                return cb(null, sortedList);
             });
         }
 
