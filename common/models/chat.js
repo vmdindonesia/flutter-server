@@ -166,7 +166,7 @@ module.exports = function (Chat) {
                     if (result[0]) {
                         item.lastChatTime = result[0].createdDate;
                     } else {
-                        item.lastChatTime = null;
+                        item.lastChatTime = new Date(0);
                     }
                     loop.next();
                 });
