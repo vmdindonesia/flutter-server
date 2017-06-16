@@ -409,6 +409,22 @@
         "nullable": "N"
       },
       "_selectable": false
+    },
+    "alias": {
+      "type": "String",
+      "required": false,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "alias",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": true
     }
   },
   "validations": [],
