@@ -161,7 +161,10 @@ module.exports = function (Chat) {
                 var index = loop.iteration();
                 var item = chatRoomList[index];
 
-                getLatestChat(item.matchId, function (result) {
+                getLatestChat(item.matchId, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
                     item.chatDetail = result;
                     if (result[0]) {
                         item.lastChatTime = result[0].createdDate;
@@ -212,7 +215,7 @@ module.exports = function (Chat) {
 
     }
 
-    function getLatestChat(matchId, callback) {
+    function getLatestChat(matchId, cb) {
         var Chatdetail = app.models.ChatDetail;
 
         var filter = {
@@ -226,7 +229,7 @@ module.exports = function (Chat) {
             if (error) {
                 return cb(error);
             }
-            callback(result);
+            return cb(null, result);
         })
 
     }
