@@ -248,6 +248,7 @@ module.exports = function (Chatdetail) {
             }
 
             Chatdetail.create(newChat, { transaction: tx }, function (error, result) {
+
                 if (error) {
                     return tx.rollback(function (err) {
                         if (err) {
@@ -261,6 +262,10 @@ module.exports = function (Chatdetail) {
                     return tx.commit(function (err) {
                         // BUAT BALIKAN SEND CHAT
                         Chatdetail.app.mx.IO.emit('chating:' + result.matchId, result);
+
+                        // BUAT BALIKAN BADGE CHAT
+                        console.log(result, 'ini chat');
+                        Chatdetail.app.mx.IO.emit('chat-badge', result);
                         return cb(null, result);
                     });
                 });
@@ -351,7 +356,7 @@ module.exports = function (Chatdetail) {
                                     var endResult = result[0];
                                     endResult.chatDetail = [];
                                     updateRead(userId, function () {
-                                        console.log(endResult);
+                                        // console.log(endResult);
                                         Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
                                         callback();
                                     });
