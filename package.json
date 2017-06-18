@@ -11,7 +11,8 @@
     "server:deploy-testing": "slc deploy --service pmjakarta-testing http://192.168.0.100",
     "server:deploy-development": "slc deploy --service pmjakarta-development http://192.168.0.100",
     "server:build": "slc build --npm",
-    "server:status": "slc ctl --control http://192.168.0.100 status"
+    "server:status": "slc ctl --control http://192.168.0.100 status",
+    "server:log-mail": "slc ctl --control http://192.168.0.100 log-dump  pmjakarta-mail"
   },
   "dependencies": {
     "@mean-expert/boot-script": "^1.0.0",
