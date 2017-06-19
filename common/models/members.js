@@ -314,6 +314,12 @@ module.exports = function (Members) {
         returns: { arg: 'respon', type: 'object', root: true }
     });
 
+    Members.remoteMethod('generateAlias', {
+        http: { verb: 'get' },
+        accepts: { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+        returns: { arg: 'result', type: 'object', root: true }
+    })
+
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -330,6 +336,7 @@ module.exports = function (Members) {
     Members.isUserNeedProfile = isUserNeedProfile;
     Members.updateProfile = updateProfile;
     Members.deleteAccount = deleteAccount;
+    Members.generateAlias = generateAlias;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -996,6 +1003,55 @@ module.exports = function (Members) {
                 cb(null, result);
             });
         }
+    }
+
+    function generateAlias(options, cb) {
+
+        var filter = {
+            where: {
+                alias: null
+            }
+        }
+
+        Members.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            common.asyncLoop(result.length, function (loop) {
+                var index = loop.iteration();
+                var item = result[index];
+
+                var where = {
+                    id: item.id
+                }
+
+                var randomNum = Math.random();
+                var expectedNum = Math.floor(randomNum * 100000);
+                var stringNum = ('0000' + expectedNum).slice(-5);
+
+                var newValue = {
+                    alias: stringNum
+                }
+
+                Members.updateAll(where, newValue, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    return loop.next();
+                });
+
+            }, function () {
+                return cb(null, {
+                    status: 'OK'
+                });
+
+            })
+
+        })
+
+
+
     }
 
 };

@@ -846,6 +846,13 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "deleteAccount"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "generateAlias"
     }
   ],
   "methods": {}
