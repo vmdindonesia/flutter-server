@@ -46,7 +46,7 @@ module.exports = function (Chat) {
                         and: [
                             { id: { inq: result } },
                             { id: { nin: hideList } },
-                            { id: { nin: excludeBlockList } }
+                            { membersId: { nin: excludeBlockList } }
                         ]
                     },
                     include: {
