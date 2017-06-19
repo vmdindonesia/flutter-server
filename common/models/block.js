@@ -138,7 +138,8 @@ module.exports = function (Block) {
                         'race', //origin
                         'degree',
                         'zodiac',
-                        'bday'
+                        'bday',
+                        'alias'
                     ],
                     include: [{
                         relation: 'memberPhotos',
