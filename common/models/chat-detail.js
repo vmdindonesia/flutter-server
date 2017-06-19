@@ -282,8 +282,7 @@ module.exports = function (Chatdetail) {
                     fields: ['membersId', 'matchId'],
                     where: {
                         and: [
-                            { matchId: matchId },
-                            { membersId: { neq: memberId } }
+                            { matchId: matchId }
                         ]
                     },
                     include: {
@@ -321,7 +320,7 @@ module.exports = function (Chatdetail) {
                     }
                 }
 
-                Matchmember.findOne(filter, { transaction: tx }, function (error, result) {
+                Matchmember.find(filter, { transaction: tx }, function (error, result) {
                     if (error) {
                         return tx.callback(function (err) {
                             if (err) {
@@ -330,60 +329,110 @@ module.exports = function (Chatdetail) {
                             return cb(error);
                         });
                     }
-                    if (result) {
-                        if ('members' in result) {
+                    
+                    var matchList = [];
 
-                            result = JSON.parse(JSON.stringify(result));
+                    result.forEach(function (item) {
 
-                            var memberData = result.members;
+                        if ('members' in item) {
+
+                            item = JSON.parse(JSON.stringify(item));
+
+                            var memberData = item.members;
                             if (typeof memberData !== 'undefined') {
                                 memberData.hobby = JSON.parse(memberData.hobby);
 
                                 var bdayDate = new Date(memberData.bday);
                                 memberData.age = common.calculateAge(bdayDate);
 
-                                memberData.matchId = result.matchId;
-                                var memberList = [];
-                                memberList.push(memberData);
-                                filterPrivacy.apply(userId, memberList, function (error, result) {
-                                    if (error) {
-                                        return tx.rollback(function (err) {
-                                            if (err) {
-                                                return cb(err);
-                                            }
-                                            return cb(error);
-                                        });
-                                    }
-                                    var endResult = result[0];
-                                    endResult.chatDetail = [];
-                                    updateRead(userId, function () {
-                                        // console.log(endResult);
-                                        Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
-                                        callback();
-                                    });
-                                    // Chat.getLatestChat(memberData.matchId, function (result) {
-                                    //     endResult.chatDetail = result;
-                                    //     updateRead(userId, function () {
-                                    //         Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
-                                    //         callback();
-                                    //     });
-                                    // });
-                                });
+                                memberData.matchId = item.matchId;
+                                matchList.push(memberData);
+
                             }
                         }
+                    }, this);
 
-                    } else {
-                        return tx.rollback(function (err) {
-                            if (err) {
-                                return cb(err);
-                            }
-                            return cb({
-                                name: 'match.member.data.not.found',
-                                status: 404,
-                                message: 'There is no match member data : ' + matchId
+                    filterPrivacy.apply(userId, matchList, function (error, result) {
+                        if (error) {
+                            return tx.rollback(function (err) {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                return cb(error);
                             });
+                        }
+
+                        var endResult = undefined;
+                        var recipientId = undefined;
+                        result.forEach(function (item) {
+                            if (item.id == userId) {
+                                endResult = item;
+                            } else {
+                                recipientId = item.id;
+                            }
+                        }, this);
+                        endResult.chatDetail = [];
+                        updateRead(userId, function () {
+                            // console.log(endResult);
+                            Pushnotification.chat(userId, recipientId, decodeURIComponent(message), endResult);
+                            callback();
                         });
-                    }
+                    });
+
+                    // if (result) {
+                    //     if ('members' in result) {
+
+                    //         result = JSON.parse(JSON.stringify(result));
+
+                    //         var memberData = result.members;
+                    //         if (typeof memberData !== 'undefined') {
+                    //             memberData.hobby = JSON.parse(memberData.hobby);
+
+                    //             var bdayDate = new Date(memberData.bday);
+                    //             memberData.age = common.calculateAge(bdayDate);
+
+                    //             memberData.matchId = result.matchId;
+                    //             var memberList = [];
+                    //             memberList.push(memberData);
+                    //             filterPrivacy.apply(userId, memberList, function (error, result) {
+                    //                 if (error) {
+                    //                     return tx.rollback(function (err) {
+                    //                         if (err) {
+                    //                             return cb(err);
+                    //                         }
+                    //                         return cb(error);
+                    //                     });
+                    //                 }
+                    //                 var endResult = result[0];
+                    //                 endResult.chatDetail = [];
+                    //                 updateRead(userId, function () {
+                    //                     // console.log(endResult);
+                    //                     Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
+                    //                     callback();
+                    //                 });
+                    //                 // Chat.getLatestChat(memberData.matchId, function (result) {
+                    //                 //     endResult.chatDetail = result;
+                    //                 //     updateRead(userId, function () {
+                    //                 //         Pushnotification.chat(userId, endResult.id, decodeURIComponent(message), endResult);
+                    //                 //         callback();
+                    //                 //     });
+                    //                 // });
+                    //             });
+                    //         }
+                    //     }
+
+                    // } else {
+                    //     return tx.rollback(function (err) {
+                    //         if (err) {
+                    //             return cb(err);
+                    //         }
+                    //         return cb({
+                    //             name: 'match.member.data.not.found',
+                    //             status: 404,
+                    //             message: 'There is no match member data : ' + matchId
+                    //         });
+                    //     });
+                    // }
                 });
 
                 function updateRead(memberId, callback) {
