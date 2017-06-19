@@ -103,10 +103,10 @@ function chat(senderUserId, recipientUserId, text, data) {
     Members.findById(senderUserId, filter, function (error, result) {
         if (result) {
             if (result.rel_visibility()[0]['match'] == 0) {
-                var randomNum = Math.random();
-                var expectedNum = Math.floor(randomNum * 100000);
-                var stringNum = ('0000' + expectedNum).slice(-5);
-                result.fullName = result.fullName[0] + stringNum;
+                // var randomNum = Math.random();
+                // var expectedNum = Math.floor(randomNum * 100000);
+                // var stringNum = ('0000' + expectedNum).slice(-5);
+                result.fullName = result.fullName[0] + result.alias;
             }
             var userData = result;
             var message = {
@@ -124,7 +124,9 @@ function chat(senderUserId, recipientUserId, text, data) {
                 data: {
                     tag: 'chat',
                     params: data
-                }
+                },
+                ios_attachments: data.memberPhotos.src,
+                large_icon: data.memberPhotos.src
             };
 
             // var message = {
