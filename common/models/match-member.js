@@ -68,7 +68,8 @@ module.exports = function (Matchmember) {
                                 'degree',
                                 'zodiac',
                                 'bday',
-                                'online'
+                                'online',
+                                'alias'
                             ],
                             include: [{
                                 relation: 'memberPhotos',

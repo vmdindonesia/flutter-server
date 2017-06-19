@@ -279,7 +279,8 @@ module.exports = function (Nearbyview) {
                             'degree',
                             'zodiac',
                             'bday',
-                            'online'
+                            'online',
+                            'alias'
                         ],
                         include: [{
                             relation: 'memberPhotos',

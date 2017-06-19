@@ -116,10 +116,11 @@ function apply(userId, someList, cb) {
 
                     config['visibilityData'].forEach(function (element) {
                         if (element.filterId == 1) {
-                            var randomNum = Math.random();
-                            var expectedNum = Math.floor(randomNum * 100000);
-                            var stringNum = ('0000' + expectedNum).slice(-5);
-                            item.fullName = item.fullName[0] + stringNum;
+                            // var randomNum = Math.random();
+                            // var expectedNum = Math.floor(randomNum * 100000);
+                            // var stringNum = ('0000' + expectedNum).slice(-5);
+                            // item.fullName = item.fullName[0] + stringNum;
+                            item.fullName = item.fullName[0] + item.alias;
                             // item.fullName = item.fullName.split(" ")[0] + ' ****';
                         }
 

@@ -27,8 +27,12 @@ module.exports = function (Chat) {
         var token = options.accessToken;
         var userId = token.userId;
 
+        var excludeBlockList = [];
+
         getHideList(function (result) {
-            getMatchList(result);
+            excludeBlock(function () {
+                getMatchList(result);
+            })
         });
 
         function getMatchList(hideList) {
@@ -41,7 +45,8 @@ module.exports = function (Chat) {
                     where: {
                         and: [
                             { id: { inq: result } },
-                            { id: { nin: hideList } }
+                            { id: { nin: hideList } },
+                            { id: { nin: excludeBlockList } }
                         ]
                     },
                     include: {
@@ -61,7 +66,8 @@ module.exports = function (Chat) {
                                 'degree',
                                 'zodiac',
                                 'bday',
-                                'online'
+                                'online',
+                                'alias'
                             ],
                             include: [{
                                 relation: 'memberPhotos',
@@ -118,6 +124,18 @@ module.exports = function (Chat) {
                 });
 
             });
+        }
+
+        function excludeBlock(callback) {
+            var Block = app.models.Block;
+            Block.getExcludeBlock(options, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                excludeBlockList = result;
+                return callback();
+            });
+
         }
 
 
@@ -210,8 +228,6 @@ module.exports = function (Chat) {
                 return cb(null, sortedList);
             });
         }
-
-
 
     }
 

@@ -303,7 +303,8 @@ module.exports = function (Chatdetail) {
                                 'degree',
                                 'zodiac',
                                 'bday',
-                                'online'
+                                'online',
+                                'alias'
                             ],
                             include: [{
                                 relation: 'memberPhotos',

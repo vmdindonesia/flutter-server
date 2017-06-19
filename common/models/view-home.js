@@ -372,12 +372,14 @@ module.exports = function (Viewhome) {
                                     switch (value2.filterId) {
                                         case 1:
 
-                                            var hasil = value.fullName;
-                                            var randomNum = Math.random();
-                                            var expectedNum = Math.floor(randomNum * 100000);
-                                            var stringNum = ('0000' + expectedNum).slice(-5);
-                                            value.fullName = value.fullName[0] + stringNum;
+                                            // var hasil = value.fullName;
+                                            // var randomNum = Math.random();
+                                            // var expectedNum = Math.floor(randomNum * 100000);
+                                            // var stringNum = ('0000' + expectedNum).slice(-5);
+                                            // value.fullName = value.fullName[0] + stringNum;
                                             // value.fullName = value.fullName.split(" ")[0] + ' ****';
+                                            console.log(value);
+                                            value.fullName = value.fullName[0] + value.alias;
 
                                             if (value2.verified) {
                                                 if (isVerify == true) {

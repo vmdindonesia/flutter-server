@@ -318,7 +318,8 @@ module.exports = function (Likelist) {
                                             'degree',
                                             'zodiac',
                                             'bday',
-                                            'online'
+                                            'online',
+                                            'alias'
                                         ],
                                         include: [{
                                             relation: 'memberPhotos',
@@ -522,7 +523,8 @@ module.exports = function (Likelist) {
                                 'race', //origin
                                 'degree',
                                 'zodiac',
-                                'bday'
+                                'bday',
+                                'alias'
                             ],
                             include: [{
                                 relation: 'memberPhotos',
@@ -628,7 +630,8 @@ module.exports = function (Likelist) {
                                 'race', //origin
                                 'degree',
                                 'zodiac',
-                                'bday'
+                                'bday',
+                                'alias'
                             ],
                             include: [{
                                 relation: 'memberPhotos',

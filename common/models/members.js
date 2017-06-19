@@ -445,6 +445,11 @@ module.exports = function (Members) {
             var dateNow = new Date();
             params.createdAt = dateNow;
 
+            var randomNum = Math.random();
+            var expectedNum = Math.floor(randomNum * 100000);
+            var stringNum = ('0000' + expectedNum).slice(-5);
+            params.alias = stringNum;
+
             Members.create(params, function (error, result) {
                 if (error) {
                     return tx.rollback(function (err) {
