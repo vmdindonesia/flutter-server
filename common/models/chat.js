@@ -36,7 +36,6 @@ module.exports = function (Chat) {
         });
 
         function getMatchList(hideList) {
-
             Matchmember.getMatchMemberIdList(userId, function (error, result) {
                 if (error) {
                     return cb(error);
@@ -45,7 +44,7 @@ module.exports = function (Chat) {
                     where: {
                         and: [
                             { id: { inq: result } },
-                            { id: { nin: hideList } },
+                            { matchId: { nin: hideList } },
                             { membersId: { nin: excludeBlockList } }
                         ]
                     },
@@ -164,12 +163,8 @@ module.exports = function (Chat) {
                 if (error) {
                     return cb(error);
                 }
-                var hideList = [];
-                result.forEach(function (item) {
-                    hideList.push(item.matchId);
-                }, this);
-
-                callback(hideList);
+                
+                callback(result);
             })
         }
 
