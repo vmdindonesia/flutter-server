@@ -7,6 +7,8 @@ module.exports = {
     match: match
 };
 
+var commonConst = require('./common-const');
+
 function send(data, someAuth) {
     var headers = {
         "Content-Type": "application/json; charset=utf-8",
@@ -89,6 +91,7 @@ function like(senderUserId, recipientUserId) {
 
 function chat(senderUserId, recipientUserId, text, data) {
     var app = require('../server/server');
+    var image_path = commonConst.SERVER_PATH + commonConst.DIR_IMAGE_MEMBERS;
     var Members = app.models.Members;
     var filter = {
         include: [
@@ -125,8 +128,8 @@ function chat(senderUserId, recipientUserId, text, data) {
                     tag: 'chat',
                     params: data
                 },
-                ios_attachments: data.memberPhotos.src,
-                large_icon: data.memberPhotos.src
+                ios_attachments: image_path + data.memberPhotos.src,
+                large_icon: image_path + data.memberPhotos.src
             };
 
             // var message = {
