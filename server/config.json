@@ -1,7 +1,7 @@
 {
   "restApiRoot": "/api",
   "host": "0.0.0.0",
-  "remoteHost": "http://pmj.dataon.com:3000",
+  "remoteHost": "https://api.flutterasia.com",
   "port": 3000,
   "remoting": {
     "context": false,
