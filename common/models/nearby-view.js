@@ -13,12 +13,14 @@ module.exports = function (Nearbyview) {
         http: { path: '/:id/getNearbyLocation', verb: 'get' },
         accepts: [
             { arg: 'id', type: 'number', required: true },
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'location', type: 'Object', root: true }
     });
 
-    Nearbyview.getNearbyLocation = function (id, options, cb) {
+    Nearbyview.getNearbyLocation = function (id, limit, offset, options, cb) {
 
         var token = options.accessToken;
         var userId = token.userId;
@@ -294,7 +296,9 @@ module.exports = function (Nearbyview) {
                             }
                         }]
                     }
-                }
+                },
+                limit: limit,
+                offset: offset
             }
 
             // Getting data from db
