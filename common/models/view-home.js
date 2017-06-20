@@ -378,7 +378,7 @@ module.exports = function (Viewhome) {
                                             // var stringNum = ('0000' + expectedNum).slice(-5);
                                             // value.fullName = value.fullName[0] + stringNum;
                                             // value.fullName = value.fullName.split(" ")[0] + ' ****';
-                                            console.log(value);
+                                            // console.log(value);
                                             value.fullName = value.fullName[0] + value.alias;
 
                                             if (value2.verified) {
