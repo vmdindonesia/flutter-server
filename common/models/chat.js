@@ -164,7 +164,12 @@ module.exports = function (Chat) {
                 if (error) {
                     return cb(error);
                 }
-                callback(result);
+                var hideList = [];
+                result.forEach(function (item) {
+                    hideList.push(item.matchId);
+                }, this);
+
+                callback(hideList);
             })
         }
 
