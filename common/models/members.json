@@ -703,6 +703,22 @@
         "nullable": "Y"
       },
       "_selectable": true
+    },
+    "lastOnline": {
+      "type": "Date",
+      "required": false,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "last_online",
+        "dataType": "datetime",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": false
     }
   },
   "validations": [],

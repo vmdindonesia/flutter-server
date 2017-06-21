@@ -408,6 +408,7 @@ module.exports = function (Members) {
 
     function onlineOffline(id, online, cb) {
         // var socket = Members.app.io;
+        online['lastOnline'] = new Date();
 
         Members.upsertWithWhere({ id: id }, online, function (err, result) {
             if (err) {
