@@ -30,7 +30,6 @@ module.exports = function (Viewhome) {
 
         //GET HOME SETTING FUNCTION1
         function getHomeSetting(callback) {
-            // console.log('GET HOME SETTING');
             var Settinghome = app.models.SettingHome;
             Settinghome.findOne({
                 where: {
@@ -43,17 +42,13 @@ module.exports = function (Viewhome) {
                     if (result) {
                         homeSettingData = result;
                         getLikeIdList();
-                        // callback(getDislikeIdList);
                     } else {
-                        // console.log('FAILED TO FIND HOME SETTING');
-                        // console.log('OR MAYBE I SHOULD INIT FOR YOU');
                         Settinghome.registerSettingHome(options, function (error, result) {
                             if (error) {
                                 cb(error);
                             } else {
                                 homeSettingData = result;
                                 getLikeIdList();
-                                // callback(getDislikeIdList);
                             }
                         });
                     }
@@ -64,7 +59,6 @@ module.exports = function (Viewhome) {
 
         //GET LIKE LIST FUNCTION2
         function getLikeIdList() {
-            // console.log('GET LIKE LIST');
             var Likelist = app.models.LikeList;
             Likelist.find({
                 fields: { likeMember: true },
@@ -79,7 +73,6 @@ module.exports = function (Viewhome) {
                         }
                     }, this);
                     getDislikeIdList();
-                    // callback(getMemberData);
                 }
             })
 
@@ -87,7 +80,6 @@ module.exports = function (Viewhome) {
 
         //GET LIKE LIST FUNCTION3
         function getDislikeIdList() {
-            // console.log('GET DISLIKE LIST');
             var Dislikelist = app.models.DislikeList;
             Dislikelist.find({
                 fields: { dislikeMamber: true },
@@ -102,7 +94,6 @@ module.exports = function (Viewhome) {
                         }
                     }, this);
                     getMemberData();
-                    // callback(getHomeListByFilter);
                 }
             })
 
@@ -110,7 +101,6 @@ module.exports = function (Viewhome) {
 
         //GET MEMBER DATA FUNCTION4
         function getMemberData() {
-            // console.log('GET MEMBER DATA');
             var Members = app.models.Members;
             Members.findById(userId, function (error, result) {
                 if (error) {
@@ -118,8 +108,6 @@ module.exports = function (Viewhome) {
                 } else {
                     memberData = result;
                     getCurrentUserVerifyScore();
-                    // getHomeListByFilter();
-                    // callback();
                 }
 
             })
@@ -135,10 +123,6 @@ module.exports = function (Viewhome) {
                 } else {
                     var status = status;
                     var score = result;
-
-                    // console.log(
-                    //     status, result
-                    // );
 
                     if (status == 'OK') {
                         memberData['verifyScore'] = score;
@@ -230,7 +214,6 @@ module.exports = function (Viewhome) {
         //FILTER VIEW HOME BY MEMBER SETTING + LIMIT BY PARAMETER FUNCTION5
         function getHomeListByFilter() {
             var Memberverifystatus = app.models.MemberVerifyStatus;
-            // console.log('GET HOME LIST BY SETTING');
             var gender = memberData.gender;
 
             var excludeIdList = [];
@@ -253,7 +236,6 @@ module.exports = function (Viewhome) {
                 andList.push({ age: { between: [homeSettingData.ageLower, homeSettingData.ageUpper] } });
             }
 
-            // console.log(JSON.stringify(homeSettingData));
             if (!_.isEmpty(JSON.parse(homeSettingData.religion))) {
                 andList.push({ religion: { inq: JSON.parse(homeSettingData.religion) } });
             }
@@ -285,39 +267,39 @@ module.exports = function (Viewhome) {
                 include: 'rel_visibility',
                 limit: limit
             };
-            // console.log('FILTER : ' + JSON.stringify(filter));
+
             Viewhome.find(filter, function (error, result) {
                 if (error) {
                     cb(error);
                 } else {
                     var homeList = result;
-                    common.asyncLoop(homeList.length, function (loop) {
-                        var index = loop.iteration();
-                        var item = homeList[index];
-                        Memberverifystatus.getVerifyScoreByUserId(item.id, function (error, status, result) {
-                            if (error) {
-                                return cb(error);
-                            }
-                            // console.log('RESULT IN ARRAY : ' + index + '_' + result);
-                            var status = status;
-                            var score = result;
+                    var tempObj = _.groupBy(result, 'points');
+                    var tempList = [];
+                    _.forEachRight(tempObj, function (value, key) {
+                        tempList = tempList.concat(_.shuffle(value));
+                    })
+                    homeList = tempList;
+                    // common.asyncLoop(homeList.length, function (loop) {
+                    //     var index = loop.iteration();
+                    //     var item = homeList[index];
+                    //     Memberverifystatus.getVerifyScoreByUserId(item.id, function (error, status, result) {
+                    //         if (error) {
+                    //             return cb(error);
+                    //         }
+                    //         var status = status;
+                    //         var score = result;
 
-                            if (status == 'OK') {
-                                item['verifyScore'] = score;
-                            } else {
-                                item['verifyScore'] = 0
-                            }
-                            loop.next();
-                        });
-                    }, function () {
-                        // cb(null, homeList);
-                        verify(homeList);
-                    });
-
-                    // cb(null, homeList);
-                    // console.log(homeList);
-                    // verify(homeList);
-
+                    //         if (status == 'OK') {
+                    //             item['verifyScore'] = score;
+                    //         } else {
+                    //             item['verifyScore'] = 0
+                    //         }
+                    //         loop.next();
+                    //     });
+                    // }, function () {
+                    //     verify(homeList);
+                    // });
+                    verify(homeList);
                 }
             })
         }
@@ -363,22 +345,10 @@ module.exports = function (Viewhome) {
                                 callback();
                             } else {
 
-                                // console.log(
-                                //     isVerify, isMatch
-                                // );
-
                                 async.eachOfSeries(value.rel_visibility(), function (value2, key, callback) {
 
                                     switch (value2.filterId) {
                                         case 1:
-
-                                            // var hasil = value.fullName;
-                                            // var randomNum = Math.random();
-                                            // var expectedNum = Math.floor(randomNum * 100000);
-                                            // var stringNum = ('0000' + expectedNum).slice(-5);
-                                            // value.fullName = value.fullName[0] + stringNum;
-                                            // value.fullName = value.fullName.split(" ")[0] + ' ****';
-                                            // console.log(value);
                                             value.fullName = value.fullName[0] + value.alias;
 
                                             if (value2.verified) {
@@ -532,11 +502,6 @@ module.exports = function (Viewhome) {
 
             }, function (err) {
                 if (err) console.error(err.message);
-                // configs is now a map of JSON data
-                // console.log(
-                //     params
-                // );
-
                 cb(null, params);
 
             });

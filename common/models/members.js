@@ -52,7 +52,7 @@ module.exports = function (Members) {
         var app = require('../../server/server');
         var Memberverifystatus = app.models.MemberVerifyStatus;
         var Members = app.models.Members;
-        // console.log('USER ID : ' + JSON.stringify(userInstance));
+
         var dateNow = new Date();
         Memberverifystatus.create({
             userId: userInstance.id,
@@ -701,8 +701,6 @@ module.exports = function (Members) {
                 ]
             }
         }, function (error, members) {
-            console.log('ERROR MEMBERS : ' + JSON.stringify(error, null, 2));
-            console.log('MEMBERS RES : ' + JSON.stringify(members, null, 2));
             var result = false;
             if (members.length > 0) { //sudah diregister
                 result = true;
@@ -734,7 +732,6 @@ module.exports = function (Members) {
                         err = 'User not found';
                     }
 
-                    console.log(err);
                     cb(err);
                     res.render('error-verify', {
                         error: err
@@ -896,8 +893,7 @@ module.exports = function (Members) {
         var https = require('https');
         var req = https.request(options, function (res) {
             res.on('data', function (data) {
-                console.log("Response:");
-                console.log(JSON.parse(data));
+                
             });
         });
 
