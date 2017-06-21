@@ -264,7 +264,6 @@ module.exports = function (Chatdetail) {
                         Chatdetail.app.mx.IO.emit('chating:' + result.matchId, result);
 
                         // BUAT BALIKAN BADGE CHAT
-                        console.log(result, 'ini chat');
                         Chatdetail.app.mx.IO.emit('chat-badge', result);
                         return cb(null, result);
                     });
@@ -374,6 +373,10 @@ module.exports = function (Chatdetail) {
                         endResult.chatDetail = [];
                         updateRead(userId, function () {
                             // console.log(endResult);
+                            if (type == 'IMAGE') {
+                                message = '%F0%9F%93%B7%20Photo';
+                            }
+
                             Pushnotification.chat(userId, recipientId, decodeURIComponent(message), endResult);
                             callback();
                         });
