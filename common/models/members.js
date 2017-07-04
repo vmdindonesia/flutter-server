@@ -452,6 +452,7 @@ module.exports = function (Members) {
 
             var dateNow = new Date();
             params.createdAt = dateNow;
+            params.updatedAt = dateNow;
 
             var randomNum = Math.random();
             var expectedNum = Math.floor(randomNum * 100000);
@@ -894,7 +895,7 @@ module.exports = function (Members) {
         var https = require('https');
         var req = https.request(options, function (res) {
             res.on('data', function (data) {
-                
+
             });
         });
 
@@ -920,6 +921,8 @@ module.exports = function (Members) {
         if ('about' in params) {
             params['about'] = decodeURIComponent(params['about']);
         }
+
+        params['updatedAt'] = new Date();
 
         Members.upsertWithWhere(where, params, function (error, result) {
             if (error) {
