@@ -263,16 +263,16 @@ module.exports = function (Members) {
         returns: { arg: 'result', type: 'boolean' }
     });
 
-    Members.remoteMethod('confirm', {
-        description: 'Confirm a user registration with email verification token.',
-        accepts: [
-            { arg: 'uid', type: 'string', required: true },
-            { arg: 'token', type: 'string', required: true },
-            { arg: 'redirect', type: 'string' },
-            { arg: 'res', type: 'object', http: { source: 'res' } }
-        ],
-        http: { verb: 'get', path: '/confirm' },
-    });
+    // Members.remoteMethod('confirm', {
+    //     description: 'Confirm a user registration with email verification token.',
+    //     accepts: [
+    //         { arg: 'uid', type: 'string', required: true },
+    //         { arg: 'token', type: 'string', required: true },
+    //         { arg: 'redirect', type: 'string' },
+    //         { arg: 'res', type: 'object', http: { source: 'res' } }
+    //     ],
+    //     http: { verb: 'get', path: '/confirm' },
+    // });
 
     Members.remoteMethod('passwordReset', {
         http: { path: '/passwordReset', verb: 'post' },
@@ -330,7 +330,7 @@ module.exports = function (Members) {
     Members.statistic = statistic;
     Members.register = register;
     Members.isSocialRegistered = isSocialRegistered;
-    Members.confirm = confirm;
+    // Members.confirm = confirm;
     Members.passwordReset = passwordReset;
     Members.emailCheck = emailCheck;
     Members.isUserNeedProfile = isUserNeedProfile;
@@ -711,37 +711,37 @@ module.exports = function (Members) {
         })
     }
 
-    function confirm(uid, token, redirect, res, cb) {
-        Members.findById(uid, function (err, user) {
-            if (err) {
-                cb(err);
-            } else {
-                if (user && user.verificationToken === token) {
-                    user.verificationToken = null;
-                    user.emailVerified = true;
-                    user.save(function (err) {
-                        if (err) {
-                            cb(err);
-                        } else {
-                            cb();
-                        }
-                    });
-                }
-                else {
-                    if (user) {
-                        err = 'This email has already been verified';
-                    } else {
-                        err = 'User not found';
-                    }
+    // function confirm(uid, token, redirect, res, cb) {
+    //     Members.findById(uid, function (err, user) {
+    //         if (err) {
+    //             cb(err);
+    //         } else {
+    //             if (user && user.verificationToken === token) {
+    //                 user.verificationToken = null;
+    //                 user.emailVerified = true;
+    //                 user.save(function (err) {
+    //                     if (err) {
+    //                         cb(err);
+    //                     } else {
+    //                         cb();
+    //                     }
+    //                 });
+    //             }
+    //             else {
+    //                 if (user) {
+    //                     err = 'This email has already been verified';
+    //                 } else {
+    //                     err = 'User not found';
+    //                 }
 
-                    cb(err);
-                    res.render('error-verify', {
-                        error: err
-                    });
-                }
-            }
-        });
-    };
+    //                 cb(err);
+    //                 res.render('error-verify', {
+    //                     error: err
+    //                 });
+    //             }
+    //         }
+    //     });
+    // };
 
     function passwordReset(param, cb) {
         Members.resetPassword(param, function (err, result) {
