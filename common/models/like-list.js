@@ -319,7 +319,8 @@ module.exports = function (Likelist) {
                                             'zodiac',
                                             'bday',
                                             'online',
-                                            'alias'
+                                            'alias',
+                                            'updatedAt'
                                         ],
                                         include: [{
                                             relation: 'memberPhotos',
@@ -524,7 +525,8 @@ module.exports = function (Likelist) {
                                 'degree',
                                 'zodiac',
                                 'bday',
-                                'alias'
+                                'alias',
+                                'updatedAt'
                             ],
                             include: [{
                                 relation: 'memberPhotos',
@@ -631,7 +633,8 @@ module.exports = function (Likelist) {
                                 'degree',
                                 'zodiac',
                                 'bday',
-                                'alias'
+                                'alias',
+                                'updatedAt'
                             ],
                             include: [{
                                 relation: 'memberPhotos',
