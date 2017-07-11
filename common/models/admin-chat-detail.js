@@ -127,7 +127,8 @@ module.exports = function (Adminchatdetail) {
             var filter = {
                 where: {
                     adminChatRoomId: chatRoomId
-                }
+                },
+                order: 'createdAt DESC'
             }
 
             Adminchatdetail.find(filter, function (error, result) {
