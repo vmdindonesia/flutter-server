@@ -121,7 +121,7 @@ module.exports = function (Adminchatmember) {
                 return cb({
                     name: 'chat.room.not.found',
                     status: 404,
-                    message: 'You dont have chat room for user  : ' + userId
+                    message: 'You dont have chat room for user  : ' + memberId
                 });
             }
 

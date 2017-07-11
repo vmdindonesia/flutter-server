@@ -892,6 +892,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "adminLogin"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "getMemberList"
     }
   ],
   "methods": {}

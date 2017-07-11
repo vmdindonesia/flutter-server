@@ -334,6 +334,16 @@ module.exports = function (Members) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Members.remoteMethod('getMemberList', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -352,6 +362,7 @@ module.exports = function (Members) {
     Members.deleteAccount = deleteAccount;
     Members.generateAlias = generateAlias;
     Members.adminLogin = adminLogin;
+    Members.getMemberList = getMemberList;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -1079,6 +1090,56 @@ module.exports = function (Members) {
         } else {
             return cb(null, {});
         }
+    }
+
+    function getMemberList(limit, offset, options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        // 1 is ADMIN ID,
+        if (userId != 1) {
+            return cb({
+                name: 'user.not.authorized',
+                status: 404,
+                message: 'You dont have authorization for Admin'
+            });
+        } else {
+            var filter = {
+                fields: [
+                    'id',
+                    'fullName'
+                ],
+                include: [
+                    {
+                        relation: 'memberPhotos',
+                        scope: {
+                            fields: [
+                                'src'
+                            ]
+                        }
+                    }
+                ],
+                limit: limit,
+                skip: offset
+            }
+            return Members.find(filter, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                var newResult = [];
+                result.forEach(function (item) {
+                    var temp = JSON.parse(JSON.stringify(item));
+                    var newItem = {
+                        memberId: temp.id,
+                        fullName: temp.fullName,
+                        avatarImg: (temp.memberPhotos ? temp.memberPhotos.src : null)
+                    }
+                    newResult.push(newItem);
+                }, this);
+                return cb(null, newResult);
+            });
+        }
+
     }
 
 };
