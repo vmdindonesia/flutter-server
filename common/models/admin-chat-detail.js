@@ -82,6 +82,10 @@ module.exports = function (Adminchatdetail) {
                     }
                     return updateRoom(result, tx, function () {
                         return tx.commit(function (err) {
+                            // BUAT BALIKAN SEND CHAT
+                            // console.log(result, 'chat detail');
+                            Adminchatdetail.app.mx.IO.emit('chating:' + result.adminChatRoomId, result);
+
                             return cb(null, result);
                         });
                     });
