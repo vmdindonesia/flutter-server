@@ -7,6 +7,7 @@ module.exports = function (Adminchatmember) {
     Adminchatmember.remoteMethod('getChatRoomId', {
         http: { verb: 'get' },
         accepts: [
+            { arg: 'memberId', type: 'number', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -99,13 +100,13 @@ module.exports = function (Adminchatmember) {
         });
     }
 
-    function getChatRoomId(options, cb) {
+    function getChatRoomId(memberId, options, cb) {
         var token = options.accessToken;
         var userId = token.userId;
 
         var filter = {
             where: {
-                memberId: userId
+                memberId: memberId
             }
         }
 
