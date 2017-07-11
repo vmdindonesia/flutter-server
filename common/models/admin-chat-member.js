@@ -4,9 +4,18 @@ module.exports = function (Adminchatmember) {
 
     var app = require('../../server/server');
 
+    Adminchatmember.remoteMethod('getChatRoomId', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    })
+
     Adminchatmember.checkRoomMember = checkRoomMember;
     Adminchatmember.addRoomMember = addRoomMember;
     Adminchatmember.getMemberRoom = getMemberRoom;
+    Adminchatmember.getChatRoomId = getChatRoomId;
 
     function checkRoomMember(chatRoomId, options, cb) {
         var token = options.accessToken;
@@ -68,9 +77,6 @@ module.exports = function (Adminchatmember) {
         var token = options.accessToken;
         var userId = token.userId;
 
-        // FOR ADMIN USING USER ID 0
-        // userId = 0;
-
         var filter = {
             where: {
                 memberId: userId
@@ -91,6 +97,35 @@ module.exports = function (Adminchatmember) {
             return cb(null, roomIdList);
 
         });
+    }
+
+    function getChatRoomId(options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            where: {
+                memberId: userId
+            }
+        }
+
+        Adminchatmember.findOne(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            if (result) {
+                var chatRoomId = result.adminChatRoomId;
+                return cb(null, chatRoomId);
+            } else {
+                return cb({
+                    name: 'chat.room.not.found',
+                    status: 404,
+                    message: 'You dont have chat room for user  : ' + userId
+                });
+            }
+
+
+        })
     }
 
 };
