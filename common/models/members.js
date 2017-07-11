@@ -116,78 +116,83 @@ module.exports = function (Members) {
     Members.afterRemote('login', function (ctx, modelInstance, next) {
 
         var userId = modelInstance.userId;
-
-        var filter = {
-            fields: [
-                'id',
-                'email',
-                'fullName',
-                'gender',
-                'about',
-                'employeeType', //occupation
-                'income',
-                'address',
-                'religion',
-                'hobby',
-                'race', //origin
-                'degree',
-                'zodiac',
-                'bday'
-            ],
-            include: [{
-                relation: 'memberPhotos',
-                scope: {
-                    fields: ['src']
-                }
-            }, {
-                relation: 'memberImage',
-                scope: {
-                    fields: ['id', 'src']
-                }
-            }, {
-                relation: 'settingHomes',
-                scope: {
-                    fields: [
-                        'religion',
-                        'ageLower',
-                        'ageUpper',
-                        'zodiac',
-                        'visibility',
-                        'distance',
-                        'smoke',
-                        'income',
-                        'verify'
-                    ]
-                }
-            }]
-        }
-
-        Members.findById(userId, filter, function (error, result) {
-
-            if (error) {
-                var memberData = null;
-                // throw error;
-            } else {
-                var memberData = JSON.parse(JSON.stringify(result));
-                memberData['hobby'] = JSON.parse(memberData['hobby']);
-
-                var bdayDate = new Date(memberData['bday']);
-                memberData['age'] = common.calculateAge(bdayDate);
+        if (userId != 1) {
 
 
-                memberData['settingHomes'].religion = JSON.parse(memberData['settingHomes'].religion);
-                memberData['settingHomes'].zodiac = JSON.parse(memberData['settingHomes'].zodiac);
-
-
+            var filter = {
+                fields: [
+                    'id',
+                    'email',
+                    'fullName',
+                    'gender',
+                    'about',
+                    'employeeType', //occupation
+                    'income',
+                    'address',
+                    'religion',
+                    'hobby',
+                    'race', //origin
+                    'degree',
+                    'zodiac',
+                    'bday'
+                ],
+                include: [{
+                    relation: 'memberPhotos',
+                    scope: {
+                        fields: ['src']
+                    }
+                }, {
+                    relation: 'memberImage',
+                    scope: {
+                        fields: ['id', 'src']
+                    }
+                }, {
+                    relation: 'settingHomes',
+                    scope: {
+                        fields: [
+                            'religion',
+                            'ageLower',
+                            'ageUpper',
+                            'zodiac',
+                            'visibility',
+                            'distance',
+                            'smoke',
+                            'income',
+                            'verify'
+                        ]
+                    }
+                }]
             }
-            var settingHome = JSON.parse(JSON.stringify(memberData['settingHomes']));
-            delete memberData['settingHomes'];
 
-            modelInstance['memberData'] = memberData;
-            modelInstance['settingHome'] = settingHome;
+            Members.findById(userId, filter, function (error, result) {
+
+                if (error) {
+                    var memberData = null;
+                    // throw error;
+                } else {
+                    var memberData = JSON.parse(JSON.stringify(result));
+                    memberData['hobby'] = JSON.parse(memberData['hobby']);
+
+                    var bdayDate = new Date(memberData['bday']);
+                    memberData['age'] = common.calculateAge(bdayDate);
+
+
+                    memberData['settingHomes'].religion = JSON.parse(memberData['settingHomes'].religion);
+                    memberData['settingHomes'].zodiac = JSON.parse(memberData['settingHomes'].zodiac);
+
+
+                }
+                var settingHome = JSON.parse(JSON.stringify(memberData['settingHomes']));
+                delete memberData['settingHomes'];
+
+                modelInstance['memberData'] = memberData;
+                modelInstance['settingHome'] = settingHome;
+                next();
+            });
+
+        } else {
             next();
-        });
-
+        }
     });
 
     Members.beforeRemote('login', function (ctx, userInstance, next) {
@@ -318,7 +323,16 @@ module.exports = function (Members) {
         http: { verb: 'get' },
         accepts: { arg: 'options', type: 'object', http: 'optionsFromRequest' },
         returns: { arg: 'result', type: 'object', root: true }
-    })
+    });
+
+    Members.remoteMethod('adminLogin', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'email', type: 'string', required: true },
+            { arg: 'password', type: 'string', required: true }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
 
     // END REMOTE METHOD ====================================================================
 
@@ -337,6 +351,7 @@ module.exports = function (Members) {
     Members.updateProfile = updateProfile;
     Members.deleteAccount = deleteAccount;
     Members.generateAlias = generateAlias;
+    Members.adminLogin = adminLogin;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -1052,6 +1067,18 @@ module.exports = function (Members) {
 
 
 
+    }
+
+    function adminLogin(email, password, cb) {
+        if (email != 'admin@flutterasia.com') {
+            return cb({
+                name: 'user.not.authorized',
+                status: 404,
+                message: 'You dont have authorization for Admin'
+            });
+        } else {
+            return cb(null, {});
+        }
     }
 
 };

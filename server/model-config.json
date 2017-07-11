@@ -255,5 +255,21 @@
   "Block": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "AdminChatRoom": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "AdminChatMember": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "AdminChatDetail": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
