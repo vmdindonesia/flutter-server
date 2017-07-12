@@ -115,7 +115,7 @@ module.exports = function (Nearbyview) {
         // Function 3
         // Get exclude filter
         function getExlcudeList(id) {
-
+            
             memberData['age'] = common.calculateAge(memberData['bday']);
             var Settinghome = app.models.SettingHome;
 
@@ -254,7 +254,7 @@ module.exports = function (Nearbyview) {
             }
 
             var filter = {
-                fields: ['id', 'geolocation'],
+                fields: ['id', 'geolocation', 'verify', 'age'],
                 // include: 'rel_visibility',
                 where: {
                     and: andList,
@@ -313,13 +313,17 @@ module.exports = function (Nearbyview) {
 
                             var memberData = item.members;
                             var geolocation = item.geolocation;
+                            var verify = item.verify;
+                            var age = item.age;
                             // memberData['geolocation'] = geolocation;
                             memberData.geolocation = geolocation;
+                            memberData.verify = verify;
+                            memberData.age = age;
                             if (typeof memberData !== 'undefined') {
                                 memberData.hobby = JSON.parse(memberData.hobby);
 
-                                var bdayDate = new Date(memberData.bday);
-                                memberData.age = common.calculateAge(bdayDate);
+                                // var bdayDate = new Date(memberData.bday);
+                                // memberData.age = common.calculateAge(bdayDate);
 
                                 nearbyList.push(memberData);
 
