@@ -10,9 +10,8 @@ module.exports = function (Memberverifystatus) {
         var dateNow = new Date();
         context.args.data.createAt = dateNow;
         context.args.data.updateAt = dateNow;
-
         next();
-    })
+    });
 
     Memberverifystatus.afterRemote('changeVerifyStatus', function (context, user, next) {
         var Members = app.models.Members;
@@ -31,17 +30,26 @@ module.exports = function (Memberverifystatus) {
                 next();
             }
         })
-    })
+    });
 
-    // Memberverifystatus.observe('before save', function (ctx, next) {
-    //     var dateNow = new Date();
-    //     if (ctx.instance) {
-    //         ctx.instance.updateAt = dateNow;
-    //     } else {
-    //         ctx.data.updateAt = dateNow;
-    //     }
-    //     next();
-    // })
+    Memberverifystatus.afterRemote('getVerifyStatusByUserId', function (context, user, next) {
+        var Memberphoto = app.models.MemberPhoto;
+        Memberphoto.findOne({
+            where: {
+                membersId: user.result.userId
+            }
+        }, function (error, result) {
+            if (result) {
+                next();
+            } else {
+                Memberphoto.create({
+                    membersId: user.result.userId,
+                    src: 'init_first'
+                });
+                next();
+            }
+        })
+    });
 
     Memberverifystatus.remoteMethod('isUserNeedVerify', {
         description: 'Check User need verify or not.',
@@ -95,28 +103,15 @@ module.exports = function (Memberverifystatus) {
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'status', type: 'boolean' }
-    })
+    });
 
-    Memberverifystatus.afterRemote('getVerifyStatusByUserId', function (context, user, next) {
-        var Memberphoto = app.models.MemberPhoto;
-        Memberphoto.findOne({
-            where: {
-                membersId: user.result.userId
-            }
-        }, function (error, result) {
-            if (result) {
-                next();
-            } else {
-                Memberphoto.create({
-                    membersId: user.result.userId,
-                    src: 'init_first'
-                });
-                next();
-            }
-        })
-    })
+    Memberverifystatus.getVerifyStatusByUserId = getVerifyStatusByUserId;
+    Memberverifystatus.getVerifyScoreByUserId = getVerifyScoreByUserId;
+    Memberverifystatus.changeVerifyStatus = changeVerifyStatus;
+    Memberverifystatus.isUserNeedVerify = isUserNeedVerify;
+    Memberverifystatus.sendEmailVerification = sendEmailVerification;
 
-    Memberverifystatus.getVerifyStatusByUserId = function (userId, cb) {
+    function getVerifyStatusByUserId(userId, cb) {
         var Members = app.models.Members;
         var filterMemberVerifyStatus = {
             where: {
@@ -155,7 +150,7 @@ module.exports = function (Memberverifystatus) {
         });
     }
 
-    Memberverifystatus.getVerifyScoreByUserId = function (userId, cb) {
+    function getVerifyScoreByUserId(userId, cb) {
         var verifyRate = {
             phone: 20,
             ktp: 20,
@@ -169,52 +164,59 @@ module.exports = function (Memberverifystatus) {
                 userId: userId
             }
         }
-        var query = 'SELECT * FROM ( ' +
-            ' SELECT A.user_id, \'phone\' AS \'verify_key\', A.phone AS \'verify_value\' ' +
-            ' FROM member_verify_status A UNION ' +
-            ' SELECT A.user_id, \'ktp\' AS \'verify_key\', A.ktp AS \'verify_value\' ' +
-            ' FROM member_verify_status A UNION ' +
-            ' SELECT A.user_id, \'sim\' AS \'verify_key\', A.sim AS \'verify_value\' ' +
-            ' FROM member_verify_status A UNION ' +
-            ' SELECT A.user_id, \'school_certificate\' AS \'verify_key\', A.school_certificate AS \'verify_value\' ' +
-            ' FROM member_verify_status A UNION ' +
-            ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
-            ' FROM member_verify_status A UNION ' +
-            ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
-            ' FROM member_verify_status A ' +
-            ' ) B WHERE user_id = ? ';
+        // var query = 'SELECT * FROM ( ' +
+        //     ' SELECT A.user_id, \'phone\' AS \'verify_key\', A.phone AS \'verify_value\' ' +
+        //     ' FROM member_verify_status A UNION ' +
+        //     ' SELECT A.user_id, \'ktp\' AS \'verify_key\', A.ktp AS \'verify_value\' ' +
+        //     ' FROM member_verify_status A UNION ' +
+        //     ' SELECT A.user_id, \'sim\' AS \'verify_key\', A.sim AS \'verify_value\' ' +
+        //     ' FROM member_verify_status A UNION ' +
+        //     ' SELECT A.user_id, \'school_certificate\' AS \'verify_key\', A.school_certificate AS \'verify_value\' ' +
+        //     ' FROM member_verify_status A UNION ' +
+        //     ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
+        //     ' FROM member_verify_status A UNION ' +
+        //     ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
+        //     ' FROM member_verify_status A ' +
+        //     ' ) B WHERE user_id = ? ';
+        var query = ' SELECT countVerify(?) AS \'verify\' ';
         var params = [userId];
 
         Memberverifystatus.dataSource.connector.execute(query, params, function (error, result) {
-            // console.log(result);
-            if (result.length > 0) {
-                var score = 0;
-                for (var i = 0; i < result.length; i++) {
-                    var verifyKey = result[i].verify_key;
-                    var verifyValue = result[i].verify_value;
-                    if (verifyValue == 1) {
-                        score += verifyRate[verifyKey];
-                    }
-                }
-                if (score > 100) {
-                    score = 100;
-                }
-                cb(null, 'OK', score, {});
-            } else {
-                var error = {
-                    code: 'member.id.not.found',
-                    message: 'Member Id not Found : ',
-                    value: userId
-                }
-                cb(null, 'FAIL', {}, error);
+            if (error) {
+                return cb(error);
             }
+            if (result.length > 0) {
+                var score = result[0].verify;
+                return cb(null, 'OK', score);
+            }
+            // if (result.length > 0) {
+            //     var score = 0;
+            //     for (var i = 0; i < result.length; i++) {
+            //         var verifyKey = result[i].verify_key;
+            //         var verifyValue = result[i].verify_value;
+            //         if (verifyValue == 1) {
+            //             score += verifyRate[verifyKey];
+            //         }
+            //     }
+            //     if (score > 100) {
+            //         score = 100;
+            //     }
+            //     cb(null, 'OK', score, {});
+            // } else {
+            //     var error = {
+            //         code: 'member.id.not.found',
+            //         message: 'Member Id not Found : ',
+            //         value: userId
+            //     }
+            //     cb(null, 'FAIL', {}, error);
+            // }
 
         });
 
 
     }
 
-    Memberverifystatus.changeVerifyStatus = function (userId, key, value, cb) {
+    function changeVerifyStatus(userId, key, value, cb) {
         var filter = {
             where: {
                 userId: userId
@@ -269,7 +271,7 @@ module.exports = function (Memberverifystatus) {
         req.end();
     };
 
-    Memberverifystatus.isUserNeedVerify = function (userId, cb) {
+    function isUserNeedVerify(userId, cb) {
 
         var query = 'SELECT * FROM ( ' +
             ' SELECT A.user_id, \'phone\' AS \'verify_key\', A.phone AS \'verify_value\' ' +
@@ -307,7 +309,7 @@ module.exports = function (Memberverifystatus) {
         });
     }
 
-    Memberverifystatus.sendEmailVerification = function (options, cb) {
+    function sendEmailVerification(options, cb) {
         var token = options.accessToken;
         if (token) {
             var userId = token.userId;
