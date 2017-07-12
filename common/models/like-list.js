@@ -570,12 +570,23 @@ module.exports = function (Likelist) {
                         }
                     }, this);
 
-                    filterPrivacy.apply(userId, likeMeList, function (error, result) {
-                        if (error) {
-                            cb(error);
-                        }
-                        cb(null, result);
+                    common.asyncLoop(likeMeList.length, function (loop) {
+                        var index = loop.iteration();
+                        var item = likeMeList[index];
+
+                        Memberverifystatus.getVerifyScoreByUserId(item.id, function (error, status, result) {
+                            item.verify = result;
+                            return loop.next();
+                        });
+                    }, function () {
+                        filterPrivacy.apply(userId, likeMeList, function (error, result) {
+                            if (error) {
+                                cb(error);
+                            }
+                            cb(null, result);
+                        });
                     });
+
                 });
             });
         }
@@ -677,12 +688,24 @@ module.exports = function (Likelist) {
                         }
                     }, this);
 
-                    filterPrivacy.apply(userId, iLikeList, function (error, result) {
-                        if (error) {
-                            cb(error);
-                        }
-                        cb(null, result);
+                    common.asyncLoop(iLikeList.length, function (loop) {
+                        var index = loop.iteration();
+                        var item = iLikeList[index];
+
+                        Memberverifystatus.getVerifyScoreByUserId(item.id, function (error, status, result) {
+                            item.verify = result;
+                            return loop.next();
+                        });
+
+                    }, function () {
+                        filterPrivacy.apply(userId, iLikeList, function (error, result) {
+                            if (error) {
+                                cb(error);
+                            }
+                            cb(null, result);
+                        });
                     });
+
                     // cb(null, iLikeList);
                 })
             })
