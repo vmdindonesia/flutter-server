@@ -472,7 +472,8 @@ module.exports = function (Likelist) {
     function getLikeMeList(limit, offset, options, cb) {
 
         var Matchmember = app.models.MatchMember;
-        var Dislikelist = app.models.DislikeList
+        var Dislikelist = app.models.DislikeList;
+        var Memberverifystatus = app.models.MemberVerifyStatus;
 
         var token = options.accessToken;
         var userId = token.userId;
@@ -607,6 +608,7 @@ module.exports = function (Likelist) {
     function getILikeList(limit, offset, options, cb) {
 
         var Matchmember = app.models.MatchMember;
+        var Memberverifystatus = app.models.MemberVerifyStatus;
 
         var token = options.accessToken;
         var userId = token.userId;
