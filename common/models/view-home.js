@@ -349,6 +349,7 @@ module.exports = function (Viewhome) {
 
                                     switch (value2.filterId) {
                                         case 1:
+                                            var hasil = value.fullName;
                                             value.fullName = value.fullName[0] + value.alias;
 
                                             if (value2.verified) {
