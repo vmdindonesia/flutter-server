@@ -271,5 +271,21 @@
   "AdminChatDetail": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "MonthViewStatistic": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "WeekViewStatistic": {
+    "dataSource": "pmjakarta",
+    "public": true,
+    "$promise": {},
+    "$resolved": true
+  },
+  "FilterViewStatistic": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
