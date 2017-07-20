@@ -67,7 +67,7 @@ module.exports = function (Adminchatdetail) {
                     adminChatRoomId: chatRoomId,
                     senderId: userId,
                     type: chatType,
-                    message: chatContent,
+                    message: decodeURIComponent(chatContent),
                     createdAt: dateNow,
                     createdBy: userId,
                     updatedAt: dateNow,
