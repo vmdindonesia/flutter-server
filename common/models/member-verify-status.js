@@ -324,7 +324,7 @@ module.exports = function (Memberverifystatus) {
                 var options = {
                     type: 'email',
                     to: userInstance.email,
-                    from: mailFrom,
+                    from: "donotreply@flutterasia.com",
                     subject: 'Thanks for registering.',
                     template: path.resolve(__dirname, '../views/verify.ejs'),
                     user: Members,

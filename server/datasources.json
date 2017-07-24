@@ -25,12 +25,12 @@
     "transports": [
       {
         "type": "smtp",
-        "host": "mail3.dataon.com",
+        "host": "pro.turbo-smtp.com",
         "secure": false,
-        "port": 25,
+        "port": 587,
         "auth": {
-          "user": "donotreply@flutterasia.com",
-          "pass": "P@ssw0rd"
+          "user": "andhina@dataon.com",
+          "pass": "QGObnVpG"
         }
       }
     ]
