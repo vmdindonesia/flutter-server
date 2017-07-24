@@ -899,6 +899,13 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "getMemberList"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "getUserData"
     }
   ],
   "methods": {}
