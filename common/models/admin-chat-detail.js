@@ -3,6 +3,7 @@
 module.exports = function (Adminchatdetail) {
 
     var app = require('../../server/server');
+    var Pushnotification = require('../push-notification');
 
     Adminchatdetail.remoteMethod('sendChat', {
         http: { verb: 'post' },
@@ -41,17 +42,23 @@ module.exports = function (Adminchatdetail) {
         var Adminchatmember = app.models.AdminChatMember;
         var Adminchatroom = app.models.AdminChatRoom;
 
+        var recipientIdList = [];
+
         if (chatRoomId) {
             Adminchatmember.checkRoomMember(chatRoomId, options, function (error, result) {
                 if (error) {
                     return cb(error);
                 }
+                // console.log('SOME RES : ' + JSON.stringify(result));
+                recipientIdList = result;
                 return addChat();
             });
         } else {
             // FOR ADMIN ROOM ONLY GENERATED FOR ADMIN (ID : 0) AND 
             // IF FROM MOBILE THEN RECIPIENT IS 0
             // IF FROM ADMIN THEN USER ID = 0
+
+            recipientIdList.push(recipientId);
             Adminchatroom.generateRoom([recipientId, userId], options, function (error, result) {
                 if (error) {
                     return cb(error);
@@ -86,6 +93,7 @@ module.exports = function (Adminchatdetail) {
                             // console.log(result, 'chat detail');
                             Adminchatdetail.app.mx.IO.emit('chating:' + result.adminChatRoomId, result);
                             Adminchatdetail.app.mx.IO.emit('roomupdate', '');
+                            Pushnotification.cs(userId, recipientIdList[0], result.message, null);
 
                             return cb(null, result);
                         });
@@ -119,6 +127,10 @@ module.exports = function (Adminchatdetail) {
     }
 
     function getDetail(chatRoomId, limit, offset, options, cb) {
+
+        var token = options.accessToken;
+        var userId = token.userId;
+
         var Adminchatmember = app.models.AdminChatMember;
 
         Adminchatmember.checkRoomMember(chatRoomId, options, function (error, result) {
@@ -140,7 +152,18 @@ module.exports = function (Adminchatdetail) {
                 if (error) {
                     return cb(error);
                 }
-                return cb(null, result);
+                var chatDetail = result;
+                return Adminchatdetail.updateAll(filter.where, {
+                    readStatus: 1,
+                    updatedAt: new Date(),
+                    updatedBy: userId
+                }, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    Adminchatdetail.app.mx.IO.emit('roomupdate', '');
+                    return cb(null, chatDetail);
+                });
             });
         }
 

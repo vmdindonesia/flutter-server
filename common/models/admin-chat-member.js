@@ -23,16 +23,34 @@ module.exports = function (Adminchatmember) {
         var userId = token.userId;
 
         var filter = {
-            adminChatRoomId: chatRoomId,
-            memberId: userId
-        }
+            where: {
+                adminChatRoomId: chatRoomId,
+                memberId: userId
+            }
+        };
 
         Adminchatmember.findOne(filter, function (error, result) {
             if (error) {
                 return cb(error);
             }
             if (result) {
-                return cb(null, result);
+                filter = {
+                    where: {
+                        adminChatRoomId: chatRoomId,
+                        memberId: { neq: userId }
+                    }
+                }
+                return Adminchatmember.find(filter, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    var memberIdList = [];
+                    result.forEach(function(item) {
+                        memberIdList.push(item.memberId);
+                    }, this);
+                    // RETURN ARRAY ISINYA ID DARI USER YANG ADA DI ROOM TSB
+                    return cb(null, memberIdList);
+                });
             } else {
                 return cb({
                     name: 'chat.room.not.authorized',

@@ -4,7 +4,8 @@ module.exports = {
     send: send,
     like: like,
     chat: chat,
-    match: match
+    match: match,
+    cs: cs
 };
 
 var commonConst = require('./common-const');
@@ -171,4 +172,31 @@ function match(recipientUserId, data) {
     };
     send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
 
+}
+
+function cs(senderUserId, recipientUserId, text, data) {
+    var app = require('../server/server');
+    var image_path = commonConst.SERVER_PATH + commonConst.DIR_IMAGE_MEMBERS;
+
+    var message = {
+        app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+        headings: { en: 'CS Flutter Asia' },
+        contents: { en: text },
+        android_group: 'chat',
+        android_group_message: {
+            en: '$[notif_count] new messages',
+            id: '$[notif_count] pesan baru'
+        },
+        filters: [
+            { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
+        ],
+        data: {
+            tag: 'cs',
+            params: data
+        },
+        // ios_attachments: image_path + data.memberPhotos.src,
+        // large_icon: image_path + data.memberPhotos.src
+    };
+
+    send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
 }
