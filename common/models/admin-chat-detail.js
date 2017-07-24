@@ -93,6 +93,7 @@ module.exports = function (Adminchatdetail) {
                             // console.log(result, 'chat detail');
                             Adminchatdetail.app.mx.IO.emit('chating:' + result.adminChatRoomId, result);
                             Adminchatdetail.app.mx.IO.emit('roomupdate', '');
+                            Adminchatdetail.app.mx.IO.emit('admin-badge', result);
                             Pushnotification.cs(userId, recipientIdList[0], result.message, null);
 
                             return cb(null, result);
