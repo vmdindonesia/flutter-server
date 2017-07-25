@@ -348,7 +348,7 @@ module.exports = function (Members) {
     Members.remoteMethod('getUserData', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'updateDate', type: 'string', required: true },
+            { arg: 'updateDate', type: 'string' },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -1166,7 +1166,7 @@ module.exports = function (Members) {
                 return cb(error);
             }
             if (result.updatedAt) {
-                if (new Date(updateDate) < new Date(result.updatedAt)) {
+                if (new Date(updateDate) < new Date(result.updatedAt) || typeof updateDate === 'undefined') {
                     filter = {
                         fields: [
                             'id',
