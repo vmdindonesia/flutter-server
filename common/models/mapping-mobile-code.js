@@ -25,7 +25,15 @@ module.exports = function (Mappingmobilecode) {
     }
     console.log('AFTER REMOTE');
 
-    var smsGatewayUrl = 'https://secure.gosmsgateway.com/masking/api/send.php?username=flutter&mobile=' + context.args.data.mobileNumber + '&message=Please+input+' + context.args.data.generatedCode + '+on+Flutter+Asia+in+30+minutes.&password=gosms38246';
+    var mobileNumber = context.args.data.mobileNumber;
+    mobileNumber = mobileNumber.trim();
+    if (mobileNumber[0] == '+') {
+      mobileNumber = mobileNumber.slice(1);
+    }
+
+    console.log('THE PHONE NUMBER : ' + mobileNumber);
+
+    var smsGatewayUrl = 'https://secure.gosmsgateway.com/masking/api/send.php?username=flutter&mobile=' + mobileNumber + '&message=Please+input+' + context.args.data.generatedCode + '+on+Flutter+Asia+in+30+minutes.&password=gosms38246';
     httpGetAsync(smsGatewayUrl, function () {
       console.log('HTTP DONE');
       // console.log(smsGatewayUrl);
