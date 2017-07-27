@@ -25,13 +25,11 @@ module.exports = function (Chathide) {
     Chathide.getHideList = getHideList;
 
     function unhide(memberId, matchId, cb) {
-        var filter = {
-            where: {
-                memberId: memberId,
-                matchId: matchId
-            }
+        var where = {
+            memberId: memberId,
+            matchId: matchId
         }
-        Chathide.destroyAll(filter, function (error, result) {
+        Chathide.destroyAll(where, function (error, result) {
             if (error) {
                 return cb(error);
             }
