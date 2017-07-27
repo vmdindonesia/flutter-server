@@ -134,7 +134,8 @@ module.exports = function (Members) {
                     'race', //origin
                     'degree',
                     'zodiac',
-                    'bday'
+                    'bday',
+                    'updatedAt'
                 ],
                 include: [{
                     relation: 'memberPhotos',
@@ -347,6 +348,15 @@ module.exports = function (Members) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Members.remoteMethod('getUserData', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'updateDate', type: 'string' },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -366,6 +376,7 @@ module.exports = function (Members) {
     Members.generateAlias = generateAlias;
     Members.adminLogin = adminLogin;
     Members.getMemberList = getMemberList;
+    Members.getUserData = getUserData;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -1152,6 +1163,104 @@ module.exports = function (Members) {
                 return cb(null, newResult);
             });
         }
+
+    }
+
+    function getUserData(updateDate, options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            fields: ['updatedAt']
+        };
+
+        Members.findById(userId, filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            if (result.updatedAt) {
+                if (new Date(updateDate) < new Date(result.updatedAt) || typeof updateDate === 'undefined') {
+                    filter = {
+                        fields: [
+                            'id',
+                            'email',
+                            'fullName',
+                            'gender',
+                            'about',
+                            'employeeType', //occupation
+                            'income',
+                            'address',
+                            'religion',
+                            'hobby',
+                            'race', //origin
+                            'degree',
+                            'zodiac',
+                            'bday',
+                            'updatedAt'
+                        ],
+                        include: [{
+                            relation: 'memberPhotos',
+                            scope: {
+                                fields: ['src']
+                            }
+                        }, {
+                            relation: 'memberImage',
+                            scope: {
+                                fields: ['id', 'src']
+                            }
+                        }, {
+                            relation: 'settingHomes',
+                            scope: {
+                                fields: [
+                                    'religion',
+                                    'ageLower',
+                                    'ageUpper',
+                                    'zodiac',
+                                    'visibility',
+                                    'distance',
+                                    'smoke',
+                                    'income',
+                                    'verify'
+                                ]
+                            }
+                        }]
+                    }
+
+                    Members.findById(userId, filter, function (error, result) {
+
+                        if (error) {
+                            return cb(error);
+                            // throw error;
+                        }
+                        var memberData = JSON.parse(JSON.stringify(result));
+                        memberData['hobby'] = JSON.parse(memberData['hobby']);
+
+                        var bdayDate = new Date(memberData['bday']);
+                        memberData['age'] = common.calculateAge(bdayDate);
+
+                        memberData['settingHomes'].religion = JSON.parse(memberData['settingHomes'].religion);
+                        memberData['settingHomes'].zodiac = JSON.parse(memberData['settingHomes'].zodiac);
+
+                        var settingHome = JSON.parse(JSON.stringify(memberData['settingHomes']));
+                        delete memberData['settingHomes'];
+
+                        var newResult = {
+                            memberData: memberData,
+                            settingHome: settingHome
+                        }
+
+                        return cb(null, newResult);
+                    });
+
+                } else {
+                    return cb({
+                        name: 'there.is.no.new.update',
+                        status: 404,
+                        message: 'Updated User Data not found : ' + updateDate
+                    });
+                }
+            }
+        });
 
     }
 
