@@ -134,8 +134,7 @@ module.exports = function (Members) {
                     'race', //origin
                     'degree',
                     'zodiac',
-                    'bday',
-                    'updatedAt'
+                    'bday'
                 ],
                 include: [{
                     relation: 'memberPhotos',
@@ -252,6 +251,9 @@ module.exports = function (Members) {
 
     Members.remoteMethod('statistic', {
         http: { path: '/statistic', verb: 'get' },
+        accepts: [
+            { arg: 'params', type: 'object' }
+        ],
         returns: { arg: 'respon', type: 'object', root: true }
     });
 
@@ -345,15 +347,6 @@ module.exports = function (Members) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
-    Members.remoteMethod('getUserData', {
-        http: { verb: 'get' },
-        accepts: [
-            { arg: 'updateDate', type: 'string' },
-            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
-        ],
-        returns: { arg: 'result', type: 'object', root: true }
-    });
-
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -373,7 +366,6 @@ module.exports = function (Members) {
     Members.generateAlias = generateAlias;
     Members.adminLogin = adminLogin;
     Members.getMemberList = getMemberList;
-    Members.getUserData = getUserData;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -459,17 +451,27 @@ module.exports = function (Members) {
         });
     }
 
-    function statistic(cb) {
+    function statistic(params, cb) {
         var ds = Members.dataSource;
-        var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive, f.matches " +
-            "FROM" +
-            "(SELECT COUNT(id) AS registered FROM pmjakarta.Members) AS a, " +
-            "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
-            "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
-            "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
-            "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e, " +
-            "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member) AS f";
-
+        if (params.flag == 0) {
+            var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive, f.matches " +
+                "FROM (" +
+                "(SELECT COUNT(id) AS registered FROM pmjakarta.Members WHERE created_at is not null) AS a, " +
+                "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0) AS b, " +
+                "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1) AS c, " +
+                "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1) AS d, " +
+                "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0) AS e, " +
+                "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member) AS f)";
+        } else {
+            var sql = "SELECT a.registered, b.male, c.female, d.active, e.inactive, f.matches " +
+                "FROM (" +
+                "(SELECT COUNT(id) AS registered FROM pmjakarta.Members WHERE created_at is not null AND created_at BETWEEN  '" + params.from + "' AND '" + params.to + "' ) AS a, " +
+                "(SELECT COUNT(gender) AS male FROM pmjakarta.Members WHERE gender = 0 AND created_at BETWEEN '" + params.from + "' AND '" + params.to + "' ) AS b, " +
+                "(SELECT COUNT(gender) AS female FROM pmjakarta.Members WHERE gender = 1 AND created_at BETWEEN '" + params.from + "' AND '" + params.to + "' ) AS c, " +
+                "(SELECT COUNT(status) AS active FROM pmjakarta.Members WHERE status = 1 AND created_at BETWEEN '" + params.from + "' AND '" + params.to + "' ) AS d, " +
+                "(SELECT COUNT(status) AS inactive FROM pmjakarta.Members WHERE status = 0 AND created_at BETWEEN '" + params.from + "' AND  '" + params.to + "' ) AS e, " +
+                "(SELECT COUNT(id) AS matches FROM pmjakarta.Match_member WHERE update_date BETWEEN '" + params.from + "' AND  '" + params.to + "') AS f)";
+        }
         ds.connector.execute(sql, function (err, result) {
             if (err) {
                 cb(err);
@@ -1150,104 +1152,6 @@ module.exports = function (Members) {
                 return cb(null, newResult);
             });
         }
-
-    }
-
-    function getUserData(updateDate, options, cb) {
-        var token = options.accessToken;
-        var userId = token.userId;
-
-        var filter = {
-            fields: ['updatedAt']
-        };
-
-        Members.findById(userId, filter, function (error, result) {
-            if (error) {
-                return cb(error);
-            }
-            if (result.updatedAt) {
-                if (new Date(updateDate) < new Date(result.updatedAt) || typeof updateDate === 'undefined') {
-                    filter = {
-                        fields: [
-                            'id',
-                            'email',
-                            'fullName',
-                            'gender',
-                            'about',
-                            'employeeType', //occupation
-                            'income',
-                            'address',
-                            'religion',
-                            'hobby',
-                            'race', //origin
-                            'degree',
-                            'zodiac',
-                            'bday',
-                            'updatedAt'
-                        ],
-                        include: [{
-                            relation: 'memberPhotos',
-                            scope: {
-                                fields: ['src']
-                            }
-                        }, {
-                            relation: 'memberImage',
-                            scope: {
-                                fields: ['id', 'src']
-                            }
-                        }, {
-                            relation: 'settingHomes',
-                            scope: {
-                                fields: [
-                                    'religion',
-                                    'ageLower',
-                                    'ageUpper',
-                                    'zodiac',
-                                    'visibility',
-                                    'distance',
-                                    'smoke',
-                                    'income',
-                                    'verify'
-                                ]
-                            }
-                        }]
-                    }
-
-                    Members.findById(userId, filter, function (error, result) {
-
-                        if (error) {
-                            return cb(error);
-                            // throw error;
-                        }
-                        var memberData = JSON.parse(JSON.stringify(result));
-                        memberData['hobby'] = JSON.parse(memberData['hobby']);
-
-                        var bdayDate = new Date(memberData['bday']);
-                        memberData['age'] = common.calculateAge(bdayDate);
-
-                        memberData['settingHomes'].religion = JSON.parse(memberData['settingHomes'].religion);
-                        memberData['settingHomes'].zodiac = JSON.parse(memberData['settingHomes'].zodiac);
-
-                        var settingHome = JSON.parse(JSON.stringify(memberData['settingHomes']));
-                        delete memberData['settingHomes'];
-
-                        var newResult = {
-                            memberData: memberData,
-                            settingHome: settingHome
-                        }
-
-                        return cb(null, newResult);
-                    });
-
-                } else {
-                    return cb({
-                        name: 'there.is.no.new.update',
-                        status: 404,
-                        message: 'Updated User Data not found : ' + updateDate
-                    });
-                }
-            }
-        });
 
     }
 
