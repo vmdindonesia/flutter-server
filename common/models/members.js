@@ -1131,7 +1131,11 @@ module.exports = function (Members) {
             var filter = {
                 fields: [
                     'id',
-                    'fullName'
+                    'fullName',
+                    'email',
+                    'phone',
+                    'gender',
+                    'bday'
                 ],
                 include: [
                     {
@@ -1144,7 +1148,8 @@ module.exports = function (Members) {
                     }
                 ],
                 limit: limit,
-                skip: offset
+                skip: offset,
+                order: 'createdAt DESC',
             }
             return Members.find(filter, function (error, result) {
                 if (error) {
@@ -1156,7 +1161,11 @@ module.exports = function (Members) {
                     var newItem = {
                         memberId: temp.id,
                         fullName: temp.fullName,
-                        avatarImg: (temp.memberPhotos ? temp.memberPhotos.src : null)
+                        avatarImg: (temp.memberPhotos ? temp.memberPhotos.src : null),
+                        email: temp.email,
+                        phone: temp.phone,
+                        gender: temp.gender,
+                        bday: temp.bday
                     }
                     newResult.push(newItem);
                 }, this);
