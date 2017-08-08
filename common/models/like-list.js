@@ -505,7 +505,7 @@ module.exports = function (Likelist) {
                         and: [
                             { likeMember: userId },
                             { likeUser: { nin: result } },
-                            { likeUser: { nin: dislikeIdList } },
+                            // { likeUser: { nin: dislikeIdList } },
                             { likeUser: { nin: excludeBlockList } }
                         ]
                     },
