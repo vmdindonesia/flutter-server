@@ -357,6 +357,12 @@ module.exports = function (Members) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Members.remoteMethod('search', {
+        http: { verb: 'post' },
+        accepts: { arg: 'search', type: 'string', required: true },
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -377,6 +383,7 @@ module.exports = function (Members) {
     Members.adminLogin = adminLogin;
     Members.getMemberList = getMemberList;
     Members.getUserData = getUserData;
+    Members.search = search;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -1135,7 +1142,8 @@ module.exports = function (Members) {
                     'email',
                     'phone',
                     'gender',
-                    'bday'
+                    'bday',
+                    'updatedAt'
                 ],
                 include: [
                     {
@@ -1155,6 +1163,7 @@ module.exports = function (Members) {
                 if (error) {
                     return cb(error);
                 }
+
                 var newResult = [];
                 result.forEach(function (item) {
                     var temp = JSON.parse(JSON.stringify(item));
@@ -1165,7 +1174,8 @@ module.exports = function (Members) {
                         email: temp.email,
                         phone: temp.phone,
                         gender: temp.gender,
-                        bday: temp.bday
+                        bday: temp.bday,
+                        updatedAt: temp.updatedAt
                     }
                     newResult.push(newItem);
                 }, this);
@@ -1271,6 +1281,22 @@ module.exports = function (Members) {
             }
         });
 
+    }
+
+    function search(text, cb) {
+        var filter = {
+            where: {
+                fullName: { like: '%'+ text +'%' }
+            }
+        };
+
+        Members.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            cb(null, result);
+        });
     }
 
 };
