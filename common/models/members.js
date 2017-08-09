@@ -1286,8 +1286,14 @@ module.exports = function (Members) {
     function search(text, cb) {
         var filter = {
             where: {
-                fullName: { like: '%'+ text +'%' }
-            }
+                fullName: { like: '%' + text + '%' }
+            },
+            include: [{
+                relation: 'memberPhotos',
+                scope: {
+                    fields: ['src']
+                }
+            }]
         };
 
         Members.find(filter, function (error, result) {
