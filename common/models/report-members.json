@@ -93,7 +93,26 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "memberPhotos": {
+      "type": "hasOne",
+      "model": "MemberPhoto",
+      "foreignKey": "membersId",
+      "primaryKey": "reportedId"
+    },
+    "reportMember": {
+      "type": "hasOne",
+      "model": "Members",
+      "foreignKey": "id",
+      "primaryKey": "reportedId"
+    },
+    "reportedBy": {
+      "type": "hasOne",
+      "model": "Members",
+      "foreignKey": "id",
+      "primaryKey": "reportId"
+    }
+  },
   "acls": [
     {
       "accessType": "*",
