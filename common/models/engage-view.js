@@ -57,7 +57,8 @@ module.exports = function (Engageview) {
                         fields: ['id', 'fullName', 'email', 'gender', 'phone']
                     }
                 }
-            ]
+            ],
+            order: 'lastOnline DESC'
         };
 
         return Engageview.find(filter, function (error, result) {
