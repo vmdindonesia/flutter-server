@@ -39,10 +39,20 @@ module.exports = function (Engageview) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Engageview.remoteMethod('getUnrespondedMatch', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'userId', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     Engageview.getUser = getUser;
     Engageview.getRegisteredUser = getRegisteredUser;
     Engageview.getUnrespondedChat = getUnrespondedChat;
     Engageview.getUnrespondedLike = getUnrespondedLike;
+    Engageview.getUnrespondedMatch = getUnrespondedMatch;
 
     function getUser(options, cb) {
         var token = options.accessToken;
@@ -104,20 +114,61 @@ module.exports = function (Engageview) {
     }
 
     function getUnrespondedChat(userId, options, cb) {
-        var Matchmember = app.models.MatchMember;
 
-        var where = {
-            membersId: userId,
-            updateDate: null
-        };
-
-        return Matchmember.count(where, function (error, result) {
+        return getMatchIdList(userId, function (error, result) {
             if (error) {
                 return cb(error);
             }
 
-            return cb(null, result);
-        });
+            var Matchmember = app.models.MatchMember;
+            var filter = {
+                fields: ['membersId', 'isRead'],
+                where: {
+                    matchId: { inq: result },
+                    membersId: userId,
+                    isRead: 1
+                },
+                include: [
+                    { relation: 'members' }
+                ]
+            }
+
+            return Matchmember.find(filter, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                var tempList = [];
+                result.forEach(function (item) {
+                    if ('members' in item) {
+                        tempList.push(item);
+                    }
+                }, this);
+                return cb(null, tempList.length);
+            });
+
+        })
+
+
+        function getMatchIdList(userId, callback) {
+            var Matchmember = app.models.MatchMember;
+            var filter = {
+                fields: ['matchId'],
+                where: {
+                    membersId: userId
+                }
+            }
+
+            return Matchmember.find(filter, function (error, result) {
+                if (error) {
+                    return callback(error);
+                }
+                var matchIdList = []
+                result.forEach(function (item) {
+                    matchIdList.push(item.matchId);
+                }, this);
+                return callback(null, matchIdList);
+            });
+        }
     }
 
     function getUnrespondedLike(userId, options, cb) {
@@ -128,7 +179,7 @@ module.exports = function (Engageview) {
         var matchUserIdList = [];
         var dislikeUserIdList = [];
 
-        return getdislikeUserIdList(function (result) {
+        return getDislikeUserIdList(function (result) {
             dislikeUserIdList = result;
             return getMatchUserIdList(function (result) {
                 matchUserIdList = result;
@@ -156,7 +207,7 @@ module.exports = function (Engageview) {
 
         }
 
-        function getdislikeUserIdList(callback) {
+        function getDislikeUserIdList(callback) {
             var filter = {
                 fields: ['dislikeMamber'],
                 where: {
@@ -184,6 +235,24 @@ module.exports = function (Engageview) {
                 return callback(result);
             });
         }
+
+    }
+
+    function getUnrespondedMatch(userId, options, cb) {
+        var Matchmember = app.models.MatchMember;
+
+        var where = {
+            membersId: userId,
+            updateDate: null
+        };
+
+        return Matchmember.count(where, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            return cb(null, result);
+        });
 
     }
 
