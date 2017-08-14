@@ -162,11 +162,6 @@
       "type": "belongsTo",
       "model": "Members",
       "foreignKey": "membersId"
-    },
-    "reportMembers": {
-      "type": "belongsTo",
-      "model": "ReportMembers",
-      "foreignKey": "reportedId"
     }
   },
   "acls": [],
