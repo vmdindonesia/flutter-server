@@ -32,12 +32,22 @@ module.exports = function (Block) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Block.remoteMethod('getAdminBlockList', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     Block.addBlock = addBlock;
     Block.getMemberIdBlockMeList = getMemberIdBlockMeList;
     Block.getMemberIdBlockList = getMemberIdBlockList;
     Block.getExcludeBlock = getExcludeBlock;
     Block.getBlockList = getBlockList;
     Block.removeBlock = removeBlock;
+    Block.getAdminBlockList = getAdminBlockList;
 
     function addBlock(targetId, options, cb) {
 
@@ -247,4 +257,36 @@ module.exports = function (Block) {
 
     }
 
+    function getAdminBlockList(limit, offset, cb) {
+        var filter = {
+            fields: ['blockId', 'memberId', 'targetId', 'createdAt', 'updatedAt'],
+            include: [{
+                relation: 'members',
+                scope: {
+                    fields: ['fullName']
+                }
+            }, {
+                relation: 'memberPhotos',
+                scope: {
+                    fields: ['src']
+                }
+            }, {
+                relation: 'blockedBy',
+                scope: {
+                    fields: ['fullName']
+                }
+            }],
+            limit: limit,
+            offset: offset,
+            order: 'createdAt DESC'
+        }
+
+        Block.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            cb(null, result);
+        });
+    }
 };

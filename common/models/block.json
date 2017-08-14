@@ -167,6 +167,18 @@
       "type": "belongsTo",
       "model": "Members",
       "foreignKey": "targetId"
+    },
+    "memberPhotos": {
+      "type": "hasOne",
+      "model": "MemberPhoto",
+      "foreignKey": "membersId",
+      "primaryKey": "targetId"
+    },
+    "blockedBy": {
+      "type": "hasOne",
+      "model": "Members",
+      "foreignKey": "id",
+      "primaryKey": "memberId"
     }
   },
   "acls": [
