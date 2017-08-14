@@ -363,6 +363,28 @@ module.exports = function (Members) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    // BADMIN
+    Members.remoteMethod('getDetailMember', {
+        http: { verb: 'post' },
+        accepts: {
+            arg: 'params',
+            type: 'object',
+            required: true
+        },
+        returns: { arg: 'params', type: 'object', root: true }
+    });
+
+    Members.remoteMethod('updateMember', {
+        http: { verb: 'post' },
+        accepts: {
+            arg: 'params',
+            type: 'object',
+            required: true
+        },
+        returns: { arg: 'params', type: 'object', root: true }
+    });
+    // 
+
     // END REMOTE METHOD ====================================================================
 
     // BEGIN LIST OF FUNCTION ===============================================================
@@ -384,6 +406,8 @@ module.exports = function (Members) {
     Members.getMemberList = getMemberList;
     Members.getUserData = getUserData;
     Members.search = search;
+    Members.getDetailMember = getDetailMember;
+    Members.updateMember = updateMember;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -1305,4 +1329,35 @@ module.exports = function (Members) {
         });
     }
 
+    function getDetailMember(params, cb) {
+        Members.findOne({
+            where: { id: params.memberid }
+        }, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            cb(null, result);
+        })
+    }
+
+    function updateMember(params, cb) {
+        let data = params.data;
+        console.log(params.dataid)
+        Members.updateAll({
+            id: params.dataid
+        }, {
+                fullName: data.txtFullName,
+                email: data.txtEmail,
+                gender: data.selGender,
+                bday: data.selBday,
+                phone: data.txtPhone
+            }, function (error, req) {
+                if (error) {
+                    return cb(error);
+                }
+
+                cb(null, req);
+            });
+    }
 };
