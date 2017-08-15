@@ -287,5 +287,9 @@
   "FilterViewStatistic": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "Statistic": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
