@@ -164,7 +164,11 @@ module.exports = function (Likelist) {
 
                 var newLike = {
                     likeUser: currentUserId,
-                    likeMember: likedUserId
+                    likeMember: likedUserId,
+                    createdAt: dateNow,
+                    createdBy: currentUserId,
+                    updatedAt: dateNow,
+                    updatedBy: currentUserId
                 };
 
                 Likelist.create(newLike, { transaction: tx }, function (error, result) {
@@ -242,7 +246,10 @@ module.exports = function (Likelist) {
 
                 var newMatches = {
                     title: 'chat',
-                    createAt: dateNow
+                    createdAt: dateNow,
+                    createdBy: currentUserId,
+                    updatedAt: dateNow,
+                    updatedBy: currentUserId
                 };
                 Matches.create(newMatches, { transaction: tx }, function (error, result) {
                     if (error) {
