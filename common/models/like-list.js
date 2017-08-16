@@ -116,6 +116,8 @@ module.exports = function (Likelist) {
 
     function doLike(userId, options, cb) {
 
+        var Dislikelist = app.models.DislikeList;
+
         var token = options.accessToken;
         var currentUserId = token.userId;
         var likedUserId = userId;
@@ -229,9 +231,24 @@ module.exports = function (Likelist) {
                                 findMatchMember();
                             }
                         } else {
-                            Pushnotification.like(currentUserId, likedUserId);
-                            return tx.commit(function (err) {
-                                return cb(null, false, {});
+                            Dislikelist.findOne({
+                                dislikeMambers: currentUserId,
+                                dislikeUser: likedUserId
+                            }, function (error, result) {
+                                if (error) {
+                                    return tx.rollback(function (err) {
+                                        if (err) {
+                                            return cb(err);
+                                        }
+                                        return cb(error);
+                                    });
+                                }
+                                if (!result) {
+                                    Pushnotification.like(currentUserId, likedUserId);
+                                }
+                                return tx.commit(function (err) {
+                                    return cb(null, false, {});
+                                });
                             });
                         }
                     }
