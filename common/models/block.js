@@ -41,6 +41,13 @@ module.exports = function (Block) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Block.remoteMethod('search', {
+        http: { verb: 'post' },
+        accepts: { arg: 'search', type: 'string', required: true },
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
+
     Block.addBlock = addBlock;
     Block.getMemberIdBlockMeList = getMemberIdBlockMeList;
     Block.getMemberIdBlockList = getMemberIdBlockList;
@@ -48,6 +55,7 @@ module.exports = function (Block) {
     Block.getBlockList = getBlockList;
     Block.removeBlock = removeBlock;
     Block.getAdminBlockList = getAdminBlockList;
+    Block.search = search;
 
     function addBlock(targetId, options, cb) {
 
@@ -287,6 +295,49 @@ module.exports = function (Block) {
             }
 
             cb(null, result);
+        });
+    }
+
+    function search(text, cb) {
+
+        var filter = {
+            fields: ['blockId', 'memberId', 'targetId', 'createdAt', 'updatedAt'],
+            include: [{
+                relation: 'members',
+                scope: {
+                    where: {
+                        fullName: { like: '%' + text + '%' }
+                    },
+                    fields: ['fullName']
+                }
+            }, {
+                relation: 'memberPhotos',
+                scope: {
+                    fields: ['src']
+                }
+            }, {
+                relation: 'blockedBy',
+                scope: {
+                    fields: ['fullName']
+                }
+            }],
+            order: 'createdAt DESC'
+        }
+
+        Block.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            var blockList = [];
+
+            result.forEach(function (item) {
+                item = JSON.parse(JSON.stringify(item));
+                if ('members' in item) {
+                    blockList.push(item);
+                }
+            }, this);
+            
+            cb(null, blockList);
         });
     }
 };
