@@ -8,7 +8,7 @@ module.exports = function (Statistic) {
     Statistic.remoteMethod('getNewRegisterNumber', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'days', type: 'number', required: true },
+            { arg: 'days', type: 'string', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -17,7 +17,7 @@ module.exports = function (Statistic) {
     Statistic.remoteMethod('getLikeListNumber', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'days', type: 'number', required: true },
+            { arg: 'days', type: 'string', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -26,7 +26,7 @@ module.exports = function (Statistic) {
     Statistic.remoteMethod('getMatchNumber', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'days', type: 'number', required: true },
+            { arg: 'days', type: 'string', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -40,8 +40,10 @@ module.exports = function (Statistic) {
     // LIST OF FUNCTION ============================================
     function getNewRegisterNumber(days, options, cb) {
         var Members = app.models.Members;
-        var startDate = moment().subtract(days, 'days').endOf('day');
-        var endDate = moment().endOf('day');
+
+        var day = days.split("/");
+        var startDate = moment().startOf('month').startOf('hour').year(day[1]).month(day[0]);
+        var endDate = moment().endOf('month').startOf('hour').year(day[1]).month(day[0]);
 
         var where = {
             createdAt: { between: [startDate, endDate] }
@@ -58,8 +60,10 @@ module.exports = function (Statistic) {
 
     function getLikeListNumber(days, options, cb) {
         var Likelist = app.models.LikeList;
-        var startDate = moment().subtract(days, 'days').endOf('day');
-        var endDate = moment().endOf('day');
+        
+        var day = days.split("/");
+        var startDate = moment().startOf('month').startOf('hour').year(day[1]).month(day[0]);
+        var endDate = moment().endOf('month').startOf('hour').year(day[1]).month(day[0]);
 
         var where = {
             createdAt: { between: [startDate, endDate] }
@@ -76,8 +80,10 @@ module.exports = function (Statistic) {
 
     function getMatchNumber(days, options, cb) {
         var Matches = app.models.Matches;
-        var startDate = moment().subtract(days, 'days').endOf('day');
-        var endDate = moment().endOf('day');
+        
+        var day = days.split("/");
+        var startDate = moment().startOf('month').startOf('hour').year(day[1]).month(day[0]);
+        var endDate = moment().endOf('month').startOf('hour').year(day[1]).month(day[0]);
 
         var where = {
             createdAt: { between: [startDate, endDate] }
