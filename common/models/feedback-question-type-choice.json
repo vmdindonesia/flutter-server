@@ -119,6 +119,11 @@
       "type": "belongsTo",
       "model": "FeedbackChoice",
       "foreignKey": "feedbackChoiceId"
+    },
+    "feedbackMemberAnswers": {
+      "type": "hasMany",
+      "model": "FeedbackMemberAnswer",
+      "foreignKey": "feedbackQuestionTypeChoiceId"
     }
   },
   "acls": [

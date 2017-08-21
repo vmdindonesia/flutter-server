@@ -93,7 +93,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "feedbackQuestionTypeChoice": {
+      "type": "belongsTo",
+      "model": "FeedbackQuestionTypeChoice",
+      "foreignKey": "feedbackQuestionTypeChoiceId"
+    }
+  },
   "acls": [
     {
       "accessType": "*",
