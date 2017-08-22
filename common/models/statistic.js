@@ -54,58 +54,59 @@ module.exports = function (Statistic) {
     // LIST OF FUNCTION ============================================
     function getNewRegisterNumber(startDate, endDate, options, cb) {
         var Members = app.models.Members;
+        var ds = Members.dataSource;
 
         var startDate = moment(startDate).startOf('day').toDate();
         var endDate = moment(endDate).endOf('day').toDate();
 
-        var where = {
-            createdAt: { between: [startDate, endDate] }
-        }
+        var sql = "SELECT COUNT(*) AS 'countMember', date(created_at) as registerDate FROM Members " +
+            "WHERE deleted_at IS NULL AND(created_at " +
+            "BETWEEN ? AND ?) GROUP BY (registerDate);";
 
-        Members.count(where, function (error, result) {
+        ds.connector.execute(sql, [startDate, endDate], function (error, result) {
             if (error) {
                 return cb(error);
             }
 
-            return cb(null, result);
+            cb(null, result);
         });
     }
 
     function getLikeListNumber(startDate, endDate, options, cb) {
         var Likelist = app.models.LikeList;
+        var ds = Likelist.dataSource;
 
         var startDate = moment(startDate).startOf('day').toDate();
         var endDate = moment(endDate).endOf('day').toDate();
 
-        var where = {
-            createdAt: { between: [startDate, endDate] }
-        }
+        var sql = "SELECT COUNT(*) AS 'countMember', date(created_at) as likeDate FROM Like_list " +
+            "WHERE (created_at BETWEEN ? AND ?) GROUP BY (likeDate);";
 
-        Likelist.count(where, function (error, result) {
+        ds.connector.execute(sql, [startDate, endDate], function (error, result) {
             if (error) {
                 return cb(error);
             }
 
-            return cb(null, result);
+            cb(null, result);
         });
     }
 
     function getMatchNumber(startDate, endDate, options, cb) {
         var Matches = app.models.Matches;
+        var ds = Matches.dataSource;
 
         var startDate = moment(startDate).startOf('day').toDate();
         var endDate = moment(endDate).endOf('day').toDate();
 
-        var where = {
-            createdAt: { between: [startDate, endDate] }
-        }
+        var sql = "SELECT COUNT(*) AS 'countMember', date(created_at) as matchDate FROM Matches " +
+            "WHERE (created_at BETWEEN ? AND ?) GROUP BY (matchDate);";
 
-        Matches.count(where, function (error, result) {
+        ds.connector.execute(sql, [startDate, endDate], function (error, result) {
             if (error) {
                 return cb(error);
             }
 
-            return cb(null, result);
+            cb(null, result);
         });
     }
 
