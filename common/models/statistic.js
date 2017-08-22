@@ -8,7 +8,8 @@ module.exports = function (Statistic) {
     Statistic.remoteMethod('getNewRegisterNumber', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'days', type: 'string', required: true },
+            { arg: 'startDate', type: 'date', required: true },
+            { arg: 'endDate', type: 'date', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -17,7 +18,8 @@ module.exports = function (Statistic) {
     Statistic.remoteMethod('getLikeListNumber', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'days', type: 'string', required: true },
+            { arg: 'startDate', type: 'date', required: true },
+            { arg: 'endDate', type: 'date', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -26,7 +28,18 @@ module.exports = function (Statistic) {
     Statistic.remoteMethod('getMatchNumber', {
         http: { verb: 'get' },
         accepts: [
-            { arg: 'days', type: 'string', required: true },
+            { arg: 'startDate', type: 'date', required: true },
+            { arg: 'endDate', type: 'date', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
+    Statistic.remoteMethod('getGenderNumber', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'startDate', type: 'date', required: true },
+            { arg: 'endDate', type: 'date', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -36,14 +49,14 @@ module.exports = function (Statistic) {
     Statistic.getNewRegisterNumber = getNewRegisterNumber;
     Statistic.getLikeListNumber = getLikeListNumber;
     Statistic.getMatchNumber = getMatchNumber;
+    Statistic.getGenderNumber = getGenderNumber;
 
     // LIST OF FUNCTION ============================================
-    function getNewRegisterNumber(days, options, cb) {
+    function getNewRegisterNumber(startDate, endDate, options, cb) {
         var Members = app.models.Members;
 
-        var day = days.split("/");
-        var startDate = moment().startOf('month').startOf('hour').year(day[1]).month(day[0]);
-        var endDate = moment().endOf('month').startOf('hour').year(day[1]).month(day[0]);
+        var startDate = moment(startDate).startOf('day').toDate();
+        var endDate = moment(endDate).endOf('day').toDate();
 
         var where = {
             createdAt: { between: [startDate, endDate] }
@@ -58,12 +71,11 @@ module.exports = function (Statistic) {
         });
     }
 
-    function getLikeListNumber(days, options, cb) {
+    function getLikeListNumber(startDate, endDate, options, cb) {
         var Likelist = app.models.LikeList;
-        
-        var day = days.split("/");
-        var startDate = moment().startOf('month').startOf('hour').year(day[1]).month(day[0]);
-        var endDate = moment().endOf('month').startOf('hour').year(day[1]).month(day[0]);
+
+        var startDate = moment(startDate).startOf('day').toDate();
+        var endDate = moment(endDate).endOf('day').toDate();
 
         var where = {
             createdAt: { between: [startDate, endDate] }
@@ -78,12 +90,11 @@ module.exports = function (Statistic) {
         });
     }
 
-    function getMatchNumber(days, options, cb) {
+    function getMatchNumber(startDate, endDate, options, cb) {
         var Matches = app.models.Matches;
-        
-        var day = days.split("/");
-        var startDate = moment().startOf('month').startOf('hour').year(day[1]).month(day[0]);
-        var endDate = moment().endOf('month').startOf('hour').year(day[1]).month(day[0]);
+
+        var startDate = moment(startDate).startOf('day').toDate();
+        var endDate = moment(endDate).endOf('day').toDate();
 
         var where = {
             createdAt: { between: [startDate, endDate] }
@@ -95,6 +106,37 @@ module.exports = function (Statistic) {
             }
 
             return cb(null, result);
+        });
+    }
+
+
+    function getGenderNumber(startDate, endDate, options, cb) {
+        var Members = app.models.Members;
+        var ds = Members.dataSource;
+
+        var startDate = moment(startDate).startOf('day').toDate();
+        var endDate = moment(endDate).endOf('day').toDate();
+
+        var sql = "SELECT COUNT(gender) AS 'countGender', gender FROM Members " +
+            "WHERE gender IS NOT NULL AND deleted_at IS NULL AND(created_at " +
+            "BETWEEN ? AND ?) GROUP BY (gender);";
+
+        ds.connector.execute(sql, [startDate, endDate], function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            var newResult =  result;
+
+            result.forEach(function(data, index) {
+                if (data.gender == 0) {
+                    newResult[index]['genderName'] = 'Male'
+                } else {
+                    newResult[index]['genderName'] = 'Female'
+                }
+            }, this);
+
+            cb(null, newResult);
         });
     }
 
