@@ -27,8 +27,21 @@ module.exports = function (Feedbackmemberanswer) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Feedbackmemberanswer.remoteMethod('getComment', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'platforms', type: 'array', required: true },
+            { arg: 'versions', type: 'array', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     Feedbackmemberanswer.addAnswer = addAnswer;
     Feedbackmemberanswer.getSummary = getSummary;
+    Feedbackmemberanswer.getComment = getComment;
 
     function addAnswer(answer, options, cb) {
         var Feedbackquestiontypechoice = app.models.FeedbackQuestionTypeChoice;
@@ -140,6 +153,48 @@ module.exports = function (Feedbackmemberanswer) {
             });
             return cb(null, newResult);
         });
+
+    }
+
+    function getComment(limit, offset, platforms, versions, options, cb) {
+
+        var Feedback = app.models.Feedback;
+
+        var andList = [];
+
+        if (platforms.length > 0) {
+            andList.push({
+                appPlatform: { inq: platforms }
+            });
+        }
+
+        if (versions.length > 0) {
+            andList.push({
+                appVersion: { inq: versions }
+            });
+        }
+
+        var filter = {
+            where: {
+                and: andList
+            },
+            limit: limit,
+            skip: offset,
+            order: 'createdAt DESC'
+        };
+
+        return Feedback.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            // result = JSON.parse(JSON.stringify(result));
+            // result = lodash.groupBy(result, 'appPlatform');
+            // result = lodash.mapValues(result, function (o) {
+            //     return lodash.groupBy(o, 'appVersion');
+            // });
+            return cb(null, result);
+        });
+
 
     }
 
