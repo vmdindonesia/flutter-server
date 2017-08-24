@@ -3,6 +3,7 @@
 module.exports = function (Statistic) {
     var app = require('../../server/server');
     var moment = require('moment');
+    var lodash = require('lodash');
 
     // LIST OF REMOTE METHOD ============================================
     Statistic.remoteMethod('getNewRegisterNumber', {
@@ -56,18 +57,39 @@ module.exports = function (Statistic) {
         var Members = app.models.Members;
         var ds = Members.dataSource;
 
-        var startDate = moment(startDate).startOf('day').toDate();
-        var endDate = moment(endDate).endOf('day').toDate();
+        startDate = moment(startDate).format("YYYY-MM-DD");
+        endDate = moment(endDate).format("YYYY-MM-DD");
 
-        var sql = "SELECT COUNT(*) AS 'countMember', date(created_at) as registerDate FROM Members " +
+        var sql = "SELECT COUNT(*) AS 'countMember', gender, date(created_at) as registerDate FROM Members " +
             "WHERE deleted_at IS NULL AND(created_at " +
-            "BETWEEN ? AND ?) GROUP BY (registerDate);";
+            "BETWEEN ? AND ?) GROUP BY registerDate, gender;";
 
         ds.connector.execute(sql, [startDate, endDate], function (error, result) {
             if (error) {
                 return cb(error);
             }
 
+            result = JSON.parse(JSON.stringify(result));
+            result = lodash.groupBy(result, 'registerDate');
+            result = lodash.mapValues(result, function (o) {
+                if (o.length == 1) {
+                    var newGender = undefined;
+                    if (o[0].gender == 0) {
+                        newGender = 1;
+                    } else {
+                        newGender = 0;
+                    };
+                    o.push({
+                        countMember: 0,
+                        gender: newGender
+                    });
+                }
+                var temp = lodash.groupBy(o, 'gender');
+                return lodash.mapValues(temp, function (o) {
+                    return o[0].countMember;
+                })
+            });
+            
             cb(null, result);
         });
     }
@@ -127,9 +149,9 @@ module.exports = function (Statistic) {
                 return cb(error);
             }
 
-            var newResult =  result;
+            var newResult = result;
 
-            result.forEach(function(data, index) {
+            result.forEach(function (data, index) {
                 if (data.gender == 0) {
                     newResult[index]['genderName'] = 'Male'
                 } else {
