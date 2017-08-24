@@ -178,6 +178,18 @@ module.exports = function (Feedbackmemberanswer) {
             where: {
                 and: andList
             },
+            include: {
+                relation: 'members',
+                scope: {
+                    fields: ['fullName'],
+                    include: {
+                        relation: 'memberPhotos',
+                        scope: {
+                            fields: ['src']
+                        }
+                    }
+                }
+            },
             limit: limit,
             skip: offset,
             order: 'createdAt DESC'
