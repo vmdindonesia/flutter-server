@@ -5,7 +5,8 @@ module.exports = {
     like: like,
     chat: chat,
     match: match,
-    cs: cs
+    cs: cs,
+    reject: reject
 };
 
 var commonConst = require('./common-const');
@@ -198,5 +199,21 @@ function cs(senderUserId, recipientUserId, text, data) {
         // large_icon: image_path + data.memberPhotos.src
     };
 
+    send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
+}
+
+
+function reject(recipientUserId,data){
+    var message = {
+        app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+        contents: { en: 'Your verification request rejected.', id: 'Permintaan verifikasi anda ditolak.' },
+        filters: [
+            { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
+        ],
+        data: {
+            tag: 'reject',
+            params: data
+        }
+    };
     send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
 }

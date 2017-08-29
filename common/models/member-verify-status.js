@@ -105,11 +105,33 @@ module.exports = function (Memberverifystatus) {
         returns: { arg: 'status', type: 'boolean' }
     });
 
+    Memberverifystatus.remoteMethod('adminApproveVerify', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'targetId', type: 'number', required: true },
+            { arg: 'targetVerify', type: 'string', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
+    Memberverifystatus.remoteMethod('adminRejectVerify', {
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'targetId', type: 'number', required: true },
+            { arg: 'targetVerify', type: 'string', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     Memberverifystatus.getVerifyStatusByUserId = getVerifyStatusByUserId;
     Memberverifystatus.getVerifyScoreByUserId = getVerifyScoreByUserId;
     Memberverifystatus.changeVerifyStatus = changeVerifyStatus;
     Memberverifystatus.isUserNeedVerify = isUserNeedVerify;
     Memberverifystatus.sendEmailVerification = sendEmailVerification;
+    Memberverifystatus.adminApproveVerify = adminApproveVerify;
+    Memberverifystatus.adminRejectVerify = adminRejectVerify;
 
     function getVerifyStatusByUserId(userId, cb) {
         var Members = app.models.Members;
@@ -217,27 +239,62 @@ module.exports = function (Memberverifystatus) {
     }
 
     function changeVerifyStatus(userId, key, value, cb) {
+        var Adminverify = app.models.AdminVerify;
+
+        var dateNow = new Date();
+
         var filter = {
             where: {
                 userId: userId
             }
         }
-        Memberverifystatus.find(filter, function (error, result) {
+        return Memberverifystatus.findOne(filter, function (error, result) {
             if (error) {
-                cb(null, 'FAIL', undefined, error);
-            } else {
-                var someData = result[0];
-                someData[key] = value;
-                someData['updateAt'] = new Date();
-                Memberverifystatus.upsert(someData, function (error, result) {
-                    if (error) {
-                        cb(null, 'FAIL', undefined, error);
-                    } else {
-                        cb(null, 'OK', result);
-                    }
-                });
+                return cb(error);
             }
+            var data = {
+                updateAt: dateNow
+            };
+            data[key] = value;
+            return result.updateAtrributes(data, function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+                var newAdminVerify = {
+                    updatedAt: dateNow,
+                    createdAt: dateNow,
+                    updatedBy: userId,
+                    createdBy: userId,
+                    memberId: userId,
+                    verifyType: key
+                }
+                var newStatus = result;
+                return Adminverify.create(newAdminVerify, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    return cb(null, newStatus);
+                });
+            });
+
         });
+        // Memberverifystatus.find(filter, function (error, result) {
+        //     if (error) {
+        //         cb(null, 'FAIL', undefined, error);
+        //     } else {
+        //         var someData = result[0];
+        //         someData[key] = value;
+        //         someData['updateAt'] = new Date();
+        //         Memberverifystatus.upsert(someData, function (error, result) {
+        //             if (error) {
+        //                 cb(null, 'FAIL', undefined, error);
+        //             } else {
+
+        //                 cb(null, 'OK', result);
+        //             }
+        //         });
+        //     }
+        // });
     }
 
     var sendNotification = function (data) {
@@ -349,6 +406,79 @@ module.exports = function (Memberverifystatus) {
 
 
 
+
+    }
+
+    function adminApproveVerify(targetId, targetVerify, options, cb) {
+
+        var filter = {
+            where: {
+                userId: targetId
+            }
+        }
+
+        return Memberverifystatus.findOne(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            } else if (result) {
+                var dateNow = new Date();
+                var data = {
+                    updatedAt: dateNow
+                }
+                data[targetVerify] = 1;
+                return result.updateAttribute(data, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    return cb(null, result);
+                });
+            } else {
+                var error = {
+                    name: 'Target ID not Found',
+                    status: 404,
+                    message: 'Target Id not found : ' + targetId
+                }
+                return cb(error);
+            }
+        });
+
+    }
+
+    function adminRejectVerify(targetId, targetVerify, options, cb) {
+
+        var push = require('../push-notification');
+
+        var filter = {
+            where: {
+                userId: targetId
+            }
+        }
+
+        return Memberverifystatus.findOne(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            } else if (result) {
+                var dateNow = new Date();
+                var data = {
+                    updatedAt: dateNow
+                }
+                data[targetVerify] = 3;
+                return result.updateAttribute(data, function (error, result) {
+                    if (error) {
+                        return cb(error);
+                    }
+                    push.reject(targetId, {});
+                    return cb(null, result);
+                });
+            } else {
+                var error = {
+                    name: 'Target ID not Found',
+                    status: 404,
+                    message: 'Target Id not found : ' + targetId
+                }
+                return cb(error);
+            }
+        });
 
     }
 
