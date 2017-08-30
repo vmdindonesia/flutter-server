@@ -26,6 +26,38 @@
       },
       "_selectable": false
     },
+    "verifiedBy": {
+      "type": "Number",
+      "required": true,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "verified_by",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "verifiedAt": {
+      "type": "Date",
+      "required": true,
+      "length": null,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "verified_at",
+        "dataType": "datetime",
+        "dataLength": null,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
     "verifyType": {
       "type": "String",
       "required": true,
@@ -38,6 +70,22 @@
         "dataLength": 20,
         "dataPrecision": null,
         "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
+    "verifyStatus": {
+      "type": "Number",
+      "required": true,
+      "length": null,
+      "precision": 10,
+      "scale": 0,
+      "mysql": {
+        "columnName": "verify_status",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 10,
+        "dataScale": 0,
         "nullable": "N"
       },
       "_selectable": false
@@ -138,6 +186,22 @@
       },
       "_selectable": true
     },
+    "verifyImg": {
+      "type": "String",
+      "required": true,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "verify_img",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "N"
+      },
+      "_selectable": false
+    },
     "adminVerifyId": {
       "type": "Number",
       "id": true,
@@ -157,18 +221,7 @@
     }
   },
   "validations": [],
-  "relations": {
-    "members": {
-      "type": "belongsTo",
-      "model": "Members",
-      "foreignKey": "memberId"
-    },
-    "memberPhotos": {
-      "type": "hasOne",
-      "model": "MemberPhoto",
-      "foreignKey": "memberId"
-    }
-  },
+  "relations": {},
   "acls": [],
   "methods": {}
 }
