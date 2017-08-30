@@ -43,7 +43,7 @@ module.exports = function (Adminverify) {
                 'createAt'
             ],
             where: {
-                or: orList
+                or: orList,
             },
             include: [{
                 relation: 'memberPhotos',
@@ -56,7 +56,10 @@ module.exports = function (Adminverify) {
                         'businessCard'
                     ]
                 }
-            }]
+            }],
+            limit: limit,
+            skip: offset,
+            order: 'updateAt DESC'
         }
 
         return Memberverifystatus.find(filter, function (error, result) {
