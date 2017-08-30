@@ -173,7 +173,14 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "memberPhotos": {
+      "type": "hasOne",
+      "model": "MemberPhoto",
+      "foreignKey": "membersId",
+      "primaryKey": "userId"
+    }
+  },
   "acls": [
     {
       "accessType": "*",

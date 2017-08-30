@@ -110,6 +110,7 @@ module.exports = function (Memberverifystatus) {
         accepts: [
             { arg: 'targetId', type: 'number', required: true },
             { arg: 'targetVerify', type: 'string', required: true },
+            { arg: 'verifyImg', type: 'string', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -120,6 +121,7 @@ module.exports = function (Memberverifystatus) {
         accepts: [
             { arg: 'targetId', type: 'number', required: true },
             { arg: 'targetVerify', type: 'string', required: true },
+            { arg: 'verifyImg', type: 'string', required: true },
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
@@ -239,8 +241,6 @@ module.exports = function (Memberverifystatus) {
     }
 
     function changeVerifyStatus(userId, key, value, cb) {
-        var Adminverify = app.models.AdminVerify;
-
         var dateNow = new Date();
 
         var filter = {
@@ -260,21 +260,7 @@ module.exports = function (Memberverifystatus) {
                 if (error) {
                     return cb(error);
                 }
-                var newAdminVerify = {
-                    updatedAt: dateNow,
-                    createdAt: dateNow,
-                    updatedBy: userId,
-                    createdBy: userId,
-                    memberId: userId,
-                    verifyType: key
-                }
-                var newStatus = result;
-                return Adminverify.create(newAdminVerify, function (error, result) {
-                    if (error) {
-                        return cb(error);
-                    }
-                    return cb(null, newStatus);
-                });
+                return cb(null, result);
             });
 
         });
@@ -409,7 +395,14 @@ module.exports = function (Memberverifystatus) {
 
     }
 
-    function adminApproveVerify(targetId, targetVerify, options, cb) {
+    function adminApproveVerify(targetId, targetVerify, verifyImg, options, cb) {
+
+        var Adminverify = app.models.AdminVerify;
+
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var dateNow = new Date();
 
         var filter = {
             where: {
@@ -421,16 +414,50 @@ module.exports = function (Memberverifystatus) {
             if (error) {
                 return cb(error);
             } else if (result) {
-                var dateNow = new Date();
-                var data = {
-                    updatedAt: dateNow
-                }
-                data[targetVerify] = 1;
-                return result.updateAttribute(data, function (error, result) {
+                return Memberverifystatus.beginTransaction({
+                    isolationLevel: Memberverifystatus.Transaction.READ_COMMITTED
+                }, function (error, tx) {
                     if (error) {
                         return cb(error);
                     }
-                    return cb(null, result);
+                    var data = {
+                        updatedAt: dateNow
+                    }
+                    data[targetVerify] = 1;
+                    return result.updateAttributes(data, { transaction: tx }, function (error, result) {
+                        if (error) {
+                            return tx.rollback(function (err) {
+                                tx.close(err);
+                                return cb(error);
+                            });
+                        }
+                        var newLog = {
+                            memberId: targetId,
+                            verifiedBy: userId,
+                            verifiedAt: dateNow,
+                            verifyType: targetVerify,
+                            verifyStatus: 1,
+                            verifyImg: verifyImg,
+                            createdAt: dateNow,
+                            createdBy: userId,
+                            updatedAt: dateNow,
+                            updatedBy: userId
+                        }
+                        return Adminverify.create(newLog, { transaction: tx }, function (error, result) {
+                            if (error) {
+                                return tx.rollback(function (err) {
+                                    tx.close(err);
+                                    return cb(error);
+                                });
+                            }
+                            return tx.commit(function (err) {
+                                tx.close(err);
+                                return cb(null, result);
+                            });
+                        });
+
+                    })
+
                 });
             } else {
                 var error = {
@@ -444,9 +471,11 @@ module.exports = function (Memberverifystatus) {
 
     }
 
-    function adminRejectVerify(targetId, targetVerify, options, cb) {
+    function adminRejectVerify(targetId, targetVerify, verifyImg, options, cb) {
 
         var push = require('../push-notification');
+
+        var dateNow = new Date();
 
         var filter = {
             where: {
@@ -458,17 +487,52 @@ module.exports = function (Memberverifystatus) {
             if (error) {
                 return cb(error);
             } else if (result) {
-                var dateNow = new Date();
-                var data = {
-                    updatedAt: dateNow
-                }
-                data[targetVerify] = 3;
-                return result.updateAttribute(data, function (error, result) {
+
+                return Memberverifystatus.beginTransaction({
+                    isolationLevel: Memberverifystatus.Transaction.READ_COMMITTED
+                }, function (error, tx) {
                     if (error) {
                         return cb(error);
                     }
-                    push.reject(targetId, {});
-                    return cb(null, result);
+                    var data = {
+                        updatedAt: dateNow
+                    }
+                    data[targetVerify] = 3;
+                    return result.updateAttributes(data, { transaction: tx }, function (error, result) {
+                        if (error) {
+                            return tx.rollback(function (err) {
+                                tx.close(err);
+                                return cb(error);
+                            });
+                        }
+                        // push.reject(targetId, {});
+                        var newLog = {
+                            memberId: targetId,
+                            verifiedBy: userId,
+                            verifiedAt: dateNow,
+                            verifyType: targetVerify,
+                            verifyStatus: 1,
+                            verifyImg: verifyImg,
+                            createdAt: dateNow,
+                            createdBy: userId,
+                            updatedAt: dateNow,
+                            updatedBy: userId
+                        }
+                        return Adminverify.create(newLog, { transaction: tx }, function (error, result) {
+                            if (error) {
+                                return tx.rollback(function (err) {
+                                    tx.close(err);
+                                    return cb(error);
+                                });
+                            }
+                            return tx.commit(function (err) {
+                                tx.close(err);
+                                return cb(null, result);
+                            });
+                        });
+                    });
+
+
                 });
             } else {
                 var error = {
