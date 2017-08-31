@@ -427,7 +427,7 @@ module.exports = function (Memberverifystatus) {
                     return result.updateAttributes(data, { transaction: tx }, function (error, result) {
                         if (error) {
                             return tx.rollback(function (err) {
-                                tx.close(err);
+                                // tx.close(err);
                                 return cb(error);
                             });
                         }
@@ -446,12 +446,12 @@ module.exports = function (Memberverifystatus) {
                         return Adminverify.create(newLog, { transaction: tx }, function (error, result) {
                             if (error) {
                                 return tx.rollback(function (err) {
-                                    tx.close(err);
+                                    // tx.close(err);
                                     return cb(error);
                                 });
                             }
                             return tx.commit(function (err) {
-                                tx.close(err);
+                                // tx.close(err);
                                 return cb(null, result);
                             });
                         });
@@ -472,8 +472,11 @@ module.exports = function (Memberverifystatus) {
     }
 
     function adminRejectVerify(targetId, targetVerify, verifyImg, options, cb) {
-
+        var Adminverify = app.models.AdminVerify;
         var push = require('../push-notification');
+
+        var token = options.accessToken;
+        var userId = token.userId;
 
         var dateNow = new Date();
 
@@ -501,7 +504,7 @@ module.exports = function (Memberverifystatus) {
                     return result.updateAttributes(data, { transaction: tx }, function (error, result) {
                         if (error) {
                             return tx.rollback(function (err) {
-                                tx.close(err);
+                                // tx.close(err);
                                 return cb(error);
                             });
                         }
@@ -511,7 +514,7 @@ module.exports = function (Memberverifystatus) {
                             verifiedBy: userId,
                             verifiedAt: dateNow,
                             verifyType: targetVerify,
-                            verifyStatus: 1,
+                            verifyStatus: 3,
                             verifyImg: verifyImg,
                             createdAt: dateNow,
                             createdBy: userId,
@@ -521,12 +524,12 @@ module.exports = function (Memberverifystatus) {
                         return Adminverify.create(newLog, { transaction: tx }, function (error, result) {
                             if (error) {
                                 return tx.rollback(function (err) {
-                                    tx.close(err);
+                                    // tx.close(err);
                                     return cb(error);
                                 });
                             }
                             return tx.commit(function (err) {
-                                tx.close(err);
+                                // tx.close(err);
                                 return cb(null, result);
                             });
                         });

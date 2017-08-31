@@ -179,6 +179,11 @@
       "model": "MemberPhoto",
       "foreignKey": "membersId",
       "primaryKey": "userId"
+    },
+    "members": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "userId"
     }
   },
   "acls": [
