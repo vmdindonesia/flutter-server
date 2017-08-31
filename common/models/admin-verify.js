@@ -16,7 +16,20 @@ module.exports = function (Adminverify) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Adminverify.remoteMethod('getListStatus', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'flag', type: 'number', required: true },
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     Adminverify.getList = getList;
+    Adminverify.getListStatus = getListStatus;
+
 
     function getList(flag, limit, offset, options, cb) {
 
@@ -74,6 +87,48 @@ module.exports = function (Adminverify) {
 
     }
 
+    function getListStatus(flag, limit, offset, options, cb) {
+        var filter = {
+            fields: [
+                'memberId',
+                'verifiedBy',
+                'verifiedAt',
+                'verifyType',
+                'verifyImg'
+            ], include: [
+                {
+                    relation: 'verifyMemberPhotos',
+                    scope: {
+                        fields: ['src']
+                    }
+                }, {
+                    relation: 'verifyMember',
+                    scope: {
+                        fields: ['fullName']
+                    }
+                },
+                {
+                    relation: 'verifyBy',
+                    scope: {
+                        fields: ['fullName']
+                    }
+                }
+            ],
+            where: {
+                verifyStatus: flag
+            },
+            limit: limit,
+            offset: offset,
+            order: 'verifiedAt DESC'
+        }
 
+        return Adminverify.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            return cb(null, result);
+        });
+
+    }
 
 };
