@@ -226,6 +226,24 @@
       "type": "belongsTo",
       "model": "Members",
       "foreignKey": "memberId"
+    },
+    "verifyMemberPhotos": {
+      "type": "hasOne",
+      "model": "MemberPhoto",
+      "foreignKey": "membersId",
+      "primaryKey": "memberId"
+    },
+    "verifyMember": {
+      "type": "hasOne",
+      "model": "Members",
+      "foreignKey": "id",
+      "primaryKey": "memberId"
+    },
+    "verifyBy": {
+      "type": "hasOne",
+      "model": "Members",
+      "foreignKey": "id",
+      "primaryKey": "verifiedBy"
     }
   },
   "acls": [],
