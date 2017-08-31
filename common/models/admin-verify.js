@@ -49,12 +49,18 @@ module.exports = function (Adminverify) {
                 relation: 'memberPhotos',
                 scope: {
                     fields: [
+                        'src',
                         'ktp',
                         'sim',
                         'schoolCertificate',
                         'passport',
                         'businessCard'
                     ]
+                }
+            }, {
+                relation: 'members',
+                scope: {
+                    fields: ['fullName', 'bday', 'address']
                 }
             }],
             limit: limit,
