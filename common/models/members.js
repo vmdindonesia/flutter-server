@@ -1309,6 +1309,7 @@ module.exports = function (Members) {
 
     function search(text, cb) {
         var filter = {
+            fields: ['id', 'fullName', 'email', 'gender', 'bday', 'phone', 'updatedAt'],
             where: {
                 fullName: { like: '%' + text + '%' }
             },
@@ -1325,7 +1326,23 @@ module.exports = function (Members) {
                 return cb(error);
             }
 
-            cb(null, result);
+            var newResult = [];
+            result.forEach(function (item) {
+                var temp = JSON.parse(JSON.stringify(item));
+                var newItem = {
+                    memberId: temp.id,
+                    fullName: temp.fullName,
+                    avatarImg: (temp.memberPhotos ? temp.memberPhotos.src : null),
+                    email: temp.email,
+                    phone: temp.phone,
+                    gender: temp.gender,
+                    bday: temp.bday,
+                    updatedAt: temp.updatedAt
+                }
+                newResult.push(newItem);
+            }, this);
+
+            cb(null, newResult);
         });
     }
 
