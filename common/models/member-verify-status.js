@@ -13,24 +13,26 @@ module.exports = function (Memberverifystatus) {
         next();
     });
 
-    Memberverifystatus.afterRemote('changeVerifyStatus', function (context, user, next) {
-        var Members = app.models.Members;
-        Members.findById(user.result.userId, function (error, result) {
-            if (error) {
-                console.log('ERROR : ' + error);
-                next();
-            } else {
-                console.log('MEMBERS : ' + JSON.stringify(result));
-                var message = {
-                    app_id: '8267bba1-3ac6-421a-93fb-19e06ff97c79',
-                    contents: { en: result.fullName + ' verify status changed' },
-                    included_segments: ["All"]
-                };
-                sendNotification(message);
-                next();
-            }
-        })
-    });
+    // Memberverifystatus.afterRemote('changeVerifyStatus', function (context, user, next) {
+    //     var Members = app.models.Members;
+    //     console.log(user);
+
+    //     Members.findById(user.result.userId, function (error, result) {
+    //         if (error) {
+    //             console.log('ERROR : ' + error);
+    //             next();
+    //         } else {
+    //             console.log('MEMBERS : ' + JSON.stringify(result));
+    //             var message = {
+    //                 app_id: '8267bba1-3ac6-421a-93fb-19e06ff97c79',
+    //                 contents: { en: result.fullName + ' verify status changed' },
+    //                 included_segments: ["All"]
+    //             };
+    //             sendNotification(message);
+    //             next();
+    //         }
+    //     })
+    // });
 
     Memberverifystatus.afterRemote('getVerifyStatusByUserId', function (context, user, next) {
         var Memberphoto = app.models.MemberPhoto;
@@ -256,7 +258,8 @@ module.exports = function (Memberverifystatus) {
                 updateAt: dateNow
             };
             data[key] = value;
-            return result.updateAtrributes(data, function (error, result) {
+
+            return result.updateAttributes(data, function (error, result) {
                 if (error) {
                     return cb(error);
                 }
