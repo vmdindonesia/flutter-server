@@ -401,6 +401,7 @@ module.exports = function (Memberverifystatus) {
     function adminApproveVerify(targetId, targetVerify, verifyImg, options, cb) {
 
         var Adminverify = app.models.AdminVerify;
+        var push = require('../push-notification');
 
         var token = options.accessToken;
         var userId = token.userId;
@@ -434,6 +435,10 @@ module.exports = function (Memberverifystatus) {
                                 return cb(error);
                             });
                         }
+
+                        // Push notification
+                        push.approve(targetId, {});
+
                         var newLog = {
                             memberId: targetId,
                             verifiedBy: userId,
@@ -511,7 +516,10 @@ module.exports = function (Memberverifystatus) {
                                 return cb(error);
                             });
                         }
-                        // push.reject(targetId, {});
+
+                        // Push notification
+                        push.reject(targetId, {});
+
                         var newLog = {
                             memberId: targetId,
                             verifiedBy: userId,

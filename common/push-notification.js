@@ -6,6 +6,7 @@ module.exports = {
     chat: chat,
     match: match,
     cs: cs,
+    approve: approve,
     reject: reject
 };
 
@@ -202,6 +203,20 @@ function cs(senderUserId, recipientUserId, text, data) {
     send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
 }
 
+function approve(recipientUserId, data) {
+    var message = {
+        app_id: '7e0eb180-9d56-4823-8d89-387c06ae97fd',
+        contents: { en: 'Your verification request approved.', id: 'Permintaan verifikasi anda diterima.' },
+        filters: [
+            { field: 'tag', key: 'userId', relation: '=', value: recipientUserId }
+        ],
+        data: {
+            tag: 'approve',
+            params: data
+        }
+    };
+    send(message, 'ZTNlMGFiOGMtZTk2Yy00OTUxLTkyOWUtNTllNmNmZTE3OTRm');
+}
 
 function reject(recipientUserId,data){
     var message = {
