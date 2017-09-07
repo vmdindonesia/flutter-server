@@ -12,7 +12,7 @@
   "properties": {
     "src": {
       "type": "String",
-      "required": true,
+      "required": false,
       "length": 255,
       "precision": null,
       "scale": null,
@@ -22,7 +22,7 @@
         "dataLength": 255,
         "dataPrecision": null,
         "dataScale": null,
-        "nullable": "N"
+        "nullable": "Y"
       },
       "_selectable": false
     },
@@ -154,7 +154,24 @@
         "nullable": "Y"
       },
       "_selectable": false
+    },
+    "srcTmp": {
+      "type": "String",
+      "required": false,
+      "length": 255,
+      "precision": null,
+      "scale": null,
+      "mysql": {
+        "columnName": "src_tmp",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "dataPrecision": null,
+        "dataScale": null,
+        "nullable": "Y"
+      },
+      "_selectable": false
     }
+
   },
   "validations": [],
   "relations": {
