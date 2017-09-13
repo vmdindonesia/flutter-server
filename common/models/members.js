@@ -383,7 +383,25 @@ module.exports = function (Members) {
         },
         returns: { arg: 'params', type: 'object', root: true }
     });
-    // 
+
+    Members.remoteMethod('getPendingEmail', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
+    Members.remoteMethod('adminApproveEmail', {
+        http: { path: '/adminApproveEmail/:id', verb: 'get' },
+        accepts: [
+            { arg: 'id', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' },
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    })
 
     // END REMOTE METHOD ====================================================================
 
@@ -408,6 +426,8 @@ module.exports = function (Members) {
     Members.search = search;
     Members.getDetailMember = getDetailMember;
     Members.updateMember = updateMember;
+    Members.getPendingEmail = getPendingEmail;
+    Members.adminApproveEmail = adminApproveEmail;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -525,7 +545,6 @@ module.exports = function (Members) {
     }
 
     function register(params, cb) {
-
         Members.beginTransaction({
             isolationLevel: Members.Transaction.READ_COMMITTED
         }, function (error, tx) {
@@ -791,38 +810,6 @@ module.exports = function (Members) {
             cb(null, result);
         })
     }
-
-    // function confirm(uid, token, redirect, res, cb) {
-    //     Members.findById(uid, function (err, user) {
-    //         if (err) {
-    //             cb(err);
-    //         } else {
-    //             if (user && user.verificationToken === token) {
-    //                 user.verificationToken = null;
-    //                 user.emailVerified = true;
-    //                 user.save(function (err) {
-    //                     if (err) {
-    //                         cb(err);
-    //                     } else {
-    //                         cb();
-    //                     }
-    //                 });
-    //             }
-    //             else {
-    //                 if (user) {
-    //                     err = 'This email has already been verified';
-    //                 } else {
-    //                     err = 'User not found';
-    //                 }
-
-    //                 cb(err);
-    //                 res.render('error-verify', {
-    //                     error: err
-    //                 });
-    //             }
-    //         }
-    //     });
-    // };
 
     function passwordReset(param, cb) {
         Members.resetPassword(param, function (err, result) {
@@ -1376,5 +1363,52 @@ module.exports = function (Members) {
 
                 cb(null, req);
             });
+    }
+
+    function getPendingEmail(limit, offset, options, cb) {
+        var filter = {
+            fields: ['id', 'fullName', 'gender', 'bday', 'email'],
+            where: {
+                emailVerified: null
+            },
+            include: {
+                relation: 'memberPhotos',
+                scope: {
+                    fields: ['membersId', 'src', 'srcTmp'],
+                }
+            },
+            limit: limit,
+            skip: offset,
+            order: 'updatedAt DESC'
+        };
+
+        Members.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            cb(null, result)
+        });
+    }
+
+    function adminApproveEmail(id, options, cb) {
+        Members.findById(id, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            var updateAttr = {
+                verificationToken: null,
+                emailVerified: 1
+            };
+
+            result.updateAttributes(updateAttr, function (error, response) {
+                if (error) {
+                    return cb(error);
+                }
+
+                cb(null, response);
+            });
+        });
     }
 };
