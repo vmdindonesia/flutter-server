@@ -934,6 +934,20 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "findById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "getPendingEmail"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "adminApproveEmail"
     }
   ],
   "methods": {}
