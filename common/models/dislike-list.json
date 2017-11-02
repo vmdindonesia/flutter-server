@@ -61,7 +61,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "memberDisLike": {
+      "type": "belongsTo",
+      "model": "Members",
+      "foreignKey": "dislike_mamber"
+    }
+  },
   "acls": [
     {
       "accessType": "*",

@@ -14,6 +14,19 @@ module.exports = function (Dislikelist) {
 
     Dislikelist.doDislike = doDislike;
     Dislikelist.getDislikeMemberIdList = getDislikeMemberIdList;
+    // begin
+    Dislikelist.remoteMethod('doDislikeList', {
+        description: 'View to Dislike List',
+        http: { verb: 'post' },
+        accepts: [
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object' }
+    });
+    Dislikelist.doDislikeList = doDislikeList;
+    // end
 
     function doDislike(userId, options, cb) {
         var token = options.accessToken;
@@ -58,6 +71,64 @@ module.exports = function (Dislikelist) {
 
         });
 
+
+    }
+
+    function doDislikeList(limit, offset, options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            fields: ['dislikeMamber'],
+            where: {
+                dislikeUser: userId
+            },
+            include: {
+                relation: 'memberDisLike',
+                scope: {
+                    fields: [
+                        'id',
+                        'fullName',
+                        'gender',
+                        'about',
+                        'employeeType', //occupation
+                        'income',
+                        'address',
+                        'religion',
+                        'hobby',
+                        'race', //origin
+                        'degree',
+                        'zodiac',
+                        'bday',
+                        'alias',
+                        'updatedAt'
+                    ],
+                    include: [{
+                        relation: 'memberPhotos',
+                        scope: {
+                            fields: ['src']
+                        }
+                    }]
+                }
+            },
+            limit: limit,
+            skip: offset,
+            order: 'id DESC'
+        }
+        Dislikelist.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+            var dislikeList = [];
+
+            result.forEach(function (item) {
+                item = JSON.parse(JSON.stringify(item));
+                dislikeList.push(item.memberDisLike);
+            }, this);
+
+            return cb(null, dislikeList);
+
+        });
 
     }
 
