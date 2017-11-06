@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = function (Memberphoto) {
+    var app = require('../../server/server');
 
     Memberphoto.observe('before save', function (ctx, next) {
         if (ctx.instance == undefined) {
@@ -97,7 +98,26 @@ module.exports = function (Memberphoto) {
                     return cb(error);
                 }
 
-                cb(null, result);
+                // cb(null, result);
+                updateMembers(result, cb);
+            });
+        });
+    }
+
+    function updateMembers(memberPhoto, cb) {
+        var Members = app.models.Members;
+
+        Members.findById(memberPhoto.membersId, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            result.updateAttribute('updatedAt', new Date(), function (error, result) {
+                if (error) {
+                    return cb(error);
+                }
+
+                cb(null, memberPhoto);
             });
         });
     }
