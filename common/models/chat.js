@@ -6,6 +6,7 @@ module.exports = function (Chat) {
     var lodash = require('lodash');
     var common = require('../common-util');
     var filterPrivacy = require('../filter-privacy');
+    var likeTx;
 
     Chat.remoteMethod('getChatRoomList', {
         http: { verb: 'get' },
@@ -17,8 +18,18 @@ module.exports = function (Chat) {
         returns: { arg: 'result', type: 'object', root: true }
     });
 
+    Chat.remoteMethod('chatFromHome', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'likeMember', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
+
     Chat.getChatRoomList = getChatRoomList;
     Chat.getLatestChat = getLatestChat;
+    Chat.chatFromHome = chatFromHome;
 
     function getChatRoomList(limit, offset, options, cb) {
 
@@ -163,7 +174,7 @@ module.exports = function (Chat) {
                 if (error) {
                     return cb(error);
                 }
-                
+
                 callback(result);
             })
         }
@@ -250,4 +261,79 @@ module.exports = function (Chat) {
 
     }
 
+    function chatFromHome(likeMember, options, cb) {
+        var token = options.accessToken;
+        var currentUserId = token.userId;
+
+        var data = {
+            likeUser: currentUserId,
+            likeMember: likeMember
+        };
+
+        createLikeUser(data, cb);
+    }
+
+    function createLikeUser(data, cb) {
+        var Likelist = app.models.LikeList;
+
+        var like = {
+            likeUser: data.likeUser,
+            likeMember: data.likeMember,
+            createdAt: new Date(),
+            createdBy: data.likeUser,
+            updatedAt: new Date(),
+            updatedBy: data.likeUser
+        }
+
+        Likelist.beginTransaction({ isolationLevel: Likelist.Transaction.READ_COMMITTED }, function (err, tx) {
+            likeTx = tx;
+
+            Likelist.create(like, { transaction: likeTx }, function (error, result) {
+                if (error) {
+                    likeTx.rollback(function (err) {
+                        if (err) {
+                            return cb(err);
+                        }
+
+                        return cb(error);
+                    });
+                }
+
+                createLikeMember(data, cb);
+            });
+        });
+    }
+
+    function createLikeMember(data, cb) {
+        var Likelist = app.models.LikeList;
+
+        var like = {
+            likeUser: data.likeMember,
+            likeMember: data.likeUser,
+            createdAt: new Date(),
+            createdBy: data.likeUser,
+            updatedAt: new Date(),
+            updatedBy: data.likeUser
+        }
+
+        Likelist.create(like, { transaction: likeTx }, function (error, result) {
+            if (error) {
+                likeTx.rollback(function (err) {
+                    if (err) {
+                        return cb(err);
+                    }
+
+                    return cb(error);
+                });
+            }
+
+            likeTx.commit(function (err) {
+                if (err) {
+                    return cb(err);
+                }
+
+                cb(null, result);
+            });
+        });
+    }
 };
