@@ -6,7 +6,6 @@ module.exports = function (Chat) {
     var lodash = require('lodash');
     var common = require('../common-util');
     var filterPrivacy = require('../filter-privacy');
-    var likeTx;
 
     Chat.remoteMethod('getChatRoomList', {
         http: { verb: 'get' },
@@ -148,25 +147,6 @@ module.exports = function (Chat) {
 
         }
 
-
-        // Matchmember.getMatchList(limit, offset, options, function (error, result) {
-        //     if (error) {
-        //         return cb(error);
-        //     }
-        //     getHideList(function (hideList) {
-        //         lodash.remove(result, function (n) {
-        //             return hideList.indexOf(n.matchId) != -1;
-        //         });
-        //         var rearrangeResult = [];
-        //         result.forEach(function (item) {
-        //             rearrangeResult.push(arrangeStructure(item));
-        //         }, this);
-
-        //         getChatDetail(rearrangeResult);
-        //         // return cb(null, result);
-        //     });
-        // });
-
         function getHideList(callback) {
             var Chathide = app.models.ChatHide;
 
@@ -178,12 +158,6 @@ module.exports = function (Chat) {
                 callback(result);
             })
         }
-
-        // function arrangeStructure(item) {
-        //     var newItem = JSON.parse(JSON.stringify(item));
-        //     delete newItem['matchMember'];
-        //     return newItem;
-        // }
 
         function getChatDetail(chatRoomList) {
             common.asyncLoop(chatRoomList.length, function (loop) {
@@ -262,78 +236,138 @@ module.exports = function (Chat) {
     }
 
     function chatFromHome(likeMember, options, cb) {
+        createMatch(likeMember, options)
+            .then(function (result) {
+
+                resultChat(likeMember, result[0].matchId, cb)
+            })
+            .catch(function (error) {
+                cb(error);
+            });
+    }
+
+    async function createMatch(likeMember, options) {
         var token = options.accessToken;
         var currentUserId = token.userId;
 
-        var data = {
+        var like = [{
             likeUser: currentUserId,
-            likeMember: likeMember
+            likeMember: likeMember,
+            createdAt: new Date(),
+            createdBy: currentUserId,
+            updatedAt: new Date(),
+            updatedBy: currentUserId,
+        }, {
+            likeUser: likeMember,
+            likeMember: currentUserId,
+            createdAt: new Date(),
+            createdBy: currentUserId,
+            updatedAt: new Date(),
+            updatedBy: currentUserId
+        }];
+
+        var newMatches = {
+            title: 'chat',
+            createdAt: new Date(),
+            createdBy: currentUserId,
+            updatedAt: new Date(),
+            updatedBy: likeMember
         };
 
-        createLikeUser(data, cb);
-    }
+        return new Promise(async function (resolve, reject) {
+            try {
+                await app.dataSources.pmjakarta.transaction(async models => {
+                    const { LikeList, Matches, MatchMember } = models;
 
-    function createLikeUser(data, cb) {
-        var Likelist = app.models.LikeList;
+                    const createLike = await LikeList.create(like);
+                    const createMatch = await Matches.create(newMatches);
 
-        var like = {
-            likeUser: data.likeUser,
-            likeMember: data.likeMember,
-            createdAt: new Date(),
-            createdBy: data.likeUser,
-            updatedAt: new Date(),
-            updatedBy: data.likeUser
-        }
+                    const newMatchMember = [{
+                        matchId: createMatch.id,
+                        membersId: currentUserId,
+                        updateBy: currentUserId,
+                        updateDate: new Date()
+                    }, {
+                        matchId: createMatch.id,
+                        membersId: likeMember,
+                        updateBy: currentUserId,
+                        updateDate: new Date()
+                    }];
 
-        Likelist.beginTransaction({ isolationLevel: Likelist.Transaction.READ_COMMITTED }, function (err, tx) {
-            likeTx = tx;
+                    const createMatchMember = await MatchMember.create(newMatchMember);
 
-            Likelist.create(like, { transaction: likeTx }, function (error, result) {
-                if (error) {
-                    likeTx.rollback(function (err) {
-                        if (err) {
-                            return cb(err);
-                        }
-
-                        return cb(error);
-                    });
-                }
-
-                createLikeMember(data, cb);
-            });
+                    resolve(createMatchMember);
+                });
+                // resolve([
+                //     { matchId: 709 }
+                // ]);
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
-    function createLikeMember(data, cb) {
-        var Likelist = app.models.LikeList;
+    function resultChat(likeMember, matchId, cb) {
+        const Matchmember = app.models.MatchMember;
 
-        var like = {
-            likeUser: data.likeMember,
-            likeMember: data.likeUser,
-            createdAt: new Date(),
-            createdBy: data.likeUser,
-            updatedAt: new Date(),
-            updatedBy: data.likeUser
-        }
+        const filter = {
+            where: {
+                and: [
+                    { membersId: likeMember },
+                    { matchId: matchId }
+                ]
+            },
+            include: {
+                relation: 'members',
+                scope: {
+                    fields: [
+                        'id',
+                        'fullName',
+                        'gender',
+                        'about',
+                        'employeeType',
+                        'income',
+                        'address',
+                        'religion',
+                        'hobby',
+                        'race',
+                        'degree',
+                        'zodiac',
+                        'bday',
+                        'online',
+                        'alias',
+                        'updatedAt'
+                    ],
+                    include: [{
+                        relation: 'memberPhotos',
+                        scope: {
+                            fields: ['src']
+                        }
+                    }, {
+                        relation: 'memberImage',
+                        scope: {
+                            fields: ['src']
+                        }
+                    }]
+                }
+            }
+        };
 
-        Likelist.create(like, { transaction: likeTx }, function (error, result) {
+        Matchmember.findOne(filter, function (error, result) {
             if (error) {
-                likeTx.rollback(function (err) {
-                    if (err) {
-                        return cb(err);
-                    }
-
-                    return cb(error);
-                });
+                return cb(error);
             }
 
-            likeTx.commit(function (err) {
-                if (err) {
-                    return cb(err);
-                }
+            result = JSON.parse(JSON.stringify(result));
 
-                cb(null, result);
-            });
+            // Recreate data
+            var tempResult = {};
+            tempResult['isMatch'] = true;
+            tempResult['matchMember'] = result.members;
+            tempResult['matchMember']['chatDetail'] = [];
+            // tempResult['matchMember']['fullName'] = result.members.fullName.charAt(0) + result.members.alias;
+
+            cb(null, tempResult);
         });
     }
 };
