@@ -46,7 +46,7 @@ module.exports = function (Chat) {
         });
 
         function getMatchList(hideList) {
-            Matchmember.getMatchMemberIdList(userId, function (error, result) {
+            Matchmember.getMatchMemberIdList(userId, true, function (error, result) {
                 if (error) {
                     return cb(error);
                 }
@@ -284,11 +284,13 @@ module.exports = function (Chat) {
 
                     const newMatchMember = [{
                         matchId: createMatch.id,
+                        matchFromHome: 1,
                         membersId: currentUserId,
                         updateBy: currentUserId,
                         updateDate: new Date()
                     }, {
                         matchId: createMatch.id,
+                        matchFromHome: 1,
                         membersId: likeMember,
                         updateBy: currentUserId,
                         updateDate: new Date()
