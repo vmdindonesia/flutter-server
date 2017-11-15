@@ -33,7 +33,7 @@ module.exports = function (Matchmember) {
         var excludeBlockList = [];
 
         excludeBlock(function () {
-            getMatchMemberIdList(userId, function (error, result) {
+            getMatchMemberIdList(userId, false, function (error, result) {
                 if (error) {
                     cb(error);
                 }
@@ -151,14 +151,21 @@ module.exports = function (Matchmember) {
 
     }
 
-    function getMatchMemberIdList(userId, cb) {
+    function getMatchMemberIdList(userId, matchFromHome, cb) {
 
         var filter = {
             fields: ['matchId'],
             where: {
-                membersId: userId
+                and: [
+                    { membersId: userId }
+                ]
             }
         }
+
+        if (!matchFromHome) {
+            filter.where.and.push({ matchFromHome: false })
+        }
+
         Matchmember.find(filter, function (error, result) {
             if (error) {
                 cb(error);
@@ -201,7 +208,7 @@ module.exports = function (Matchmember) {
 
     function getMemberIdMatchList(userId, cb) {
 
-        getMatchMemberIdList(userId, function (error, result) {
+        getMatchMemberIdList(userId, false, function (error, result) {
             if (error) {
                 cb(error);
             }
