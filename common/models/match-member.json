@@ -106,6 +106,19 @@
         "nullable": "N"
       },
       "_selectable": false
+    },
+    "matchFromHome": {
+      "type": "boolean",
+      "required": true,
+      "default": false,
+      "mysql": {
+        "columnName": "match_from_home",
+        "dataType": "int",
+        "dataLength": null,
+        "dataPrecision": 4,
+        "dataScale": 0,
+        "nullable": "N"
+      }
     }
   },
   "validations": [],
