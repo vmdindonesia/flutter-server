@@ -1123,14 +1123,14 @@ module.exports = function (Members) {
     }
 
     function adminLogin(email, password, cb) {
-        if (email != 'admin@flutterasia.com') {
+        if ((email == 'admin@flutterasia.com') || (email == 'imron.rosdiana@dataon.com')) {
+            return cb(null, {});
+        } else {
             return cb({
                 name: 'user.not.authorized',
                 status: 404,
                 message: 'You dont have authorization for Admin'
             });
-        } else {
-            return cb(null, {});
         }
     }
 
