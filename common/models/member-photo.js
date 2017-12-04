@@ -57,7 +57,10 @@ module.exports = function (Memberphoto) {
         var filter = {
             fields: ['id', 'membersId', 'src', 'srcTmp'],
             where: {
-                srcTmp: { neq: null }
+                and: [
+                    { srcTmp: { neq: null } },
+                    { srcTmp: { nlike: 'init_first' } }
+                ]
             },
             include: {
                 relation: 'members',
