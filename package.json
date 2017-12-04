@@ -17,10 +17,10 @@
   "dependencies": {
     "@mean-expert/boot-script": "^1.0.0",
     "@mean-expert/fireloop": "1.0.0-beta.2.7",
-    "@mean-expert/loopback-component-realtime": "1.0.0-rc.9.7",
+    "@mean-expert/loopback-component-realtime": "1.0.0-rc.9.8",
     "@mean-expert/loopback-sdk-builder": "2.1.1",
-    "@mean-expert/loopback-stats-mixin": "1.2.2",
-    "@types/node": "8.0.51",
+    "@mean-expert/loopback-stats-mixin": "1.2.2-2",
+    "@types/node": "8.0.53",
     "async": "2.6.0",
     "body-parser": "1.18.2",
     "compression": "1.7.1",
@@ -46,10 +46,10 @@
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
-    "eslint": "4.10.0",
+    "eslint": "4.11.0",
     "eslint-config-loopback": "^8.0.0",
     "jshint": "^2.9.4",
-    "nsp": "2.8.1"
+    "nsp": "3.1.0"
   },
   "repository": {
     "type": "git",
