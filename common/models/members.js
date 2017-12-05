@@ -1138,61 +1138,52 @@ module.exports = function (Members) {
         var token = options.accessToken;
         var userId = token.userId;
 
-        // 1 is ADMIN ID,
-        if (userId != 1) {
-            return cb({
-                name: 'user.not.authorized',
-                status: 404,
-                message: 'You dont have authorization for Admin'
-            });
-        } else {
-            var filter = {
-                fields: [
-                    'id',
-                    'fullName',
-                    'email',
-                    'phone',
-                    'gender',
-                    'bday',
-                    'updatedAt'
-                ],
-                include: [
-                    {
-                        relation: 'memberPhotos',
-                        scope: {
-                            fields: [
-                                'src'
-                            ]
-                        }
+        var filter = {
+            fields: [
+                'id',
+                'fullName',
+                'email',
+                'phone',
+                'gender',
+                'bday',
+                'updatedAt'
+            ],
+            include: [
+                {
+                    relation: 'memberPhotos',
+                    scope: {
+                        fields: [
+                            'src'
+                        ]
                     }
-                ],
-                limit: limit,
-                skip: offset,
-                order: 'createdAt DESC',
-            }
-            return Members.find(filter, function (error, result) {
-                if (error) {
-                    return cb(error);
                 }
-
-                var newResult = [];
-                result.forEach(function (item) {
-                    var temp = JSON.parse(JSON.stringify(item));
-                    var newItem = {
-                        memberId: temp.id,
-                        fullName: temp.fullName,
-                        avatarImg: (temp.memberPhotos ? temp.memberPhotos.src : null),
-                        email: temp.email,
-                        phone: temp.phone,
-                        gender: temp.gender,
-                        bday: temp.bday,
-                        updatedAt: temp.updatedAt
-                    }
-                    newResult.push(newItem);
-                }, this);
-                return cb(null, newResult);
-            });
+            ],
+            limit: limit,
+            skip: offset,
+            order: 'createdAt DESC',
         }
+        return Members.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            var newResult = [];
+            result.forEach(function (item) {
+                var temp = JSON.parse(JSON.stringify(item));
+                var newItem = {
+                    memberId: temp.id,
+                    fullName: temp.fullName,
+                    avatarImg: (temp.memberPhotos ? temp.memberPhotos.src : null),
+                    email: temp.email,
+                    phone: temp.phone,
+                    gender: temp.gender,
+                    bday: temp.bday,
+                    updatedAt: temp.updatedAt
+                }
+                newResult.push(newItem);
+            }, this);
+            return cb(null, newResult);
+        });
 
     }
 
