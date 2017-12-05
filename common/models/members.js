@@ -1146,6 +1146,7 @@ module.exports = function (Members) {
                 'phone',
                 'gender',
                 'bday',
+                'createdAt',
                 'updatedAt'
             ],
             include: [
@@ -1178,6 +1179,7 @@ module.exports = function (Members) {
                     phone: temp.phone,
                     gender: temp.gender,
                     bday: temp.bday,
+                    createdAt: temp.createdAt,
                     updatedAt: temp.updatedAt
                 }
                 newResult.push(newItem);
