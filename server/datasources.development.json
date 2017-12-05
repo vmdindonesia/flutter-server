@@ -17,7 +17,7 @@
     "name": "storage",
     "connector": "loopback-component-storage",
     "provider": "filesystem",
-    "root": "./server"
+    "root": "/var/loopback/storage/pmjakarta"
   },
   "pmjemail": {
     "name": "pmjemail",
