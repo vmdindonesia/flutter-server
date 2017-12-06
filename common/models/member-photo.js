@@ -3,16 +3,16 @@
 module.exports = function (Memberphoto) {
     var app = require('../../server/server');
 
-    Memberphoto.observe('before save', function (ctx, next) {
-        if (ctx.instance == undefined) {
-            return next();
-        }
+    // Memberphoto.observe('before save', function (ctx, next) {
+    //     if (ctx.instance == undefined) {
+    //         return next();
+    //     }
 
-        var tmp = ctx.instance.src;
-        ctx.instance.src = null;
-        ctx.instance.srcTmp = tmp;
-        next();
-    });
+    //     var tmp = ctx.instance.src;
+    //     ctx.instance.src = null;
+    //     ctx.instance.srcTmp = tmp;
+    //     next();
+    // });
 
     // REMOTE METHOD //
     Memberphoto.remoteMethod('getList', {
