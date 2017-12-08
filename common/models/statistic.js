@@ -62,7 +62,7 @@ module.exports = function (Statistic) {
 
         var sql = "SELECT COUNT(*) AS 'countMember', gender, date(created_at) as registerDate FROM Members " +
             "WHERE deleted_at IS NULL AND(created_at " +
-            "BETWEEN ? AND ?) GROUP BY registerDate, gender;";
+            "BETWEEN ? AND ?) AND gender IS NOT NULL GROUP BY registerDate, gender;";
 
         ds.connector.execute(sql, [startDate, endDate], function (error, result) {
             if (error) {
