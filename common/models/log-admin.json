@@ -1,0 +1,44 @@
+{
+  "name": "LogAdmin",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "page": {
+      "type": "string",
+      "id": false,
+      "required": true,
+      "mysql": {
+        "columnName": "page",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "nullable": "N"
+      }
+    },
+    "activity": {
+      "type": "string",
+      "required": true,
+      "mysql": {
+        "columnName": "activity",
+        "dataType": "varchar",
+        "dataLength": 255,
+        "nullable": "N"
+      }
+    },
+    "logDate": {
+      "type": "date",
+      "required": true,
+      "mysql": {
+        "columnName": "log_date",
+        "dataType": "datetime",
+        "nullable": "N"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
