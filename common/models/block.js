@@ -3,6 +3,13 @@
 module.exports = function (Block) {
     var common = require('../common-util');
     var filterPrivacy = require('../filter-privacy');
+    var LogAdmin = require('../log-admin');
+
+    Block.afterRemote('getAdminBlockList', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Blocked member', 'List blocked members');
+
+        next();
+    });
 
     Block.remoteMethod('addBlock', {
         http: { verb: 'post' },

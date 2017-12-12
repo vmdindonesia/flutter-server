@@ -3,6 +3,7 @@
 module.exports = function (Adminchatmember) {
 
     var app = require('../../server/server');
+    var LogAdmin = require('../log-admin');
 
     Adminchatmember.remoteMethod('getChatRoomId', {
         http: { verb: 'get' },
@@ -11,7 +12,13 @@ module.exports = function (Adminchatmember) {
             { arg: 'options', type: 'object', http: 'optionsFromRequest' }
         ],
         returns: { arg: 'result', type: 'object', root: true }
-    })
+    });
+
+    Adminchatmember.afterRemoteError('getChatRoomId', function (ctx, next) {
+        LogAdmin.insertLog(ctx, 'Member', 'Create new chat');
+
+        next();
+    });
 
     Adminchatmember.checkRoomMember = checkRoomMember;
     Adminchatmember.addRoomMember = addRoomMember;
@@ -142,9 +149,7 @@ module.exports = function (Adminchatmember) {
                     message: 'You dont have chat room for user  : ' + memberId
                 });
             }
-
-
-        })
+        });
     }
 
 };

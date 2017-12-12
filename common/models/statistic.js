@@ -4,8 +4,15 @@ module.exports = function (Statistic) {
     var app = require('../../server/server');
     var moment = require('moment');
     var lodash = require('lodash');
+    var LogAdmin = require('../log-admin');
 
     // LIST OF REMOTE METHOD ============================================
+    Statistic.afterRemote('getNewRegisterNumber', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Dashboard', 'Show statistic member');
+
+        next();
+    });
+
     Statistic.remoteMethod('getNewRegisterNumber', {
         http: { verb: 'get' },
         accepts: [

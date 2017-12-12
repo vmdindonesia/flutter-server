@@ -10,6 +10,7 @@ module.exports = function (Members) {
 
     var app = require('../../server/server');
     var common = require('../common-util.js');
+    var LogAdmin = require('../log-admin');
 
     // BEGIN BEFORE REMOTE ==================================================================
 
@@ -22,30 +23,6 @@ module.exports = function (Members) {
         context.args.data.createdAt = dateNow;
         next();
     });
-
-    // Members.afterRemote('register', function (context, remoteMethodOutput, next) {
-    //     var Role = Members.app.models.Role;
-    //     var RoleMapping = Members.app.models.RoleMapping;
-
-    //     Role.findOne({
-    //         where: { name: 'admin' }
-    //     }, function (err, role) {
-    //         if (err) {
-    //             cb(err);
-    //             return;
-    //         }
-
-    //         RoleMapping.create({
-    //             principalType: RoleMapping.USER,
-    //             principalId: remoteMethodOutput.id,
-    //             roleId: role.id
-    //         }, function (err, roleMapping) {
-    //             if (err) next(err);
-
-    //             next();
-    //         });
-    //     });
-    // });
 
     Members.afterRemote('register', function (context, userInstance, next) {
         //init verify status
@@ -75,42 +52,6 @@ module.exports = function (Members) {
         };
         sendNotification(message, 'MDQzZTAwMmEtODczMi00M2Q4LWI1YjMtZDEzZmM2MzI2NzAy');
         next();
-
-        // // Send mail
-        // var mailFrom = Members.app.dataSources.pmjemail.settings.transports[0].auth.user;
-
-        // // Send verify email
-        // var url = config.remoteHost + '/api/Members/confirm?uid=' + userInstance.id + '&redirect=/verified';
-        // var options = {
-        //     type: 'email',
-        //     to: userInstance.email,
-        //     from: mailFrom,
-        //     subject: 'Thanks for registering.',
-        //     template: path.resolve(__dirname, '../views/verify.ejs'),
-        //     user: Members,
-        //     verifyHref: url,
-        //     dateNow: moment().format('DD/MM/YYYY'),
-        //     fullName: userInstance.fullName
-        // };
-        // userInstance.verify(options, function (err, response, nexts) {
-        //     console.log(err, 'Error send email');
-        //     if (err) {
-        //         return next(err);
-        //     }
-
-        //     Members.updateById(userInstance.id, {
-        //         emailSent: 1
-        //     }, function (error, result) {
-        //         if (error) {
-        //             return next(err);
-        //         }
-
-        //         next();
-        //     });
-
-        //     console.log('> verification email sent:', response);
-        //     // next();
-        // });
     });
 
     Members.afterRemote('login', function (ctx, modelInstance, next) {
@@ -222,6 +163,51 @@ module.exports = function (Members) {
         });
     });
 
+    Members.afterRemote('adminLogin', function (ctx, modelInstance, next) {
+        const LogAdmin = app.models.LogAdmin;
+
+        if (ctx.args.email == 'admin@flutterasia.com') {
+            const data = {
+                page: 'Login',
+                activity: 'Login',
+                logDate: new Date()
+            };
+
+            LogAdmin.create(data, function (error, result) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log(result);
+                }
+            });
+        }
+
+        next();
+    });
+
+    Members.afterRemote('updateMember', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Member', 'Update member');
+
+        next();
+    });
+
+    Members.afterRemote('deleteAccount', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Member', 'Delete member');
+
+        next();
+    });
+
+    Members.afterRemote('adminApproveEmail', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Verification email', 'Approve email');
+
+        next();
+    })
+
+    Members.beforeRemote('logout', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Menu', 'Logout');
+
+        next();
+    });
     // END AFTER REMOTE =====================================================================
 
     // BEGIN REMOTE METHOD ==================================================================
@@ -1340,7 +1326,7 @@ module.exports = function (Members) {
 
     function updateMember(params, cb) {
         let data = params.data;
-        console.log(params.dataid)
+
         Members.updateAll({
             id: params.dataid
         }, {

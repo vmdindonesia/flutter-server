@@ -5,6 +5,19 @@ module.exports = function (Feedbackmemberanswer) {
     var app = require('../../server/server');
     var common = require('../common-util');
     var lodash = require('lodash');
+    var LogAdmin = require('../log-admin');
+
+    Feedbackmemberanswer.afterRemote('getSummary', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Feedback', 'Show feedback graphic');
+
+        next();
+    });
+
+    Feedbackmemberanswer.afterRemote('getComment', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Feedback', 'List feedbacks');
+
+        next();
+    })
 
     Feedbackmemberanswer.remoteMethod('addAnswer', {
         http: { verb: 'post' },

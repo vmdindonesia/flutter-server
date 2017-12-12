@@ -1,7 +1,14 @@
 'use strict';
 
 module.exports = function (Reportmembers) {
+    const LogAdmin = require('../log-admin');
+
     // BEGIN REMOTE METHOD ====================================================================
+
+    Reportmembers.afterRemote('getReportList', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Report', 'List member reports');
+        next();
+    });
 
     Reportmembers.remoteMethod('getReportList', {
         http: { verb: 'get' },

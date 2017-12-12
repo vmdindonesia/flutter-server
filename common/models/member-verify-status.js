@@ -5,6 +5,7 @@ module.exports = function (Memberverifystatus) {
     var path = require('path');
     var moment = require('moment');
     var config = require('../../server/config.json');
+    var LogAdmin = require('../log-admin');
 
     Memberverifystatus.beforeRemote('create', function (context, user, next) {
         var dateNow = new Date();
@@ -12,27 +13,6 @@ module.exports = function (Memberverifystatus) {
         context.args.data.updateAt = dateNow;
         next();
     });
-
-    // Memberverifystatus.afterRemote('changeVerifyStatus', function (context, user, next) {
-    //     var Members = app.models.Members;
-    //     console.log(user);
-
-    //     Members.findById(user.result.userId, function (error, result) {
-    //         if (error) {
-    //             console.log('ERROR : ' + error);
-    //             next();
-    //         } else {
-    //             console.log('MEMBERS : ' + JSON.stringify(result));
-    //             var message = {
-    //                 app_id: '8267bba1-3ac6-421a-93fb-19e06ff97c79',
-    //                 contents: { en: result.fullName + ' verify status changed' },
-    //                 included_segments: ["All"]
-    //             };
-    //             sendNotification(message);
-    //             next();
-    //         }
-    //     })
-    // });
 
     Memberverifystatus.afterRemote('getVerifyStatusByUserId', function (context, user, next) {
         var Memberphoto = app.models.MemberPhoto;
@@ -51,6 +31,24 @@ module.exports = function (Memberverifystatus) {
                 next();
             }
         })
+    });
+
+    Memberverifystatus.afterRemote('adminApproveVerify', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Member', 'Admin approve document');
+
+        next();
+    });
+
+    Memberverifystatus.afterRemote('adminApproveVerify', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Member', 'Admin reject document');
+
+        next();
+    });
+
+    Memberverifystatus.afterRemote('getVerifyStatusByUserId', function (ctx, modelInstance, next) {
+        LogAdmin.insertLog(ctx, 'Feed', 'Show detail feed');
+
+        next();
     });
 
     Memberverifystatus.remoteMethod('isUserNeedVerify', {
@@ -147,23 +145,7 @@ module.exports = function (Memberverifystatus) {
         Memberverifystatus.find(filterMemberVerifyStatus, function (error, result) {
             if (result.length > 0) {
                 var verifyData = result[0];
-                // Members.findById(userId, function (error, result) {
-                //     if (error) {
-                //         cb(error);
-                //     } else if (result) {
-                //         // var email = result.emailVerified;
-                //         // if (email == null) {
-                //         //     email = 0;
-                //         // }
-                //         // verifyData['email'] = email;
-                //     } else {
-                //         var error = {
-                //             status: 404,
-                //             message: 'Member Id not Found : ' + userId,
-                //         }
-                //         cb(error);
-                //     }
-                // })
+                
                 cb(null, 'OK', verifyData, {});
             } else {
                 var error = {
@@ -190,20 +172,7 @@ module.exports = function (Memberverifystatus) {
                 userId: userId
             }
         }
-        // var query = 'SELECT * FROM ( ' +
-        //     ' SELECT A.user_id, \'phone\' AS \'verify_key\', A.phone AS \'verify_value\' ' +
-        //     ' FROM member_verify_status A UNION ' +
-        //     ' SELECT A.user_id, \'ktp\' AS \'verify_key\', A.ktp AS \'verify_value\' ' +
-        //     ' FROM member_verify_status A UNION ' +
-        //     ' SELECT A.user_id, \'sim\' AS \'verify_key\', A.sim AS \'verify_value\' ' +
-        //     ' FROM member_verify_status A UNION ' +
-        //     ' SELECT A.user_id, \'school_certificate\' AS \'verify_key\', A.school_certificate AS \'verify_value\' ' +
-        //     ' FROM member_verify_status A UNION ' +
-        //     ' SELECT A.user_id, \'passport\' AS \'verify_key\', A.passport AS \'verify_value\' ' +
-        //     ' FROM member_verify_status A UNION ' +
-        //     ' SELECT A.user_id, \'business_card\' AS \'verify_key\', A.business_card AS \'verify_value\' ' +
-        //     ' FROM member_verify_status A ' +
-        //     ' ) B WHERE user_id = ? ';
+        
         var query = ' SELECT countVerify(?) AS \'verify\' ';
         var params = [userId];
 
@@ -215,27 +184,6 @@ module.exports = function (Memberverifystatus) {
                 var score = result[0].verify;
                 return cb(null, 'OK', score);
             }
-            // if (result.length > 0) {
-            //     var score = 0;
-            //     for (var i = 0; i < result.length; i++) {
-            //         var verifyKey = result[i].verify_key;
-            //         var verifyValue = result[i].verify_value;
-            //         if (verifyValue == 1) {
-            //             score += verifyRate[verifyKey];
-            //         }
-            //     }
-            //     if (score > 100) {
-            //         score = 100;
-            //     }
-            //     cb(null, 'OK', score, {});
-            // } else {
-            //     var error = {
-            //         code: 'member.id.not.found',
-            //         message: 'Member Id not Found : ',
-            //         value: userId
-            //     }
-            //     cb(null, 'FAIL', {}, error);
-            // }
 
         });
 
@@ -267,23 +215,6 @@ module.exports = function (Memberverifystatus) {
             });
 
         });
-        // Memberverifystatus.find(filter, function (error, result) {
-        //     if (error) {
-        //         cb(null, 'FAIL', undefined, error);
-        //     } else {
-        //         var someData = result[0];
-        //         someData[key] = value;
-        //         someData['updateAt'] = new Date();
-        //         Memberverifystatus.upsert(someData, function (error, result) {
-        //             if (error) {
-        //                 cb(null, 'FAIL', undefined, error);
-        //             } else {
-
-        //                 cb(null, 'OK', result);
-        //             }
-        //         });
-        //     }
-        // });
     }
 
     var sendNotification = function (data) {
