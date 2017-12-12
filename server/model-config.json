@@ -305,5 +305,9 @@
   "AdminVerify": {
     "dataSource": "pmjakarta",
     "public": true
+  },
+  "LogAdmin": {
+    "dataSource": "pmjakarta",
+    "public": true
   }
 }
