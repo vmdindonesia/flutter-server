@@ -238,7 +238,6 @@ module.exports = function (Chat) {
     function chatFromHome(likeMember, options, cb) {
         createMatch(likeMember, options)
             .then(function (result) {
-
                 resultChat(likeMember, result[0].matchId, cb)
             })
             .catch(function (error) {
@@ -366,6 +365,7 @@ module.exports = function (Chat) {
             var tempResult = {};
             tempResult['isMatch'] = true;
             tempResult['matchMember'] = result.members;
+            tempResult['matchMember']['matchId'] = matchId;
             tempResult['matchMember']['chatDetail'] = [];
             // tempResult['matchMember']['fullName'] = result.members.fullName.charAt(0) + result.members.alias;
 
