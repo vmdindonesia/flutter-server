@@ -236,15 +236,13 @@ module.exports = function (Chat) {
     }
 
     function chatFromHome(likeMember, options, cb) {
-        // createMatch(likeMember, options)
-        //     .then(function (result) {
-        //         resultChat(likeMember, result[0].matchId, cb)
-        //     })
-        //     .catch(function (error) {
-        //         cb(error);
-        //     });
-
-        resultChat(likeMember, 755, cb)
+        createMatch(likeMember, options)
+            .then(function (result) {
+                resultChat(likeMember, result[0].matchId, cb)
+            })
+            .catch(function (error) {
+                cb(error);
+            });
     }
 
     async function createMatch(likeMember, options) {
