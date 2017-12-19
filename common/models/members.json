@@ -948,6 +948,13 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "adminApproveEmail"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "getEveryOne"
     }
   ],
   "methods": {}

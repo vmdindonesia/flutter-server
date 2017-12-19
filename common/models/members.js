@@ -9,8 +9,10 @@ var lodash = require('lodash');
 module.exports = function (Members) {
 
     var app = require('../../server/server');
-    var common = require('../common-util.js');
+    var common = require('../common-util');
     var LogAdmin = require('../log-admin');
+    const async = require('async');
+    const filterPrivacy = require('../filter-privacy');
 
     // BEGIN BEFORE REMOTE ==================================================================
 
@@ -387,7 +389,17 @@ module.exports = function (Members) {
             { arg: 'options', type: 'object', http: 'optionsFromRequest' },
         ],
         returns: { arg: 'result', type: 'object', root: true }
-    })
+    });
+
+    Members.remoteMethod('getEveryOne', {
+        http: { verb: 'get' },
+        accepts: [
+            { arg: 'limit', type: 'number', required: true },
+            { arg: 'offset', type: 'number', required: true },
+            { arg: 'options', type: 'object', http: 'optionsFromRequest' }
+        ],
+        returns: { arg: 'result', type: 'object', root: true }
+    });
 
     // END REMOTE METHOD ====================================================================
 
@@ -414,6 +426,7 @@ module.exports = function (Members) {
     Members.updateMember = updateMember;
     Members.getPendingEmail = getPendingEmail;
     Members.adminApproveEmail = adminApproveEmail;
+    Members.getEveryOne = getEveryOne;
 
     // END LIST OF FUNCTION =================================================================
 
@@ -1389,5 +1402,204 @@ module.exports = function (Members) {
                 cb(null, response);
             });
         });
+    }
+
+    function getEveryOne(limit, offset, options, cb) {
+        var token = options.accessToken;
+        var userId = token.userId;
+
+        var filter = {
+            where: {
+                id: { neq: userId }
+            },
+            fields: [
+                'id',
+                'fullName',
+                'email',
+                'address',
+                'phone',
+                'gender',
+                'employeeType',
+                'alias',
+                'bday',
+                'about',
+                'degree',
+                'income',
+                'online',
+                'race',
+                'religion',
+                'zodiac',
+                'hobby',
+                'createdAt',
+                'updatedAt'
+            ],
+            include: [
+                {
+                    relation: 'memberPhotos',
+                    scope: {
+                        fields: ['src']
+                    }
+                },
+                {
+                    relation: 'memberImage',
+                    scope: {
+                        fields: ['src']
+                    }
+                }
+            ],
+            limit: limit,
+            skip: offset,
+            order: 'createdAt DESC',
+        };
+
+        Members.find(filter, function (error, result) {
+            if (error) {
+                return cb(error);
+            }
+
+            var newResult = [];
+
+            async.eachOfSeries(result, function (value, key, next) {
+
+                getDislikeStatus(userId, value.id, function (error, result) {
+                    if (error) {
+                        next();
+                    } else {
+                        value['isDisliked'] = result;
+
+                        // Get Like status
+                        getLikeStatus(userId, value.id, function (error, result) {
+                            if (error) {
+                                next();
+                            } else {
+                                value['isLiked'] = result;
+
+                                // Get match status
+                                getMatchStatus(userId, value.id, function (error, result) {
+                                    if (error) {
+                                        next()
+                                    } else {
+                                        value['isMatch'] = result;
+                                        value['age'] = common.calculateAge(value['bday']);
+
+                                        getCurrentUserVerifyScore(value.id, function (error, result) {
+                                            if (error) {
+                                                next();
+                                            } else {
+                                                value['verifyScore'] = result;
+
+                                                newResult.push(value);
+
+                                                next();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }, function () {
+                console.log('Done each members');
+
+                filterPrivacy.apply(userId, JSON.parse(JSON.stringify(newResult)), function (error, result) {
+                    if (error) {
+                        cb(error);
+                    }
+                    cb(null, result);
+                });
+            });
+        });
+    }
+
+    function getDislikeStatus(userId, targetId, cb) {
+        const DislikeList = app.models.DislikeList;
+
+        const filter = {
+            where: {
+                and: [
+                    { dislikeUser: userId },
+                    { dislikeMamber: targetId }
+                ]
+            }
+        };
+
+        DislikeList.findOne(filter, function (error, result) {
+            if (error) {
+                cb(error);
+            } else {
+                if (result) {
+                    cb(null, true);
+                } else {
+                    cb(null, false);
+                }
+            }
+        });
+    }
+
+    function getLikeStatus(userId, targetId, cb) {
+        const LikeList = app.models.LikeList;
+
+        const filter = {
+            where: {
+                and: [
+                    { likeUser: userId },
+                    { likeMember: targetId }
+                ]
+            }
+        }
+
+        LikeList.findOne(filter, function (error, result) {
+            if (error) {
+                cb(error);
+            } else {
+                if (result) {
+                    cb(null, true);
+                } else {
+                    cb(null, false);
+                }
+            }
+        })
+    }
+
+    function getMatchStatus(userId, targetId, cb) {
+        var query = new String();
+        query = query.concat('SELECT match_id, COUNT(*) AS \'count\' FROM Match_member ')
+            .concat(' WHERE members_id = ? OR members_id = ? ')
+            .concat(' GROUP BY match_id HAVING count > 1 ');
+
+        var params = [userId, targetId];
+
+        Members.dataSource.connector.execute(query, params, function (error, result) {
+            if (error) {
+                cb(error);
+            } else {
+                if (result.length > 0) {
+                    cb(null, true);
+                } else {
+                    cb(null, false);
+                }
+            }
+        });
+    }
+
+    function getCurrentUserVerifyScore(userId, cb) {
+        var Memberverifystatus = app.models.MemberVerifyStatus;
+
+        Memberverifystatus.getVerifyScoreByUserId(userId, function (error, status, result) {
+            if (error) {
+                cb(error);
+            } else {
+                var status = status;
+                var score = result;
+
+                if (status == 'OK') {
+                    cb(null, score);
+                } else {
+                    cb(null, 0);
+                }
+            }
+        });
+
     }
 };
