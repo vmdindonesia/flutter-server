@@ -236,13 +236,15 @@ module.exports = function (Chat) {
     }
 
     function chatFromHome(likeMember, options, cb) {
-        createMatch(likeMember, options)
-            .then(function (result) {
-                resultChat(likeMember, result[0].matchId, cb)
-            })
-            .catch(function (error) {
-                cb(error);
-            });
+        // createMatch(likeMember, options)
+        //     .then(function (result) {
+        //         resultChat(likeMember, result[0].matchId, cb)
+        //     })
+        //     .catch(function (error) {
+        //         cb(error);
+        //     });
+
+        resultChat(likeMember, 755, cb)
     }
 
     async function createMatch(likeMember, options) {
@@ -361,15 +363,30 @@ module.exports = function (Chat) {
 
             result = JSON.parse(JSON.stringify(result));
 
+            // Apply filter privacy
+            var newList = [];
+            newList.push(result.members);
+
             // Recreate data
             var tempResult = {};
             tempResult['isMatch'] = true;
-            tempResult['matchMember'] = result.members;
-            tempResult['matchMember']['matchId'] = matchId;
-            tempResult['matchMember']['chatDetail'] = [];
-            // tempResult['matchMember']['fullName'] = result.members.fullName.charAt(0) + result.members.alias;
 
-            cb(null, tempResult);
+            filterPrivacy.apply(result.members.id, newList, function (err, res) {
+                if (error) {
+                    console.log(err);
+
+                    tempResult['matchMember'] = result.members;
+                    tempResult['matchMember']['matchId'] = matchId;
+                    tempResult['matchMember']['chatDetail'] = [];
+                } else {
+                    tempResult['matchMember'] = res[0];
+                    tempResult['matchMember']['matchId'] = matchId;
+                    tempResult['matchMember']['chatDetail'] = [];
+                }
+
+                cb(null, tempResult);
+            });
+
         });
     }
 };
